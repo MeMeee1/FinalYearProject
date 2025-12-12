@@ -2,14 +2,15 @@ import express from "express";
 import path from "path";
 
 import { ENV } from "./config/env.js";
+import { connectDB } from "./config/db.js";
 
-
+import {clerkMiddleware} from "@clerk/express";
 const app = express();
 
 const __dirname = path.resolve();
 
 app.use(express.json());
-
+app.use(clerkMiddleware());
 
 
 app.get("/api/health", (req, res) => {
@@ -26,7 +27,7 @@ if (ENV.NODE_ENV === "production") {
 }
 
 const startServer = async () => {
- 
+    await connectDB();
   app.listen(ENV.PORT, () => {
     console.log("Server is up and running");
   });
