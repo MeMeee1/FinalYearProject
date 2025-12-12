@@ -6,7 +6,11 @@
     "node": ">=20.0.0"
   },
   "scripts": {
+<<<<<<< HEAD
     "build":"npm install --prefix backend && npm install --prefix admin && npm run build --prefix admin",
+=======
+    "build": "npm install --prefix backend && npm install --prefix admin && cd admin && npm run build",
+>>>>>>> 4ac9fad05685e10489a5c4cfc84663bc0297bfb9
     "start":"npm run start --prefix backend"
   },
   "repository": {
