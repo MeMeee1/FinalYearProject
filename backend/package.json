@@ -26,5 +26,8 @@
     "pg-hstore": "^2.3.4",
     "postgresql": "^0.0.1",
     "sequelize": "^6.37.7"
+  },
+  "devDependencies": {
+    "ts-migrate": "^0.1.35"
   }
 }
