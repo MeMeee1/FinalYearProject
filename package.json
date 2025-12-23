@@ -6,11 +6,9 @@
     "node": ">=20.0.0"
   },
   "scripts": {
-    "build": "npm ci --prefix nitrobackend/mulit_vendor_ecommerce && npm ci --prefix admin && npm run build --prefix admin && npm run nitro:build",
-    "start": "npm run nitro:start",
-    "nitro:build": "cd nitrobackend/mulit_vendor_ecommerce && npx nitro build",
-    "nitro:start": "cd nitrobackend/mulit_vendor_ecommerce && node .output/server/index.mjs"
-  },
+  "build": "npm ci --prefix nitrobackend/mulit_vendor_ecommerce && npm run nitro:build && npm ci --prefix admin && npm run build --prefix admin",
+  "nitro:build": "cd nitrobackend/mulit_vendor_ecommerce && npm install && npx nitro build"
+},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/MeMeee1/FinalYearProject.git"
