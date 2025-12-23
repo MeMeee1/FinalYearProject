@@ -5,11 +5,10 @@ export default defineNitroConfig({
   compatibilityDate: "latest",
   srcDir: "server",
   imports: false,
-   experimental: {
+  experimental: {
     database: true
   },
   database: {
-    
     default: {
       connector: 'postgresql',
       options: {
