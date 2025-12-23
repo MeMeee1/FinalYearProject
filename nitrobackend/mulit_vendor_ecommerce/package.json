@@ -12,6 +12,7 @@
     "nitropack": "^2.12.4"
   },
   "dependencies": {
+    "expoecommerce_finalproject": "file:../..",
     "patch-package": "^8.0.1"
   }
 }
