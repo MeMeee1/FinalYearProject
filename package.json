@@ -23,5 +23,8 @@
   "description": "",
   "dependencies": {
     "@clerk/clerk-expo": "^2.19.11"
+  },
+  "devDependencies": {
+    "nitropack": "^2.12.9"
   }
 }
