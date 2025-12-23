@@ -7,9 +7,10 @@
     "preview": "node .output/server/index.mjs"
   },
   "devDependencies": {
+    "h3": "^1.15.4",
     "nitropack": "^2.12.4"
   },
   "dependencies": {
-    "h3": "^1.15.4"
+    "patch-package": "^8.0.1"
   }
 }
