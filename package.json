@@ -6,8 +6,10 @@
     "node": ">=20.0.0"
   },
   "scripts": {
-    "build": "npm install --prefix nitrobackend/mulit_vendor_ecommerce && npm install --prefix admin && npm run build --prefix admin",
-    "start": "npm run build --prefix nitrobackend/mulit_vendor_ecommerce"
+    "build": "npm ci --prefix nitrobackend/mulit_vendor_ecommerce && npm ci --prefix admin && npm run build --prefix admin && npm run nitro:build",
+    "start": "npm run nitro:start",
+    "nitro:build": "cd nitrobackend/mulit_vendor_ecommerce && npx nitro build",
+    "nitro:start": "cd nitrobackend/mulit_vendor_ecommerce && node .output/server/index.mjs"
   },
   "repository": {
     "type": "git",
@@ -23,8 +25,5 @@
   "description": "",
   "dependencies": {
     "@clerk/clerk-expo": "^2.19.11"
-  },
-  "devDependencies": {
-    "nitropack": "^2.12.9"
   }
 }
