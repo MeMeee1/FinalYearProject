@@ -7,7 +7,7 @@
   },
   "scripts": {
     "build": "npm ci --prefix nitrobackend/mulit_vendor_ecommerce && npm run nitro:build && npm ci --prefix admin && npm run build --prefix admin",
-    "nitro:build": "cd nitrobackend/mulit_vendor_ecommerce && rm -rf .output .nitro && npx nitro build"
+    "nitro:build": "cd nitrobackend/mulit_vendor_ecommerce && npx nitro build"
   },
   "repository": {
     "type": "git",
