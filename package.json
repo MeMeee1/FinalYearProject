@@ -6,7 +6,7 @@
     "node": ">=20.0.0"
   },
   "scripts": {
-    "build": "npm install --include=dev --prefix nitrobackend/mulit_vendor_ecommerce && npm install --prefix admin && npm run build --prefix admin && npm run build --prefix nitrobackend/mulit_vendor_ecommerce",
+    "build": "npm install --include=dev --prefix nitrobackend/mulit_vendor_ecommerce && npm install --prefix admin && npm run build --prefix admin  && npx prisma migrate deploy &&  npm run build --prefix nitrobackend/mulit_vendor_ecommerce",
     "start": "npm run preview --prefix nitrobackend/mulit_vendor_ecommerce",
     "dev": "npm run dev --prefix nitrobackend/mulit_vendor_ecommerce"
   },
