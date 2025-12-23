@@ -1,0 +1,67 @@
+.notfound-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #f06, #f79);
+  color: white;
+  font-family: 'Arial', sans-serif;
+  overflow: hidden;
+}
+
+.notfound-title {
+  font-size: 10rem;
+  margin: 0;
+  animation: bounce 1.5s infinite;
+}
+
+.notfound-text {
+  font-size: 1.5rem;
+  margin: 10px 0 30px;
+}
+
+.notfound-button {
+  padding: 10px 25px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  background-color: white;
+  color: #f06;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.notfound-button:hover {
+  transform: scale(1.1);
+  background-color: #ffe;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+
+.notfound-animation {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.notfound-star {
+  position: absolute;
+  font-size: 2rem;
+  animation: twinkle 2s infinite;
+}
+
+.notfound-star:nth-child(1) { top: 10%; left: 20%; animation-delay: 0s; }
+.notfound-star:nth-child(2) { top: 30%; left: 70%; animation-delay: 0.5s; }
+.notfound-star:nth-child(3) { top: 60%; left: 40%; animation-delay: 1s; }
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 1; }
+}
