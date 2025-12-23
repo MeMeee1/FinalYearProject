@@ -2,8 +2,9 @@
   "name": "nitro-app",
   "private": true,
   "scripts": {
-    "build": "nitro build",
-    "dev": "nitro dev",
+    "build": "npx nitro build",
+    "start": "node .output/server/index.mjs",
+    "dev": "npx nitro dev",
     "preview": "node .output/server/index.mjs",
     "postinstall": "patch-package"
   },
