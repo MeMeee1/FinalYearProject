@@ -1,21 +1,17 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react';
-import NotFound from './NotFound';
+
+import NotFound from './components/NotFound';
+import Home from './screens/Home';
 
 function App() {
   return (
     <Router>
       <div>
-        <SignedOut>
-          <SignInButton mode="modal" />
-        </SignedOut>
-        <SignedIn>
-          <UserButton />
-        </SignedIn>
+        
 
         <Routes>
-        
+          <Route path="/" element={<Home />} />
           {/* Catch-all 404 route */}
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -1,13 +1,26 @@
+/* Reset default margins and ensure html/body take full height */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden; /* Prevents scrollbars if content overflows */
+}
+
 .notfound-container {
-  height: 100vh;
+  min-height: 100vh;           /* Fallback for older browsers */
+  height: 100%;                /* Takes full height of parent (body) */
+  width: 100%;                 /* Explicit full width */
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #f06, #f79);
+  background: linear-gradient(135deg, rgb(1, 192, 39), rgb(33, 224, 78));
   color: white;
   font-family: 'Arial', sans-serif;
   overflow: hidden;
+  box-sizing: border-box;      /* Ensures padding doesn't cause overflow */
+  position: relative;          /* Needed for absolute-positioned children */
 }
 
 .notfound-title {
@@ -19,15 +32,17 @@
 .notfound-text {
   font-size: 1.5rem;
   margin: 10px 0 30px;
+  text-align: center;
 }
 
 .notfound-button {
   padding: 10px 25px;
   font-size: 1rem;
   border: none;
+  font-weight: bold;
   border-radius: 8px;
   background-color: white;
-  color: #f06;
+  color: rgb(3, 3, 3);
   cursor: pointer;
   transition: transform 0.2s, background-color 0.2s;
 }
@@ -44,11 +59,9 @@
 
 .notfound-animation {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;                    /* Modern shorthand for top/right/bottom/left: 0 */
   pointer-events: none;
+  overflow: hidden;
 }
 
 .notfound-star {
