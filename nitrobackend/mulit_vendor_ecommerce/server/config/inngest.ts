@@ -11,46 +11,50 @@ const syncUser = inngest.createFunction(
   async ({ event }) => {
     const prisma = getPrisma();
 
-    // Correct way to get Clerk payload
-    const data = event.data.object; // ← This is the key fix!
-    const clerkId = data.id;
-    const email = data.email_addresses?.[0]?.email_address;
-    const first_name = data.first_name;
-    const last_name = data.last_name;
-    const image_url = data.image_url;
+    // Correctly extract from Clerk's nested "object" structure
+    const userData = event.data.object;
 
-    if (!email) {
-      console.warn('Skipping user sync: no email in payload', { clerkId });
-      return;
+    const clerkId = userData.id;
+    const email = userData.primary_email_address_id 
+      ? userData.email_addresses.find((e: { id: string; email_address: string }) => e.id === userData.primary_email_address_id)?.email_address
+      : userData.email_addresses[0]?.email_address;
+
+    if (!clerkId || !email) {
+      console.warn('Skipping sync: missing clerkId or email', { clerkId, email });
+      return { status: 'skipped', reason: 'missing_data' };
     }
 
-    const name = `${first_name || ""} ${last_name || ""}`.trim() || "User";
+    const name = `${userData.first_name || ""} ${userData.last_name || ""}`.trim() || "User";
+    const imageUrl = userData.profile_image_url || userData.image_url || null;
 
-    console.log('Syncing Clerk user to DB:', { clerkId, email, name }); // Debug log
+    console.log('🔄 Syncing Clerk user:', { clerkId, email, name });
 
     try {
-      await prisma.user.upsert({
+      const upserted = await prisma.user.upsert({
         where: { clerkId },
-        update: { email, name, imageUrl: image_url },
+        update: {
+          email,
+          name,
+          imageUrl,
+        },
         create: {
           clerkId,
           email,
           name,
-          imageUrl: image_url,
-          // Add defaults for other fields if needed
-          role: "BUYER",
+          imageUrl,
+          role: "BUYER", // default role
           isActive: true,
         },
       });
 
-      console.log('✅ User synced successfully:', clerkId);
+      console.log('✅ User synced to DB:', upserted.id);
+      return { status: 'success', userId: upserted.id };
     } catch (err) {
       console.error('❌ Failed to sync user:', err);
       throw err; // Let Inngest retry
     }
   }
 );
-
 const deleteUserFromDB = inngest.createFunction(
   { id: "delete-user-from-db" },
   { event: "clerk/user.deleted" },
