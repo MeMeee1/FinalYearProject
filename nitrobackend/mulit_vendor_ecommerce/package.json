@@ -2,18 +2,18 @@
   "name": "nitro-app",
   "private": true,
   "scripts": {
-    "build": "nitro build && npx prisma migrate deploy --schema=./prisma/schema.prisma", 
-        "dev": "nitro dev",
+    "build": "nitro build && npx prisma migrate deploy --schema=./prisma/schema.prisma",
+    "dev": "nitro dev",
     "preview": "node .output/server/index.mjs"
   },
   "devDependencies": {
-    "@prisma/client": "^7.2.0",
     "h3": "^1.15.4",
-    "nitropack": "^2.12.4",
-    "prisma": "^7.2.0"
+    "nitropack": "^2.12.4"
   },
   "dependencies": {
+    "@prisma/client": "^6.19.1",
     "expoecommerce_finalproject": "file:../..",
-    "patch-package": "^8.0.1"
+    "patch-package": "^8.0.1",
+    "prisma": "^6.19.1"
   }
 }
