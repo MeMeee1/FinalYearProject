@@ -1,10 +1,11 @@
 {
   "name": "nitro-app",
   "private": true,
-  "scripts": {
-    "build": "nitro build && npx prisma migrate deploy --schema=./prisma/schema.prisma",
-    "dev": "nitro dev",
-    "preview": "node .output/server/index.mjs"
+   "scripts": {
+    "build": "prisma generate --schema=./prisma/schema.prisma && nitro build",
+    "dev": "prisma generate --schema=./prisma/schema.prisma && nitro dev",
+    "preview": "node .output/server/index.mjs",
+    "postinstall": "prisma generate --schema=./prisma/schema.prisma"
   },
   "devDependencies": {
     "h3": "^1.15.4",
