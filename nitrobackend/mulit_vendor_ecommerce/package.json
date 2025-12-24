@@ -14,6 +14,7 @@
     "@prisma/client": "^6.19.1",
     "dotenv": "^17.2.3",
     "expoecommerce_finalproject": "file:../..",
+    "inngest": "^3.48.1",
     "patch-package": "^8.0.1",
     "prisma": "^6.19.1"
   }
