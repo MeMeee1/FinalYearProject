@@ -16,30 +16,44 @@ const syncUser = inngest.createFunction(
   async ({ event }) => {
     const prisma = getPrisma();
 
-    // Clerk wraps the actual user object in event.data.object
     const userData = event.data.object;
 
-    const clerkId = userData.id;
-    const email =
-      userData.email_addresses.find(
-        (e: any) => e.id === userData.primary_email_address_id
-      )?.email_address ||
-      userData.email_addresses[0]?.email_address;
+    if (!userData) {
+      console.error("No user data in event");
+      throw new Error("Invalid event payload: missing object");
+    }
 
-    if (!clerkId || !email) {
-      console.warn("Skipping user sync: missing clerkId or email", {
-        clerkId,
-        email,
-      });
-      return { status: "skipped", reason: "missing_required_fields" };
+    const clerkId = userData.id;
+    if (!clerkId) {
+      console.warn("Skipping sync: no clerkId");
+      return { status: "skipped", reason: "no_clerk_id" };
+    }
+
+    // Safely get email_addresses array (defensive against undefined)
+    const emailAddresses = Array.isArray(userData.email_addresses)
+      ? userData.email_addresses
+      : [];
+
+    // Try primary first, then fallback to first available
+    let email = emailAddresses.find(
+      (e: any) => e.id === userData.primary_email_address_id
+    )?.email_address;
+
+    if (!email && emailAddresses.length > 0) {
+      email = emailAddresses[0].email_address;
+    }
+
+    if (!email) {
+      console.warn("Skipping user sync: no email found", { clerkId });
+      return { status: "skipped", reason: "no_email" };
     }
 
     const name =
       `${userData.first_name || ""} ${userData.last_name || ""}`.trim() ||
       "User";
-    const imageUrl = userData.profile_image_url || null;
+    const imageUrl = userData.profile_image_url || userData.image_url || null;
 
-    console.log("🔄 Syncing user from Clerk", { clerkId, email, name });
+    console.log("🔄 Syncing Clerk user", { clerkId, email, name });
 
     try {
       const user = await prisma.user.upsert({
@@ -48,27 +62,25 @@ const syncUser = inngest.createFunction(
           email,
           name,
           imageUrl,
-          // Add any other fields you want to keep in sync
         },
         create: {
           clerkId,
           email,
           name,
           imageUrl,
-          role: "BUYER", // default role
+          role: "BUYER",
           isActive: true,
         },
       });
 
-      console.log("✅ User successfully synced/created", { userId: user.id });
-      return { status: "success", userId: user.id, action: "upsert" };
+      console.log("✅ User synced successfully", { userId: user.id });
+      return { status: "success", userId: user.id };
     } catch (error) {
-      console.error("❌ Failed to sync user from Clerk", error);
-      throw error; // Important: re-throw so Inngest retries
+      console.error("❌ Failed to sync user", { clerkId, error });
+      throw error;
     }
   }
 );
-
 const deleteUserFromDB = inngest.createFunction(
   {
     id: "delete-user-from-db",
