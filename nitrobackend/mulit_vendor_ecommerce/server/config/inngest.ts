@@ -16,25 +16,28 @@ const syncUser = inngest.createFunction(
   async ({ event }) => {
     const prisma = getPrisma();
 
-    const userData = event.data.object;
+    // Log the full event for debugging
+    console.log("Received Clerk event:", JSON.stringify(event.data, null, 2));
 
-    if (!userData) {
-      console.error("No user data in event");
-      throw new Error("Invalid event payload: missing object");
+    // Clerk sometimes wraps in .object, sometimes not — handle both
+    let userData = event.data.object || event.data;
+
+    if (!userData || typeof userData !== "object") {
+      console.error("Invalid payload: no user data", event.data);
+      throw new Error("Invalid Clerk payload");
     }
 
     const clerkId = userData.id;
     if (!clerkId) {
-      console.warn("Skipping sync: no clerkId");
+      console.warn("Skipping sync: no clerkId in payload", userData);
       return { status: "skipped", reason: "no_clerk_id" };
     }
 
-    // Safely get email_addresses array (defensive against undefined)
+    // Safely handle email_addresses
     const emailAddresses = Array.isArray(userData.email_addresses)
       ? userData.email_addresses
       : [];
 
-    // Try primary first, then fallback to first available
     let email = emailAddresses.find(
       (e: any) => e.id === userData.primary_email_address_id
     )?.email_address;
@@ -44,7 +47,7 @@ const syncUser = inngest.createFunction(
     }
 
     if (!email) {
-      console.warn("Skipping user sync: no email found", { clerkId });
+      console.warn("Skipping sync: no email found", { clerkId });
       return { status: "skipped", reason: "no_email" };
     }
 
@@ -53,7 +56,7 @@ const syncUser = inngest.createFunction(
       "User";
     const imageUrl = userData.profile_image_url || userData.image_url || null;
 
-    console.log("🔄 Syncing Clerk user", { clerkId, email, name });
+    console.log("🔄 Syncing Clerk user to DB", { clerkId, email, name });
 
     try {
       const user = await prisma.user.upsert({
@@ -73,10 +76,14 @@ const syncUser = inngest.createFunction(
         },
       });
 
-      console.log("✅ User synced successfully", { userId: user.id });
-      return { status: "success", userId: user.id };
-    } catch (error) {
-      console.error("❌ Failed to sync user", { clerkId, error });
+      console.log("✅ User synced successfully!", { userId: user.id, clerkId });
+      return { status: "success", userId: user.id, clerkId };
+    } catch (error: any) {
+      console.error("❌ Prisma sync failed", {
+        clerkId,
+        message: error.message,
+        code: error.code,
+      });
       throw error;
     }
   }
