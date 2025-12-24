@@ -1,10 +1,9 @@
-// src/inngest.ts  (or config/inngest.ts — wherever you keep it)
-
+// src/inngest.ts
 import { Inngest } from "inngest";
-import { getPrisma } from "../utils/prisma_client"; // adjust path if needed
+import { getPrisma } from "../utils/prisma_client";
 
 export const inngest = new Inngest({
-  id: "ecommerce-app", // matches your app name in Inngest dashboard
+  id: "ecommerce-app",
 });
 
 const syncUser = inngest.createFunction(
@@ -16,11 +15,10 @@ const syncUser = inngest.createFunction(
   async ({ event }) => {
     const prisma = getPrisma();
 
-    // Log the full event for debugging
     console.log("Received Clerk event:", JSON.stringify(event.data, null, 2));
 
-    // Clerk sometimes wraps in .object, sometimes not — handle both
-    let userData = event.data.object || event.data;
+    // Clerk sends data directly in event.data, not event.data.object
+    const userData = event.data;
 
     if (!userData || typeof userData !== "object") {
       console.error("Invalid payload: no user data", event.data);
@@ -33,7 +31,7 @@ const syncUser = inngest.createFunction(
       return { status: "skipped", reason: "no_clerk_id" };
     }
 
-    // Safely handle email_addresses
+    // Extract email
     const emailAddresses = Array.isArray(userData.email_addresses)
       ? userData.email_addresses
       : [];
@@ -46,15 +44,18 @@ const syncUser = inngest.createFunction(
       email = emailAddresses[0].email_address;
     }
 
+    // Fallback email if none provided (similar to your Express version)
     if (!email) {
-      console.warn("Skipping sync: no email found", { clerkId });
-      return { status: "skipped", reason: "no_email" };
+      email = `${clerkId}@clerk.local`;
+      console.warn("No email found, using fallback", { clerkId, email });
     }
 
-    const name =
-      `${userData.first_name || ""} ${userData.last_name || ""}`.trim() ||
-      "User";
-    const imageUrl = userData.profile_image_url || userData.image_url || null;
+    // Build name from first_name and last_name
+    const firstName = userData.first_name || email.split("@")[0] || "Clerk";
+    const lastName = userData.last_name || "User";
+    const name = `${firstName} ${lastName}`.trim();
+
+    const imageUrl = userData.image_url || userData.profile_image_url || null;
 
     console.log("🔄 Syncing Clerk user to DB", { clerkId, email, name });
 
@@ -88,6 +89,7 @@ const syncUser = inngest.createFunction(
     }
   }
 );
+
 const deleteUserFromDB = inngest.createFunction(
   {
     id: "delete-user-from-db",
@@ -97,12 +99,12 @@ const deleteUserFromDB = inngest.createFunction(
   async ({ event }) => {
     const prisma = getPrisma();
 
-    const userData = event.data.object;
-    const clerkId = userData.id;
+    // Access data directly from event.data
+    const clerkId = event.data?.id;
 
     if (!clerkId) {
       console.warn("Skipping delete: no clerkId in payload");
-      return { status: "skipped" };
+      return { status: "skipped", reason: "no_clerk_id" };
     }
 
     console.log("🗑️ Deleting user from DB", { clerkId });
@@ -113,14 +115,17 @@ const deleteUserFromDB = inngest.createFunction(
       });
 
       if (result.count === 0) {
-        console.log("No user found to delete", { clerkId });
-        return { status: "not_found" };
+        console.log("⚠️ No user found to delete", { clerkId });
+        return { status: "not_found", clerkId };
       }
 
-      console.log("✅ User deleted from DB", { clerkId });
-      return { status: "success", deletedCount: result.count };
-    } catch (error) {
-      console.error("❌ Failed to delete user", error);
+      console.log("✅ User deleted from DB", { clerkId, count: result.count });
+      return { status: "success", deletedCount: result.count, clerkId };
+    } catch (error: any) {
+      console.error("❌ Failed to delete user", {
+        clerkId,
+        message: error.message,
+      });
       throw error;
     }
   }
