@@ -19,5 +19,11 @@ export default defineNitroConfig({
   prerender: {
     crawlLinks: false,
     routes: []
-  }
+  },
+   runtimeConfig: {
+    // This makes env vars available at runtime
+    databaseUrl: process.env.DATABASE_URL,
+  },
+  // Ensure dotenv is loaded during build and runtime
+
 });
