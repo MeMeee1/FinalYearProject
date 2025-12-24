@@ -1,41 +1,54 @@
-// src/inngest.ts (or wherever it is)
+// src/inngest.ts  (or config/inngest.ts — wherever you keep it)
 
 import { Inngest } from "inngest";
-import { getPrisma } from "../utils/prisma_client";
+import { getPrisma } from "../utils/prisma_client"; // adjust path if needed
 
-export const inngest = new Inngest({ id: "ecommerce-app" });
+export const inngest = new Inngest({
+  id: "ecommerce-app", // matches your app name in Inngest dashboard
+});
 
 const syncUser = inngest.createFunction(
-  { id: "sync-user" },
+  {
+    id: "sync-user",
+    name: "Sync Clerk User to Database",
+  },
   { event: "clerk/user.created" },
   async ({ event }) => {
     const prisma = getPrisma();
 
-    // Correctly extract from Clerk's nested "object" structure
+    // Clerk wraps the actual user object in event.data.object
     const userData = event.data.object;
 
     const clerkId = userData.id;
-    const email = userData.primary_email_address_id 
-      ? userData.email_addresses.find((e: { id: string; email_address: string }) => e.id === userData.primary_email_address_id)?.email_address
-      : userData.email_addresses[0]?.email_address;
+    const email =
+      userData.email_addresses.find(
+        (e: any) => e.id === userData.primary_email_address_id
+      )?.email_address ||
+      userData.email_addresses[0]?.email_address;
 
     if (!clerkId || !email) {
-      console.warn('Skipping sync: missing clerkId or email', { clerkId, email });
-      return { status: 'skipped', reason: 'missing_data' };
+      console.warn("Skipping user sync: missing clerkId or email", {
+        clerkId,
+        email,
+      });
+      return { status: "skipped", reason: "missing_required_fields" };
     }
 
-    const name = `${userData.first_name || ""} ${userData.last_name || ""}`.trim() || "User";
-    const imageUrl = userData.profile_image_url || userData.image_url || null;
+    const name =
+      `${userData.first_name || ""} ${userData.last_name || ""}`.trim() ||
+      "User";
+    const imageUrl = userData.profile_image_url || null;
 
-    console.log('🔄 Syncing Clerk user:', { clerkId, email, name });
+    console.log("🔄 Syncing user from Clerk", { clerkId, email, name });
 
     try {
-      const upserted = await prisma.user.upsert({
+      const user = await prisma.user.upsert({
         where: { clerkId },
         update: {
           email,
           name,
           imageUrl,
+          // Add any other fields you want to keep in sync
         },
         create: {
           clerkId,
@@ -47,36 +60,49 @@ const syncUser = inngest.createFunction(
         },
       });
 
-      console.log('✅ User synced to DB:', upserted.id);
-      return { status: 'success', userId: upserted.id };
-    } catch (err) {
-      console.error('❌ Failed to sync user:', err);
-      throw err; // Let Inngest retry
+      console.log("✅ User successfully synced/created", { userId: user.id });
+      return { status: "success", userId: user.id, action: "upsert" };
+    } catch (error) {
+      console.error("❌ Failed to sync user from Clerk", error);
+      throw error; // Important: re-throw so Inngest retries
     }
   }
 );
+
 const deleteUserFromDB = inngest.createFunction(
-  { id: "delete-user-from-db" },
+  {
+    id: "delete-user-from-db",
+    name: "Delete User from Database",
+  },
   { event: "clerk/user.deleted" },
   async ({ event }) => {
     const prisma = getPrisma();
 
-    const data = event.data.object; // ← Key fix here too!
-    const clerkId = data.id;
+    const userData = event.data.object;
+    const clerkId = userData.id;
 
-    console.log('Deleting user from DB:', clerkId);
+    if (!clerkId) {
+      console.warn("Skipping delete: no clerkId in payload");
+      return { status: "skipped" };
+    }
+
+    console.log("🗑️ Deleting user from DB", { clerkId });
 
     try {
-      const deleted = await prisma.user.deleteMany({ where: { clerkId } });
+      const result = await prisma.user.deleteMany({
+        where: { clerkId },
+      });
 
-      if (deleted.count === 0) {
-        console.warn('No user found to delete for clerkId:', clerkId);
-      } else {
-        console.log('✅ User deleted from DB:', clerkId);
+      if (result.count === 0) {
+        console.log("No user found to delete", { clerkId });
+        return { status: "not_found" };
       }
-    } catch (err) {
-      console.error('❌ Failed to delete user:', err);
-      throw err;
+
+      console.log("✅ User deleted from DB", { clerkId });
+      return { status: "success", deletedCount: result.count };
+    } catch (error) {
+      console.error("❌ Failed to delete user", error);
+      throw error;
     }
   }
 );
