@@ -4,7 +4,7 @@
   "scripts": {
     "build": "nitro build && npx prisma generate --schema=./prisma/schema.prisma && npx prisma migrate deploy --schema=./prisma/schema.prisma ",
     "dev": "nitro dev",
-    "preview": "npx prisma generate --schema=./prisma/schema.prisma && npx prisma migrate deploy --schema=./prisma/schema.prisma && node -r dotenv/config .output/server/index.mjs"
+    "preview": "npx prisma migrate deploy --schema=./prisma/schema.prisma && node -r dotenv/config .output/server/index.mjs"
   },
   "devDependencies": {
     "h3": "^1.15.4",
