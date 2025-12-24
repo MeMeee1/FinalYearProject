@@ -1,0 +1,28 @@
+{
+  "name": "expoecommerce_finalproject",
+  "version": "1.0.0",
+  "main": "index.js",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "build": "npm install --include=dev --prefix nitrobackend/mulit_vendor_ecommerce && npm install --prefix admin && npm run build --prefix admin && npm run build --prefix nitrobackend/mulit_vendor_ecommerce",
+    "start": "npm run preview --prefix nitrobackend/mulit_vendor_ecommerce",
+    "dev": "npm run dev --prefix nitrobackend/mulit_vendor_ecommerce"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MeMeee1/FinalYearProject.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MeMeee1/FinalYearProject/issues"
+  },
+  "homepage": "https://github.com/MeMeee1/FinalYearProject#readme",
+  "description": "",
+  "dependencies": {
+    "@clerk/clerk-expo": "^2.19.11"
+  }
+}
