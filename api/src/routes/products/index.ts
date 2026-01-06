@@ -2,9 +2,12 @@ import { Router } from 'express';
 import {
   listProducts,
   getProductById,
+  getProductsBySeller,
+  getProductsByDistance,
   createProduct,
   updateProduct,
   deleteProduct,
+  searchProducts,
 } from './productsController.js';
 import { validateData } from '../../middlewares/validationMiddleware.js';
 
@@ -16,8 +19,14 @@ import { verifySeller, verifyToken } from '../../middlewares/authMiddleware.js';
 
 const router = Router();
 
+// Public routes
 router.get('/', listProducts);
+router.get('/search', searchProducts);
+router.get('/by-distance', getProductsByDistance);
+router.get('/seller/:sellerId', getProductsBySeller);
 router.get('/:id', getProductById);
+
+// Protected routes (seller/admin only)
 router.post(
   '/',
   verifyToken,

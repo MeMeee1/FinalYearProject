@@ -68,6 +68,10 @@ function Sidebar() {
       <Link href="/dashboard/orders">
         <Text>Orders</Text>
       </Link>
+
+      <Link href="">
+        <Text>Messages</Text>
+      </Link>
     </VStack>
   );
 }
@@ -85,6 +89,9 @@ function MobileNavbar() {
 
       <Link href="/dashboard/orders">
         <Icon as={ThreeDotsIcon} />
+      </Link>
+      <Link href="">
+        <Icon as={MessageCircleIcon} />
       </Link>
     </HStack>
   );

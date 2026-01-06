@@ -11,7 +11,7 @@ export function verifyToken(req: Request, res: Response, next: NextFunction) {
 
   try {
     // decode jwt toke data
-    const decoded = jwt.verify(token, 'your-secret');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) ;
     if (typeof decoded !== 'object' || !decoded?.userId) {
       res.status(401).json({ error: 'Access denied' });
       return;
@@ -26,8 +26,23 @@ export function verifyToken(req: Request, res: Response, next: NextFunction) {
 
 export function verifySeller(req: Request, res: Response, next: NextFunction) {
   const role = req.role;
-  if (role !== 'seller') {
-    res.status(401).json({ error: 'Access denied' });
+ if (req.role !== 'seller' && req.role !== 'admin') {
+    res.status(403).json({ error: 'Seller access required' });
+    return;
+  }
+  next();
+}
+export function verifyAdmin(req: Request, res: Response, next: NextFunction) {
+  if (req.role !== 'admin') {
+    res.status(403).json({ error: 'Admin access required' });
+    return;
+  }
+  next();
+}
+
+export function verifySellerOwnership(req: Request, res: Response, next: NextFunction) {
+  if (req.role !== 'seller' && req.role !== 'admin') {
+    res.status(403).json({ error: 'Seller doesn"t own this resource' });
     return;
   }
   next();

@@ -6,7 +6,9 @@ export function validateData(schema: z.ZodObject<any, any>) {
   return (req: Request, res: Response, next: NextFunction) => {
     try {
       schema.parse(req.body);
+      console.log(`Validation succeeded${req.body}`);
       req.cleanBody = _.pick(req.body, Object.keys(schema.shape));
+      console.log(req.cleanBody);
       next();
     } catch (error) {
       if (error instanceof ZodError) {

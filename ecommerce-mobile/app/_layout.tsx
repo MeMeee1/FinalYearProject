@@ -16,7 +16,7 @@ const queryClient = new QueryClient();
 export default function RootLayout() {
   const cartItemsNum = useCart((state) => state.items.length);
   const isLoggedIn = useAuth((s) => !!s.token);
-
+  console.log('Logged in status: ', isLoggedIn);
   return (
     <QueryClientProvider client={queryClient}>
       <CustomStripeProvider>

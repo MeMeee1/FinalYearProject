@@ -13,7 +13,7 @@ import jwt from 'jsonwebtoken';
 const router = Router();
 
 const generateUserToken = (user: any) => {
-  return jwt.sign({ userId: user.id, role: user.role }, 'your-secret', {
+  return jwt.sign({ userId: user.id, role: user.role }, process.env.JWT_SECRET as string, {
     expiresIn: '30d',
   });
 };
@@ -22,13 +22,31 @@ router.post('/register', validateData(createUserSchema), async (req, res) => {
   try {
     const data = req.cleanBody;
     data.password = await bcrypt.hash(data.password, 10);
-
+    data.role = 'user';
     const [user] = await db.insert(usersTable).values(data).returning();
 
     // @ts-ignore
     delete user.password;
     const token = generateUserToken(user);
 
+    res.status(201).json({ user, token });
+  } catch (e) {
+    console.log(e);
+    res.status(500).send('Something went wrong');
+  }
+});
+router.post('/register/seller', validateData(createUserSchema), async (req, res) => {
+  try {
+    const data = req.cleanBody;
+    data.password = await bcrypt.hash(data.password, 10);
+    data.role = 'seller';
+    data.isApproved = false; // Sellers need admin approval
+    data.status = 'pending';
+    const [user] = await db.insert(usersTable).values(data).returning();
+
+    // @ts-ignore
+    delete user.password;
+    const token = generateUserToken(user);
     res.status(201).json({ user, token });
   } catch (e) {
     console.log(e);

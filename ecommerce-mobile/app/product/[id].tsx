@@ -43,14 +43,14 @@ export default function ProductDetailsScreen() {
       <Stack.Screen options={{ title: product.name }} />
 
       <Card className="p-5 rounded-lg max-w-[960px] w-full flex-1">
-        <Image
+        {/* <Image
           source={{
             uri: product.image,
           }}
           className="mb-6 h-[240px] w-full rounded-md"
           alt={`${product.name} image`}
           resizeMode="contain"
-        />
+        /> */}
         <Text className="text-sm font-normal mb-2 text-typography-700">
           {product.name}
         </Text>
