@@ -38,15 +38,15 @@ export default async function ProductsPage({
     };
 
     return (
-      <div className="w-full max-w-[1400px] mx-auto px-3 sm:px-4 lg:px-6 min-h-screen flex flex-col">
+      <div className="w-full max-w-[1400px] mx-auto px-2 sm:px-4 lg:px-6 py-4 sm:py-6">
         {/* Header */}
         <div className="mb-4 sm:mb-6 lg:mb-8">
-          <Heading size="xl" className="mb-4">Browse Products by Vendor</Heading>
+          <Heading size="xl" className="mb-3 sm:mb-4 text-lg sm:text-xl">Browse Products by Vendor</Heading>
           <SearchBar />
         </div>
 
         {/* Main content area */}
-        <div className="flex-grow">
+        <div>
           {vendors.length === 0 ? (
             <div className="text-center py-10">
               <p className="text-slate-500 text-lg">
@@ -104,9 +104,6 @@ export default async function ProductsPage({
             </>
           )}
         </div>
-
-        {/* Spacer for mobile */}
-        <div className="h-4 sm:h-6 lg:h-8"></div>
       </div>
     );
   } catch (error: any) {

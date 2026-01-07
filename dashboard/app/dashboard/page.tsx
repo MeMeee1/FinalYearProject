@@ -28,31 +28,31 @@ export default async function DashboardPage() {
   const avgOrderValue = stats?.totalOrders ? (totalRevenue / stats.totalOrders) : 0;
 
   return (
-    <div className="w-full max-w-[1400px] mx-auto px-3 sm:px-4 lg:px-6 min-h-screen">
+    <div className="w-full max-w-[1400px] mx-auto px-2 sm:px-4 lg:px-6 py-4 sm:py-6">
       {/* Welcome Section */}
-      <div className="mb-6 sm:mb-8">
-        <Heading size="2xl" className="mb-2">Welcome Back! 👋</Heading>
-        <Text className="text-slate-600">Here's what's happening with your platform today.</Text>
+      <div className="mb-4 sm:mb-6">
+        <Heading size="2xl" className="mb-2 text-xl sm:text-2xl">Welcome Back! 👋</Heading>
+        <Text className="text-slate-600 text-sm sm:text-base">Here's what's happening with your platform today.</Text>
       </div>
 
       {/* Stats Grid */}
       {stats && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
           {/* Total Revenue */}
-          <Card className="p-5 bg-gradient-to-br from-blue-500 to-blue-600 text-white hover:shadow-xl transition-shadow">
-            <div className="flex items-start justify-between mb-3">
+          <Card className="p-4 sm:p-5 bg-gradient-to-br from-blue-500 to-blue-600 text-white hover:shadow-xl transition-shadow">
+            <div className="flex items-start justify-between mb-2 sm:mb-3">
               <div className="p-2 bg-white/20 rounded-lg">
-                <DollarSign className="w-6 h-6" />
+                <DollarSign className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
-              <div className="flex items-center gap-1 text-sm bg-white/20 px-2 py-1 rounded">
+              <div className="flex items-center gap-1 text-xs sm:text-sm bg-white/20 px-2 py-1 rounded">
                 <TrendingUp className="w-3 h-3" />
                 <span>12%</span>
               </div>
             </div>
-            <Heading size="xl" className="text-white mb-1">
+            <Heading size="xl" className="text-white mb-1 text-lg sm:text-xl">
               ${totalRevenue.toFixed(2)}
             </Heading>
-            <Text className="text-blue-100 text-sm">Platform Revenue</Text>
+            <Text className="text-blue-100 text-xs sm:text-sm">Platform Revenue</Text>
           </Card>
 
           {/* Total Orders */}

@@ -18,7 +18,7 @@ export default async function VendorProductsPage({
   try {
     const vendorId = params.id;
     const currentPage = Math.max(1, Number(searchParams.page) || 1);
-    const limit = 20;
+    const limit = 5;
 
     const [vendor, productsResponse] = await Promise.all([
       getVendorById(vendorId),
