@@ -9,26 +9,18 @@ export default function SearchBar() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [query, setQuery] = useState(searchParams.get('q') || '');
+  const status = searchParams.get('status') || 'active';
 
-  // Debounce search to avoid too many updates
   useEffect(() => {
     const timer = setTimeout(() => {
       const params = new URLSearchParams();
-      if (query.trim()) {
-        params.set('q', query.trim());
-      }
-      // Always reset to page 1 when searching
+      if (query.trim()) params.set('q', query.trim());
       params.set('page', '1');
-      
-      const newUrl = query.trim() 
-        ? `/dashboard/products?${params.toString()}`
-        : '/dashboard/products';
-      
-      router.push(newUrl);
-    }, 300); // 300ms debounce
-
+      params.set('status', status);
+      router.push(`/dashboard/vendors?${params.toString()}`);
+    }, 300);
     return () => clearTimeout(timer);
-  }, [query, router]);
+  }, [query, status, router]);
 
   function handleChange(e: any) {
     const value = e.nativeEvent?.text || e.target?.value || '';
@@ -40,11 +32,7 @@ export default function SearchBar() {
       <InputSlot className="pl-2">
         <InputIcon as={SearchIcon} />
       </InputSlot>
-      <InputField
-        placeholder="Search vendors..."
-        value={query}
-        onChange={handleChange}
-      />
+      <InputField placeholder="Search vendors..." value={query} onChange={handleChange} />
     </Input>
   );
 }

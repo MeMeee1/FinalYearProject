@@ -46,6 +46,47 @@ export async function listPendingVendors(req: Request, res: Response) {
   }
 }
 
+export async function listSuspendedVendors(req: Request, res: Response) {
+  try {
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
+
+    if (page < 1 || limit < 1) {
+      return res.status(400).json({ message: 'Page and limit must be positive numbers' });
+    }
+
+    const offset = (page - 1) * limit;
+
+    const vendors = await db
+      .select()
+      .from(vendorsTable)
+      .where(eq(vendorsTable.status, 'suspended'))
+      .limit(limit)
+      .offset(offset);
+
+    const [{ count }] = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(vendorsTable)
+      .where(eq(vendorsTable.status, 'suspended'));
+
+    const totalPages = Math.ceil(count / limit);
+
+    res.json({
+      data: vendors,
+      pagination: {
+        page,
+        limit,
+        total: count,
+        totalPages,
+        hasMore: page < totalPages,
+      },
+    });
+  } catch (e) {
+    console.log(e);
+    res.status(500).send(e);
+  }
+}
+
 export async function approveVendor(req: Request, res: Response) {
   try {
     const { vendorId } = req.params;
@@ -203,6 +244,12 @@ export async function getPlatformStats(req: Request, res: Response) {
       .from(vendorsTable)
       .where(eq(vendorsTable.status, 'pending'));
 
+    // Suspended vendors
+    const [{ suspendedVendors }] = await db
+      .select({ suspendedVendors: sql<number>`count(*)` })
+      .from(vendorsTable)
+      .where(eq(vendorsTable.status, 'suspended'));
+
     // Total orders
     const [{ totalOrders }] = await db
       .select({ totalOrders: sql<number>`count(*)` })
@@ -217,6 +264,7 @@ export async function getPlatformStats(req: Request, res: Response) {
       totalVendors,
       activeVendors,
       pendingVendors,
+      suspendedVendors,
       totalOrders,
       totalPlatformRevenue: Number(totalPlatformRevenue),
     });

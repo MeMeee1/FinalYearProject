@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import {
   listPendingVendors,
+  listSuspendedVendors,
   approveVendor,
   rejectVendor,
   suspendVendor,
@@ -15,6 +16,7 @@ const router = Router();
 router.use(verifyToken, verifyAdmin);
 
 router.get('/vendors/pending', listPendingVendors);
+router.get('/vendors/suspended', listSuspendedVendors);
 router.post('/vendors/:vendorId/approve', approveVendor);
 router.post('/vendors/:vendorId/reject', rejectVendor);
 router.post('/vendors/:vendorId/suspend', suspendVendor);
