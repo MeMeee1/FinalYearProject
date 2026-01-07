@@ -34,7 +34,7 @@ export default async function VendorProductsPage({
     };
 
     return (
-      <div className="w-full max-w-[1400px] mx-auto px-3 sm:px-4 lg:px-6 min-h-screen flex flex-col">
+      <div className="w-full max-w-[1400px] mx-auto px-2 sm:px-4 lg:px-6 py-4 sm:py-6">
         {/* Header */}
         <div className="mb-4 sm:mb-6 lg:mb-8">
           <Link 
@@ -51,17 +51,17 @@ export default async function VendorProductsPage({
                 <img src={vendor.storeLogo} alt={vendor.storeName} className="w-full h-full object-cover" />
               </div>
             )}
-            <div className="flex-1">
-              <Heading size="xl" className="mb-1">{vendor.storeName}</Heading>
+            <div className="flex-1 min-w-0">
+              <Heading size="xl" className="mb-1 text-lg sm:text-xl">{vendor.storeName}</Heading>
               {vendor.storeDescription && (
-                <Text className="text-slate-600">{vendor.storeDescription}</Text>
+                <Text className="text-slate-600 text-sm sm:text-base">{vendor.storeDescription}</Text>
               )}
             </div>
           </div>
         </div>
 
         {/* Main content area */}
-        <div className="flex-grow">
+        <div>
           {products.length === 0 ? (
             <div className="text-center py-10">
               <p className="text-slate-500 text-lg">
@@ -93,34 +93,33 @@ export default async function VendorProductsPage({
 
               {/* Simple pagination */}
               {pagination.totalPages > 1 && (
-                <div className="mt-6 sm:mt-8 pt-4 border-t border-gray-200 flex justify-center gap-2">
-                  {currentPage > 1 && (
-                    <Link 
-                      href={`/dashboard/products/vendor/${vendorId}?page=${currentPage - 1}`}
-                      className="px-4 py-2 border rounded hover:bg-gray-50"
-                    >
-                      Previous
-                    </Link>
-                  )}
-                  <span className="px-4 py-2">
-                    Page {currentPage} of {pagination.totalPages}
-                  </span>
-                  {currentPage < pagination.totalPages && (
-                    <Link 
-                      href={`/dashboard/products/vendor/${vendorId}?page=${currentPage + 1}`}
-                      className="px-4 py-2 border rounded hover:bg-gray-50"
-                    >
-                      Next
-                    </Link>
-                  )}
+                <div className="mt-6 sm:mt-8 pt-4 border-t border-gray-200">
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3">
+                    {currentPage > 1 && (
+                      <Link 
+                        href={`/dashboard/products/vendor/${vendorId}?page=${currentPage - 1}`}
+                        className="w-full sm:w-auto px-4 py-2 border rounded hover:bg-gray-50 text-center text-sm"
+                      >
+                        Previous
+                      </Link>
+                    )}
+                    <span className="px-4 py-2 text-sm whitespace-nowrap">
+                      Page {currentPage} of {pagination.totalPages}
+                    </span>
+                    {currentPage < pagination.totalPages && (
+                      <Link 
+                        href={`/dashboard/products/vendor/${vendorId}?page=${currentPage + 1}`}
+                        className="w-full sm:w-auto px-4 py-2 border rounded hover:bg-gray-50 text-center text-sm"
+                      >
+                        Next
+                      </Link>
+                    )}
+                  </div>
                 </div>
               )}
             </>
           )}
         </div>
-
-        {/* Spacer for mobile */}
-        <div className="h-4 sm:h-6 lg:h-8"></div>
       </div>
     );
   } catch (error: any) {
