@@ -14,7 +14,7 @@ import {
   StarIcon,
   ThreeDotsIcon,
 } from '@/components/ui/icon';
-// import { HomeIcon } from 'lucide-react-native';
+import LogoutButton from './LogoutButton';
 
 type DashboardLayoutProps = {
   children: React.ReactNode;
@@ -47,9 +47,13 @@ function Header() {
     <HStack className="p-3 sm:p-4 border-b justify-between items-center flex-shrink-0">
       <Heading className="text-lg sm:text-xl">Dashboard</Heading>
 
-      <Avatar size="sm">
-        <AvatarFallbackText>VS</AvatarFallbackText>
-      </Avatar>
+      <div className="flex items-center gap-3">
+        <div className="hidden sm:flex flex-col items-end">
+          <Text className="text-sm font-medium">Admin User</Text>
+          <Text className="text-xs text-slate-500">admin@ecommerce.com</Text>
+        </div>
+        <LogoutButton />
+      </div>
     </HStack>
   );
 }
@@ -72,6 +76,14 @@ function Sidebar() {
       <Link href="/dashboard/vendors" className="w-full">
         <Text className="hover:text-blue-600 transition-colors py-2 px-3 rounded hover:bg-blue-50">Vendors</Text>
       </Link>
+
+      <Link href="/dashboard/analytics" className="w-full">
+        <Text className="hover:text-blue-600 transition-colors py-2 px-3 rounded hover:bg-blue-50">Analytics</Text>
+      </Link>
+
+      <div className="mt-auto pt-4 border-t">
+        <LogoutButton variant="sidebar" />
+      </div>
     </VStack>
   );
 }

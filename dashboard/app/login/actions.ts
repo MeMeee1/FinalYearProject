@@ -6,7 +6,7 @@ import { redirect } from 'next/navigation';
 
 export async function handleLogin(email: string, password: string) {
   let redirectUrl = `/login?errorMessage=${encodeURIComponent(
-    'Failed to login'
+    'Failed to login, Check Credentials'
   )}`;
   try {
     const res = await login(email, password);

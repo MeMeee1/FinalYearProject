@@ -1,3 +1,4 @@
+'use server';
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export async function login(email: string, password: string) {
@@ -10,11 +11,24 @@ export async function login(email: string, password: string) {
   });
 
   const data = await res.json();
+  console.log(data);
+  if(data.user.role !== 'admin') {
+    throw Error('Not authorized');
+  }
   if (!res.ok) {
     console.log(data);
     throw Error('Failed to login');
   }
   return data;
+}
+
+export async function logout() {
+  
+  const { cookies } = await import('next/headers');
+  const { redirect } = await import('next/navigation');
+  
+  cookies().delete('token');
+  redirect('/login');
 }
 
 export async function signup(email: string, password: string) {
