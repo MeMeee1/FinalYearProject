@@ -19,11 +19,15 @@ export default async function VendorsPage({
 
     const [stats, list] = await Promise.all([
         getPlatformStats().catch(() => null),
-        status === 'pending'
+        (status === 'pending'
             ? listPendingVendors(currentPage, limit)
             : status === 'suspended'
-            ? listSuspendingVendors(currentPage, limit)
-            : listActiveVendors(currentPage, limit),
+                ? listSuspendingVendors(currentPage, limit)
+                : listActiveVendors(currentPage, limit)
+        ).catch((err) => {
+            console.error('Failed to fetch vendors:', err);
+            return null;
+        }),
     ]);
 
     let vendors = list?.data ?? [];
@@ -37,11 +41,11 @@ export default async function VendorsPage({
     const pagination = list?.pagination
         ? { ...list.pagination }
         : {
-                page: currentPage,
-                total: vendors.length,
-                totalPages: Math.max(1, Math.ceil(vendors.length / limit)),
-                hasMore: vendors.length === limit,
-            };
+            page: currentPage,
+            total: vendors.length,
+            totalPages: Math.max(1, Math.ceil(vendors.length / limit)),
+            hasMore: vendors.length === limit,
+        };
 
     return (
         <div className="w-full max-w-[1400px] mx-auto px-3 sm:px-4 lg:px-6 min-h-screen flex flex-col">

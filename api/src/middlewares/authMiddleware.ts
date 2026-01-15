@@ -11,7 +11,7 @@ export function verifyToken(req: Request, res: Response, next: NextFunction) {
 
   try {
     // decode jwt toke data
-    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) ;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET as string);
     if (typeof decoded !== 'object' || !decoded?.userId) {
       res.status(401).json({ error: 'Access denied' });
       return;
@@ -26,17 +26,20 @@ export function verifyToken(req: Request, res: Response, next: NextFunction) {
 
 export function verifySeller(req: Request, res: Response, next: NextFunction) {
   const role = req.role;
- if (req.role !== 'seller' && req.role !== 'admin') {
+  if (req.role !== 'seller' && req.role !== 'admin') {
     res.status(403).json({ error: 'Seller access required' });
     return;
   }
   next();
 }
 export function verifyAdmin(req: Request, res: Response, next: NextFunction) {
+  console.log('[verifyAdmin] Checking admin access. Current role:', req.role, 'User ID:', req.userId);
   if (req.role !== 'admin') {
+    console.log('[verifyAdmin] Access denied. Role is not admin:', req.role);
     res.status(403).json({ error: 'Admin access required' });
     return;
   }
+  console.log('[verifyAdmin] Access granted');
   next();
 }
 

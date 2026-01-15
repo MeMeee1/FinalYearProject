@@ -3,6 +3,7 @@ import { db } from '../../db/index.js';
 import { vendorsTable } from '../../db/vendorsSchema.js';
 import { usersTable } from '../../db/usersSchema.js';
 import { productsTable } from '../../db/productsSchema.js';
+import { ordersTable } from '../../db/ordersSchema.js';
 import { eq, sql } from 'drizzle-orm';
 
 // Add this temporary debug endpoint
@@ -19,7 +20,7 @@ export async function debugVendors(req: Request, res: Response) {
     });
   } catch (e) {
     console.log(e);
-    res.status(500).send(e); 
+    res.status(500).send(e);
   }
 }
 export async function listVendors(req: Request, res: Response) {
@@ -111,6 +112,7 @@ export async function getVendorById(req: Request, res: Response) {
 
 export async function getVendorProfile(req: Request, res: Response) {
   try {
+    console.log('[DEBUG] getVendorProfile called. userId:', req.userId);
     if (!req.userId) {
       return res.status(401).json({ message: 'Unauthorized' });
     }
@@ -120,8 +122,41 @@ export async function getVendorProfile(req: Request, res: Response) {
       .from(vendorsTable)
       .where(eq(vendorsTable.userId, req.userId as number));
 
+    console.log('[DEBUG] Vendor search result:', vendor);
+
     if (!vendor || vendor.length === 0) {
-      return res.status(404).json({ message: 'Vendor profile not found' });
+      console.log('[DEBUG] No vendor found for userId:', req.userId, '. Creating default vendor profile.');
+      
+      // Auto-create a default vendor profile
+      try {
+        const user = await db
+          .select()
+          .from(usersTable)
+          .where(eq(usersTable.id, req.userId as number));
+        
+        if (!user || user.length === 0) {
+          return res.status(401).json({ message: 'User not found' });
+        }
+
+        const defaultVendor = {
+          userId: req.userId as number,
+          storeName: user[0].name || 'My Store',
+          businessName: user[0].name || 'My Business',
+          businessEmail: user[0].email || '',
+          status: 'pending',
+        };
+
+        const [newVendor] = await db
+          .insert(vendorsTable)
+          .values(defaultVendor)
+          .returning();
+
+        console.log('[DEBUG] Created default vendor profile:', newVendor);
+        return res.status(201).json(newVendor);
+      } catch (createError) {
+        console.error('[DEBUG] Error creating default vendor profile:', createError);
+        return res.status(500).json({ message: 'Failed to create vendor profile' });
+      }
     }
 
     res.json(vendor[0]);
@@ -229,12 +264,30 @@ export async function getVendorStats(req: Request, res: Response) {
       .from(productsTable)
       .where(sql`${productsTable.sellerId} = ${vendorId} AND ${productsTable.stock} = 0`);
 
+    // Get Order Stats for this vendor
+    // We need to query orders based on sellerId
+
+    // Total Orders
+    const [{ totalOrders }] = await db
+      .select({ totalOrders: sql<number>`count(*)` })
+      .from(ordersTable) // Assuming ordersTable has a sellerId or similar way to filter
+      // If ordersTable has sellerId (which it seems to based on schema):
+      .where(eq(ordersTable.sellerId, vendorId));
+
+    // Total Revenue
+    const [{ totalRevenue }] = await db
+      .select({ totalRevenue: sql<number>`sum(${ordersTable.sellerAmount})` }) // Use sellerAmount
+      .from(ordersTable)
+      .where(eq(ordersTable.sellerId, vendorId));
+
     res.json({
       vendorId,
       storeName: vendor[0].storeName,
       totalProducts,
       activeProducts,
       outOfStockProducts,
+      totalOrders: Number(totalOrders || 0),
+      totalRevenue: Number(totalRevenue || 0),
       status: vendor[0].status,
     });
   } catch (e) {

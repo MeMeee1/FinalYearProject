@@ -20,7 +20,8 @@ export async function listActiveVendors(page = 1, limit = 12) {
 		cache: 'no-store',
 	});
 	if (!res.ok) {
-		throw new Error('Failed to load vendors');
+		const text = await res.text().catch(() => 'Unknown error');
+		throw new Error(`Failed to load vendors: ${res.status} ${text}`);
 	}
 	return (await res.json()) as { data: any[]; pagination: Pagination };
 }
@@ -39,7 +40,8 @@ export async function listPendingVendors(page = 1, limit = 12) {
 		},
 	});
 	if (!res.ok) {
-		throw new Error('Failed to load pending vendors');
+		const text = await res.text().catch(() => 'Unknown error');
+		throw new Error(`Failed to load pending vendors: ${res.status} ${text}`);
 	}
 	return (await res.json()) as { data: any[]; pagination: Pagination };
 }
@@ -57,7 +59,8 @@ export async function listSuspendingVendors(page = 1, limit = 12) {
 		},
 	});
 	if (!res.ok) {
-		throw new Error('Failed to load pending vendors');
+		const text = await res.text().catch(() => 'Unknown error');
+		throw new Error(`Failed to load pending vendors: ${res.status} ${text}`);
 	}
 	return (await res.json()) as { data: any[]; pagination: Pagination };
 }
@@ -102,33 +105,37 @@ export async function getPlatformStats() {
 
 
 export async function approveVendor(vendorId: number | string) {
-  const token = cookies().get('token')?.value;
-  const res = await fetch(`${API_URL}/admin/vendors/${vendorId}/approve`, {
-    method: 'POST',
-    headers: { Authorization: token ?? '', 'Content-Type': 'application/json' },
-  });
-  if (!res.ok) throw new Error('Failed to approve vendor');
-  revalidatePath('/dashboard/vendors');
+	const token = cookies().get('token')?.value;
+	const res = await fetch(`${API_URL}/admin/vendors/${vendorId}/approve`, {
+		method: 'POST',
+		headers: { Authorization: token ?? '', 'Content-Type': 'application/json' },
+	});
+	if (!res.ok) throw new Error('Failed to approve vendor');
+	revalidatePath('/dashboard/vendors');
 }
 
 export async function rejectVendor(vendorId: number | string, reason?: string) {
-  const token = cookies().get('token')?.value;
-  const res = await fetch(`${API_URL}/admin/vendors/${vendorId}/reject`, {
-    method: 'POST',
-    headers: { Authorization: token ?? '', 'Content-Type': 'application/json' },
-    body: JSON.stringify({ reason }),
-  });
-  if (!res.ok) throw new Error('Failed to reject vendor');
-  revalidatePath('/dashboard/vendors');
+	const token = cookies().get('token')?.value;
+	const res = await fetch(`${API_URL}/admin/vendors/${vendorId}/reject`, {
+		method: 'POST',
+		headers: { Authorization: token ?? '', 'Content-Type': 'application/json' },
+		body: JSON.stringify({ reason }),
+	});
+	if (!res.ok) throw new Error('Failed to reject vendor');
+	revalidatePath('/dashboard/vendors');
 }
 
 export async function suspendVendor(vendorId: number | string, reason?: string) {
-  const token = cookies().get('token')?.value;
-  const res = await fetch(`${API_URL}/admin/vendors/${vendorId}/suspend`, {
-    method: 'POST',
-    headers: { Authorization: token ?? '', 'Content-Type': 'application/json' },
-    body: JSON.stringify({ reason }),
-  });
-  if (!res.ok) throw new Error('Failed to suspend vendor');
-  revalidatePath('/dashboard/vendors');
+	const token = cookies().get('token')?.value;
+	const res = await fetch(`${API_URL}/admin/vendors/${vendorId}/suspend`, {
+		method: 'POST',
+		headers: { Authorization: token ?? '', 'Content-Type': 'application/json' },
+		body: JSON.stringify({ reason }),
+	});
+	if (!res.ok) {
+		const errorText = await res.text().catch(() => 'Unknown error');
+		console.error('Suspend vendor error:', res.status, errorText);
+		throw new Error(`Failed to suspend vendor: ${res.status} - ${errorText}`);
+	}
+	revalidatePath('/dashboard/vendors');
 }

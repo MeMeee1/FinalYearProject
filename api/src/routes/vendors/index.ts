@@ -19,9 +19,9 @@ router.get('/by-id/:id', getVendorById);
 router.get('/debug', debugVendors);
 router.post('/', verifyToken, validateData(createVendorSchema), createVendor);
 // Protected routes (vendor/admin)
-router.get('/profile/me',verifySeller, verifyToken, getVendorProfile);
-router.get('/stats/me', verifySeller,verifyToken, getVendorStats);
+router.get('/profile/me', verifyToken, verifySeller, getVendorProfile);
+router.get('/stats/me', verifyToken, verifySeller, getVendorStats);
 
-router.put('/profile/me', verifyToken,verifySeller, validateData(updateVendorSchema), updateVendor);
+router.put('/profile/me', verifyToken, verifySeller, validateData(updateVendorSchema), updateVendor);
 
 export default router;

@@ -78,8 +78,9 @@ router.post('/login', validateData(loginSchema), async (req, res) => {
     // @ts-ignore
     delete user.password;
     res.status(200).json({ token, user });
-  } catch (e) {
-    res.status(500).send('Something went wrong');
+  } catch (e: any) {
+    console.log(e);
+    res.status(500).json({ message: 'Something went wrong', error: e.message });
   }
 });
 

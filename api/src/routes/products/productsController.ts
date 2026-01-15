@@ -51,16 +51,16 @@ export async function listProducts(req: Request, res: Response) {
       .where(eq(productsTable.status, 'active'))
       .limit(limit)
       .offset(offset);
-      console.log('Fetched products:', products);
+    console.log('Fetched products:', products);
     // Filter by distance using Haversine formula if coordinates provided
     let filteredProducts = products;
     if (userLat !== null && userLon !== null && maxDistance !== null) {
       filteredProducts = products.filter((product) => {
         if (!product.latitude || !product.longitude) return false;
-        
+
         const productLat = Number(product.latitude);
         const productLon = Number(product.longitude);
-        
+
         const distance = calculateDistance(userLat, userLon, productLat, productLon);
         return distance <= maxDistance;
       });
@@ -347,6 +347,10 @@ export async function updateProduct(req: Request, res: Response) {
       return res.status(403).json({ message: 'Vendor profile not found' });
     }
 
+    if (vendor[0].status !== 'active') {
+      return res.status(403).json({ message: 'Vendor account must be active to perform this action' });
+    }
+
     // Check if product belongs to this vendor
     const product = await db
       .select()
@@ -392,6 +396,10 @@ export async function deleteProduct(req: Request, res: Response) {
 
     if (!vendor || vendor.length === 0) {
       return res.status(403).json({ message: 'Vendor profile not found' });
+    }
+
+    if (vendor[0].status !== 'active') {
+      return res.status(403).json({ message: 'Vendor account must be active to perform this action' });
     }
 
     // Check if product belongs to this vendor
@@ -470,9 +478,9 @@ export async function searchProducts(req: Request, res: Response) {
         and(
           eq(productsTable.status, 'active'),
           or(
-         ilike(productsTable.name, `%${searchQuery}%`),
-        ilike(productsTable.description, `%${searchQuery}%`),
-        ilike(vendorsTable.storeName, `%${searchQuery}%`),
+            ilike(productsTable.name, `%${searchQuery}%`),
+            ilike(productsTable.description, `%${searchQuery}%`),
+            ilike(vendorsTable.storeName, `%${searchQuery}%`),
           )
         )
       )
@@ -491,7 +499,7 @@ export async function searchProducts(req: Request, res: Response) {
           or(
             like(productsTable.name, `%${searchQuery}%`),
             like(productsTable.description, `%${searchQuery}%`),
-            
+
           )
         )
       );

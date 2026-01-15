@@ -153,14 +153,19 @@ export async function suspendVendor(req: Request, res: Response) {
     const { vendorId } = req.params;
     const { reason } = req.body;
 
+    console.log('[suspendVendor] Request received:', { vendorId, reason });
+
     const vendor = await db
       .select()
       .from(vendorsTable)
       .where(eq(vendorsTable.id, Number(vendorId)));
 
     if (!vendor || vendor.length === 0) {
+      console.log('[suspendVendor] Vendor not found:', vendorId);
       return res.status(404).json({ message: 'Vendor not found' });
     }
+
+    console.log('[suspendVendor] Current vendor status:', vendor[0].status);
 
     const [updatedVendor] = await db
       .update(vendorsTable)
@@ -168,13 +173,18 @@ export async function suspendVendor(req: Request, res: Response) {
       .where(eq(vendorsTable.id, Number(vendorId)))
       .returning();
 
+    console.log('[suspendVendor] Vendor suspended successfully:', updatedVendor.id);
+
     res.json({
       message: 'Vendor suspended successfully',
       vendor: updatedVendor,
     });
   } catch (e) {
-    console.log(e);
-    res.status(500).send(e);
+    console.error('[suspendVendor] Error:', e);
+    res.status(500).json({
+      message: 'Internal server error',
+      error: e instanceof Error ? e.message : 'Unknown error'
+    });
   }
 }
 
