@@ -1,5 +1,5 @@
 'use server';
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+import { API_URL } from '@/config';
 
 export async function login(email: string, password: string) {
   const res = await fetch(`${API_URL}/auth/login`, {
@@ -11,23 +11,23 @@ export async function login(email: string, password: string) {
   });
 
   const data = await res.json();
-  
+
   if (!res.ok) {
     throw Error(data.message || 'Failed to login');
   }
-  
-  if(data.user.role !== 'seller') {
+
+  if (data.user.role !== 'seller') {
     throw Error('Not authorized - vendor access required');
   }
-  
+
   return data;
 }
 
 export async function logout() {
-  
+
   const { cookies } = await import('next/headers');
   const { redirect } = await import('next/navigation');
-  
+
   cookies().delete('token');
   redirect('/login');
 }
@@ -43,7 +43,7 @@ export async function signup(email: string, password: string) {
 
   const data = await res.json();
   if (!res.ok) {
-    throw Error('Failed to login');
+    throw Error(data.message || 'Failed to login');
   }
   return data;
 }
@@ -59,7 +59,7 @@ export async function signupVendor(email: string, password: string) {
 
   const data = await res.json();
   if (!res.ok) {
-    throw Error('Failed to signup vendor');
+    throw Error(data.message || 'Failed to signup vendor');
   }
   return data;
 }

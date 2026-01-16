@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import express, { json, urlencoded, Request } from 'express';
+import cors from 'cors';
 import productsRoutes from './routes/products/index.js';
 import authRoutes from './routes/auth/index.js';
 import ordersRoutes from './routes/orders/index.js';
@@ -13,6 +14,7 @@ import serverless from 'serverless-http';
 const port = 3001;
 const app = express();
 
+app.use(cors());
 app.use(urlencoded({ extended: false }));
 app.use(
   json({

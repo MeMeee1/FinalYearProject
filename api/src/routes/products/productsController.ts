@@ -5,16 +5,11 @@ import { vendorsTable } from '../../db/vendorsSchema.js';
 import { usersTable } from '../../db/usersSchema.js';
 import { eq, and, sql, like, or, ilike } from 'drizzle-orm';
 import _ from 'lodash';
-import { calculateDistance } from '../../utils/calculateDistance.js';
-// Haversine formula to calculate distance between two coordinates
 
 export async function listProducts(req: Request, res: Response) {
   try {
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 10;
-    const userLat = req.query.latitude ? Number(req.query.latitude) : null;
-    const userLon = req.query.longitude ? Number(req.query.longitude) : null;
-    const maxDistance = req.query.maxDistance ? Number(req.query.maxDistance) : null; // in km
 
     if (page < 1 || limit < 1) {
       return res.status(400).json({ message: 'Page and limit must be positive numbers' });
@@ -33,9 +28,6 @@ export async function listProducts(req: Request, res: Response) {
         stock: productsTable.stock,
         sku: productsTable.sku,
         status: productsTable.status,
-        productAddress: productsTable.productAddress,
-        longitude: productsTable.longitude,
-        latitude: productsTable.latitude,
         createdAt: productsTable.createdAt,
         updatedAt: productsTable.updatedAt,
         sellerId: productsTable.sellerId,
@@ -52,33 +44,6 @@ export async function listProducts(req: Request, res: Response) {
       .limit(limit)
       .offset(offset);
     console.log('Fetched products:', products);
-    // Filter by distance using Haversine formula if coordinates provided
-    let filteredProducts = products;
-    if (userLat !== null && userLon !== null && maxDistance !== null) {
-      filteredProducts = products.filter((product) => {
-        if (!product.latitude || !product.longitude) return false;
-
-        const productLat = Number(product.latitude);
-        const productLon = Number(product.longitude);
-
-        const distance = calculateDistance(userLat, userLon, productLat, productLon);
-        return distance <= maxDistance;
-      });
-    }
-
-    // Add distance to response if coordinates provided
-    const productsWithDistance = filteredProducts.map((product) => {
-      if (userLat !== null && userLon !== null && product.latitude && product.longitude) {
-        const distance = calculateDistance(
-          userLat,
-          userLon,
-          Number(product.latitude),
-          Number(product.longitude)
-        );
-        return { ...product, distance };
-      }
-      return product;
-    });
 
     // Get total count for pagination
     const [{ count }] = await db
@@ -89,7 +54,7 @@ export async function listProducts(req: Request, res: Response) {
     const totalPages = Math.ceil(count / limit);
 
     res.json({
-      data: productsWithDistance,
+      data: products,
       pagination: {
         page,
         limit,
@@ -117,9 +82,6 @@ export async function getProductById(req: Request, res: Response) {
         stock: productsTable.stock,
         sku: productsTable.sku,
         status: productsTable.status,
-        productAddress: productsTable.productAddress,
-        longitude: productsTable.longitude,
-        latitude: productsTable.latitude,
         createdAt: productsTable.createdAt,
         updatedAt: productsTable.updatedAt,
         sellerId: productsTable.sellerId,
@@ -199,96 +161,14 @@ export async function getProductsBySeller(req: Request, res: Response) {
   }
 }
 
-export async function getProductsByDistance(req: Request, res: Response) {
-  try {
-    const { latitude, longitude, maxDistance } = req.query;
 
-    if (!latitude || !longitude || !maxDistance) {
-      return res
-        .status(400)
-        .json({ message: 'latitude, longitude, and maxDistance are required' });
-    }
 
-    const userLat = Number(latitude);
-    const userLon = Number(longitude);
-    const maxDist = Number(maxDistance);
-
-    const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 10;
-
-    if (page < 1 || limit < 1) {
-      return res.status(400).json({ message: 'Page and limit must be positive numbers' });
-    }
-
-    const offset = (page - 1) * limit;
-
-    // Get all active products
-    const allProducts = await db
-      .select({
-        id: productsTable.id,
-        name: productsTable.name,
-        description: productsTable.description,
-        image: productsTable.image,
-        price: productsTable.price,
-        stock: productsTable.stock,
-        sku: productsTable.sku,
-        status: productsTable.status,
-        longitude: productsTable.longitude,
-        latitude: productsTable.latitude,
-        productAddress: productsTable.productAddress,
-        createdAt: productsTable.createdAt,
-        updatedAt: productsTable.updatedAt,
-        sellerId: productsTable.sellerId,
-        vendor: {
-          id: vendorsTable.id,
-          storeName: vendorsTable.storeName,
-          businessAddress: vendorsTable.businessAddress,
-        },
-      })
-      .from(productsTable)
-      .leftJoin(vendorsTable, eq(productsTable.sellerId, vendorsTable.id))
-      .where(eq(productsTable.status, 'active'));
-
-    // Filter products within distance
-    const productsWithinDistance = allProducts
-      .filter((product) => {
-        if (!product.latitude || !product.longitude) return false;
-
-        const productLat = Number(product.latitude);
-        const productLon = Number(product.longitude);
-        const distance = calculateDistance(userLat, userLon, productLat, productLon);
-
-        return distance <= maxDist;
-      })
-      .map((product) => {
-        const distance = calculateDistance(
-          userLat,
-          userLon,
-          Number(product.latitude),
-          Number(product.longitude)
-        );
-        return { ...product, distance };
-      })
-      .sort((a, b) => a.distance - b.distance); // Sort by distance (closest first)
-
-    // Apply pagination
-    const paginatedProducts = productsWithinDistance.slice(offset, offset + limit);
-    const totalPages = Math.ceil(productsWithinDistance.length / limit);
-
-    res.json({
-      data: paginatedProducts,
-      pagination: {
-        page,
-        limit,
-        total: productsWithinDistance.length,
-        totalPages,
-        hasMore: page < totalPages,
-      },
-    });
-  } catch (e) {
-    console.log(e);
-    res.status(500).send(e);
-  }
+// Helper to generate SKU
+function generateSKU(name: string): string {
+  const prefix = name.slice(0, 3).toUpperCase().replace(/[^A-Z]/g, 'X');
+  const timestamp = Date.now().toString().slice(-6);
+  const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+  return `${prefix}-${timestamp}-${random}`;
 }
 
 export async function createProduct(req: Request, res: Response) {
@@ -312,8 +192,27 @@ export async function createProduct(req: Request, res: Response) {
       return res.status(403).json({ message: 'Vendor account is not active' });
     }
 
+    const { name, image, images, sku, ...rest } = req.cleanBody;
+
+    // Handle images: prefer 'images' array, fallback to 'image' string/array
+    let finalImageString = '[]';
+    if (Array.isArray(images)) {
+      finalImageString = JSON.stringify(images);
+    } else if (Array.isArray(image)) {
+      finalImageString = JSON.stringify(image);
+    } else if (image) {
+      // If it's a single string, wrap in array
+      finalImageString = JSON.stringify([image]);
+    }
+
+    // Auto-generate SKU if missing
+    const finalSku = sku && sku.trim() !== '' ? sku : generateSKU(name);
+
     const productData = {
-      ...req.cleanBody,
+      name,
+      ...rest,
+      sku: finalSku,
+      image: finalImageString,
       sellerId: vendor[0].id,
     };
 
@@ -365,7 +264,19 @@ export async function updateProduct(req: Request, res: Response) {
       return res.status(403).json({ message: 'Not authorized to update this product' });
     }
 
-    const updatedFields = req.cleanBody;
+    const { image, images, ...rest } = req.cleanBody;
+    const updatedFields: any = { ...rest };
+
+    // Handle image update if provided
+    if (images !== undefined) {
+      updatedFields.image = JSON.stringify(images);
+    } else if (image !== undefined) {
+      if (Array.isArray(image)) {
+        updatedFields.image = JSON.stringify(image);
+      } else {
+        updatedFields.image = JSON.stringify([image]);
+      }
+    }
 
     const [updatedProduct] = await db
       .update(productsTable)
@@ -459,9 +370,6 @@ export async function searchProducts(req: Request, res: Response) {
         stock: productsTable.stock,
         sku: productsTable.sku,
         status: productsTable.status,
-        productAddress: productsTable.productAddress,
-        longitude: productsTable.longitude,
-        latitude: productsTable.latitude,
         createdAt: productsTable.createdAt,
         updatedAt: productsTable.updatedAt,
         sellerId: productsTable.sellerId,

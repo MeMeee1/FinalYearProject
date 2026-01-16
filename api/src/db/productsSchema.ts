@@ -12,28 +12,26 @@ import { vendorsTable } from './vendorsSchema';
 export const productsTable = pgTable('products', {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   sellerId: integer().references(() => vendorsTable.id).default(1),
-  
+
   name: varchar({ length: 255 }).notNull(),
   description: text(),
-  image: varchar({ length: 255 }),
+  image: text(), // Changed to text to support JSON string of multiple images
   price: doublePrecision().notNull(),
-  
+
   // Inventory
-  stock: integer().notNull().default(0), 
-  sku: varchar({ length: 100 }), 
-  
+  stock: integer().notNull().default(0),
+  sku: varchar({ length: 100 }),
+
   // Status
-  status: varchar({ length: 50, enum: ['active', 'draft', 'out_of_stock'] }).notNull().default('active'), 
-  
-  productAddress: text().notNull().default(''), // Location of the product (seller's address)
-  longitude: varchar({ length: 50 }).notNull().default(''),
-  latitude: varchar({ length: 50 }).notNull().default(''),
-  createdAt: timestamp().notNull().defaultNow(), 
-  updatedAt: timestamp().notNull().defaultNow(), 
+  status: varchar({ length: 50, enum: ['active', 'draft', 'out_of_stock'] }).notNull().default('active'),
+
+  createdAt: timestamp().notNull().defaultNow(),
+  updatedAt: timestamp().notNull().defaultNow(),
 });
 
 export const createProductSchema = createInsertSchema(productsTable).omit({
   id: true,
+  sellerId: true, // Omit sellerId - it's set by the backend from the authenticated vendor
   createdAt: true,
   updatedAt: true,
 });

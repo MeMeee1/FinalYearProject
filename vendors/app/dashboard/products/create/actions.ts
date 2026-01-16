@@ -46,6 +46,8 @@ export async function createProduct(
   name: string,
   description: string,
   price: number,
+  stock: number,
+  sku: string,
   image?: string
 ) {
   let redirectUrl = '/dashboard/products';
@@ -58,7 +60,7 @@ export async function createProduct(
         Authorization: `${token}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ name, description, price, image }),
+      body: JSON.stringify({ name, description, price, stock, sku, image }),
     });
 
     if (!res.ok) {

@@ -1,0 +1,101 @@
+﻿app/dashboard/orders/[id]/page.tsx(34,26): error TS7006: Parameter 'orderItem' implicitly has an 'any' type.
+components/ui/form-control/index.tsx(350,7): error TS2322: Type '{ children?: ReactNode; hitSlop?: Insets | undefined; id?: string | undefined; onLayout?: ((event: LayoutChangeEvent) => void) | undefined; pointerEvents?: "auto" | ... 3 more ... | undefined; ... 79 more ...; className: string; }' is not assignable to type 'IntrinsicAttributes & ViewProps'.
+  Property 'ref' does not exist on type 'IntrinsicAttributes & ViewProps'.
+components/ui/form-control/index.tsx(374,7): error TS2322: Type '{ allowFontScaling?: boolean | undefined; children?: ReactNode; ellipsizeMode?: "head" | "clip" | "middle" | "tail" | undefined; id?: string | undefined; lineBreakMode?: "head" | ... 3 more ... | undefined; ... 63 more ...; ref: ForwardedRef<...>; }' is not assignable to type 'IntrinsicAttributes & TextProps'.
+  Property 'ref' does not exist on type 'IntrinsicAttributes & TextProps'.
+components/ui/form-control/index.tsx(432,7): error TS2322: Type '{ children?: ReactNode; hitSlop?: Insets | undefined; id?: string | undefined; onLayout?: ((event: LayoutChangeEvent) => void) | undefined; pointerEvents?: "auto" | ... 3 more ... | undefined; ... 79 more ...; className: string; }' is not assignable to type 'IntrinsicAttributes & ViewProps'.
+  Property 'ref' does not exist on type 'IntrinsicAttributes & ViewProps'.
+components/ui/form-control/index.tsx(457,7): error TS2322: Type '{ allowFontScaling?: boolean | undefined; children?: ReactNode; ellipsizeMode?: "head" | "clip" | "middle" | "tail" | undefined; id?: string | undefined; lineBreakMode?: "head" | ... 3 more ... | undefined; ... 63 more ...; ref: ForwardedRef<...>; }' is not assignable to type 'IntrinsicAttributes & TextProps'.
+  Property 'ref' does not exist on type 'IntrinsicAttributes & TextProps'.
+components/ui/form-control/index.tsx(474,7): error TS2322: Type '{ children?: ReactNode; hitSlop?: Insets | undefined; id?: string | undefined; onLayout?: ((event: LayoutChangeEvent) => void) | undefined; pointerEvents?: "auto" | ... 3 more ... | undefined; ... 79 more ...; className: string; }' is not assignable to type 'IntrinsicAttributes & ViewProps'.
+  Property 'ref' does not exist on type 'IntrinsicAttributes & ViewProps'.
+components/ui/form-control/index.tsx(501,7): error TS2322: Type '{ allowFontScaling?: boolean | undefined; children?: ReactNode; ellipsizeMode?: "head" | "clip" | "middle" | "tail" | undefined; id?: string | undefined; lineBreakMode?: "head" | ... 3 more ... | undefined; ... 63 more ...; ref: ForwardedRef<...>; }' is not assignable to type 'IntrinsicAttributes & TextProps'.
+  Property 'ref' does not exist on type 'IntrinsicAttributes & TextProps'.
+components/ui/heading/index.tsx(54,15): error TS2322: Type 'ForwardedRef<typeof Text | Component<TextProps, any, any>>' is not assignable to type 'LegacyRef<typeof Text> | undefined'.
+  Type 'MutableRefObject<typeof Text | Component<TextProps, any, any> | null>' is not assignable to type 'LegacyRef<typeof Text> | undefined'.
+    Type 'MutableRefObject<typeof Text | Component<TextProps, any, any> | null>' is not assignable to type 'RefObject<typeof Text>'.
+      Types of property 'current' are incompatible.
+        Type 'typeof Text | Component<TextProps, any, any> | null' is not assignable to type 'typeof Text | null'.
+          Property 'prototype' is missing in type 'Component<TextProps, any, any>' but required in type 'typeof Text'.
+components/ui/heading/index.tsx(72,15): error TS2322: Type 'ForwardedRef<typeof Text | Component<TextProps, any, any>>' is not assignable to type 'LegacyRef<typeof Text> | undefined'.
+  Type 'MutableRefObject<typeof Text | Component<TextProps, any, any> | null>' is not assignable to type 'LegacyRef<typeof Text> | undefined'.
+    Type 'MutableRefObject<typeof Text | Component<TextProps, any, any> | null>' is not assignable to type 'RefObject<typeof Text>'.
+      Types of property 'current' are incompatible.
+        Type 'typeof Text | Component<TextProps, any, any> | null' is not assignable to type 'typeof Text | null'.
+          Property 'prototype' is missing in type 'Component<TextProps, any, any>' but required in type 'typeof Text'.
+components/ui/heading/index.tsx(90,15): error TS2322: Type 'ForwardedRef<typeof Text | Component<TextProps, any, any>>' is not assignable to type 'LegacyRef<typeof Text> | undefined'.
+  Type 'MutableRefObject<typeof Text | Component<TextProps, any, any> | null>' is not assignable to type 'LegacyRef<typeof Text> | undefined'.
+    Type 'MutableRefObject<typeof Text | Component<TextProps, any, any> | null>' is not assignable to type 'RefObject<typeof Text>'.
+      Types of property 'current' are incompatible.
+        Type 'typeof Text | Component<TextProps, any, any> | null' is not assignable to type 'typeof Text | null'.
+          Property 'prototype' is missing in type 'Component<TextProps, any, any>' but required in type 'typeof Text'.
+components/ui/heading/index.tsx(108,15): error TS2322: Type 'ForwardedRef<typeof Text | Component<TextProps, any, any>>' is not assignable to type 'LegacyRef<typeof Text> | undefined'.
+  Type 'MutableRefObject<typeof Text | Component<TextProps, any, any> | null>' is not assignable to type 'LegacyRef<typeof Text> | undefined'.
+    Type 'MutableRefObject<typeof Text | Component<TextProps, any, any> | null>' is not assignable to type 'RefObject<typeof Text>'.
+      Types of property 'current' are incompatible.
+        Type 'typeof Text | Component<TextProps, any, any> | null' is not assignable to type 'typeof Text | null'.
+          Property 'prototype' is missing in type 'Component<TextProps, any, any>' but required in type 'typeof Text'.
+components/ui/heading/index.tsx(126,15): error TS2322: Type 'ForwardedRef<typeof Text | Component<TextProps, any, any>>' is not assignable to type 'LegacyRef<typeof Text> | undefined'.
+  Type 'MutableRefObject<typeof Text | Component<TextProps, any, any> | null>' is not assignable to type 'LegacyRef<typeof Text> | undefined'.
+    Type 'MutableRefObject<typeof Text | Component<TextProps, any, any> | null>' is not assignable to type 'RefObject<typeof Text>'.
+      Types of property 'current' are incompatible.
+        Type 'typeof Text | Component<TextProps, any, any> | null' is not assignable to type 'typeof Text | null'.
+          Property 'prototype' is missing in type 'Component<TextProps, any, any>' but required in type 'typeof Text'.
+components/ui/heading/index.tsx(145,15): error TS2322: Type 'ForwardedRef<typeof Text | Component<TextProps, any, any>>' is not assignable to type 'LegacyRef<typeof Text> | undefined'.
+  Type 'MutableRefObject<typeof Text | Component<TextProps, any, any> | null>' is not assignable to type 'LegacyRef<typeof Text> | undefined'.
+    Type 'MutableRefObject<typeof Text | Component<TextProps, any, any> | null>' is not assignable to type 'RefObject<typeof Text>'.
+      Types of property 'current' are incompatible.
+        Type 'typeof Text | Component<TextProps, any, any> | null' is not assignable to type 'typeof Text | null'.
+          Property 'prototype' is missing in type 'Component<TextProps, any, any>' but required in type 'typeof Text'.
+components/ui/heading/index.tsx(163,15): error TS2322: Type 'ForwardedRef<typeof Text | Component<TextProps, any, any>>' is not assignable to type 'LegacyRef<typeof Text> | undefined'.
+  Type 'MutableRefObject<typeof Text | Component<TextProps, any, any> | null>' is not assignable to type 'LegacyRef<typeof Text> | undefined'.
+    Type 'MutableRefObject<typeof Text | Component<TextProps, any, any> | null>' is not assignable to type 'RefObject<typeof Text>'.
+      Types of property 'current' are incompatible.
+        Type 'typeof Text | Component<TextProps, any, any> | null' is not assignable to type 'typeof Text | null'.
+          Property 'prototype' is missing in type 'Component<TextProps, any, any>' but required in type 'typeof Text'.
+components/ui/input/index.tsx(5,21): error TS2307: Cannot find module '@gluestack-ui/utils/nativewind-utils' or its corresponding type declarations.
+components/ui/input/index.tsx(9,8): error TS2307: Cannot find module '@gluestack-ui/utils/nativewind-utils' or its corresponding type declarations.
+components/ui/input/index.tsx(11,35): error TS2307: Cannot find module '@gluestack-ui/utils/nativewind-utils' or its corresponding type declarations.
+components/ui/select/index.tsx(311,33): error TS2339: Property 'ItemText' does not exist on type 'ISelectComponentType<ViewProps, Omit<Omit<PressableProps & RefAttributes<View>, "ref"> & RefAttributes<View>, "ref"> & WithStyleContextProps & RefAttributes<...>, ... 13 more ..., Omit<...> & RefAttributes<...>>'.
+components/ui/select/select-actionsheet.tsx(120,32): error TS2345: Argument of type '{ className: "style"; }' is not assignable to parameter of type 'EnableCssInteropOptions<ForwardRefExoticComponent<RefAttributes<IPrimitiveIcon & RefAttributes<Svg>> & Omit<IPrimitiveIcon & RefAttributes<Svg>, "ref">>> & { ...; }'.
+  Type '{ className: "style"; }' is not assignable to type 'EnableCssInteropOptions<ForwardRefExoticComponent<RefAttributes<IPrimitiveIcon & RefAttributes<Svg>> & Omit<IPrimitiveIcon & RefAttributes<Svg>, "ref">>>'.
+    Property 'className' is incompatible with index signature.
+      Type '"style"' is not assignable to type 'CSSInteropClassNamePropConfig<RefAttributes<IPrimitiveIcon & RefAttributes<Svg>> & Omit<IPrimitiveIcon & RefAttributes<Svg>, "ref">>'.
+components/ui/table/index.tsx(42,9): error TS2322: Type 'ForwardedRef<typeof View | Component<ViewProps, any, any>>' is not assignable to type 'LegacyRef<typeof View> | undefined'.
+  Type 'MutableRefObject<typeof View | Component<ViewProps, any, any> | null>' is not assignable to type 'LegacyRef<typeof View> | undefined'.
+    Type 'MutableRefObject<typeof View | Component<ViewProps, any, any> | null>' is not assignable to type 'RefObject<typeof View>'.
+      Types of property 'current' are incompatible.
+        Type 'typeof View | Component<ViewProps, any, any> | null' is not assignable to type 'typeof View | null'.
+          Type 'Component<ViewProps, any, any>' is missing the following properties from type 'typeof View': prototype, forceTouchAvailable
+components/ui/table/index.tsx(62,9): error TS2322: Type 'ForwardedRef<typeof View | Component<ViewProps, any, any>>' is not assignable to type 'LegacyRef<typeof View> | undefined'.
+  Type 'MutableRefObject<typeof View | Component<ViewProps, any, any> | null>' is not assignable to type 'LegacyRef<typeof View> | undefined'.
+    Type 'MutableRefObject<typeof View | Component<ViewProps, any, any> | null>' is not assignable to type 'RefObject<typeof View>'.
+      Types of property 'current' are incompatible.
+        Type 'typeof View | Component<ViewProps, any, any> | null' is not assignable to type 'typeof View | null'.
+          Type 'Component<ViewProps, any, any>' is missing the following properties from type 'typeof View': prototype, forceTouchAvailable
+components/ui/table/index.tsx(76,7): error TS2322: Type 'ForwardedRef<typeof View | Component<ViewProps, any, any>>' is not assignable to type 'LegacyRef<typeof View> | undefined'.
+  Type 'MutableRefObject<typeof View | Component<ViewProps, any, any> | null>' is not assignable to type 'LegacyRef<typeof View> | undefined'.
+    Type 'MutableRefObject<typeof View | Component<ViewProps, any, any> | null>' is not assignable to type 'RefObject<typeof View>'.
+      Types of property 'current' are incompatible.
+        Type 'typeof View | Component<ViewProps, any, any> | null' is not assignable to type 'typeof View | null'.
+          Type 'Component<ViewProps, any, any>' is missing the following properties from type 'typeof View': prototype, forceTouchAvailable
+components/ui/table/index.tsx(95,9): error TS2322: Type 'ForwardedRef<typeof View | Component<ViewProps, any, any>>' is not assignable to type 'LegacyRef<typeof View> | undefined'.
+  Type 'MutableRefObject<typeof View | Component<ViewProps, any, any> | null>' is not assignable to type 'LegacyRef<typeof View> | undefined'.
+    Type 'MutableRefObject<typeof View | Component<ViewProps, any, any> | null>' is not assignable to type 'RefObject<typeof View>'.
+      Types of property 'current' are incompatible.
+        Type 'typeof View | Component<ViewProps, any, any> | null' is not assignable to type 'typeof View | null'.
+          Type 'Component<ViewProps, any, any>' is missing the following properties from type 'typeof View': prototype, forceTouchAvailable
+components/ui/table/index.tsx(135,7): error TS2322: Type 'ForwardedRef<typeof View | Component<ViewProps, any, any>>' is not assignable to type 'LegacyRef<typeof View> | undefined'.
+  Type 'MutableRefObject<typeof View | Component<ViewProps, any, any> | null>' is not assignable to type 'LegacyRef<typeof View> | undefined'.
+    Type 'MutableRefObject<typeof View | Component<ViewProps, any, any> | null>' is not assignable to type 'RefObject<typeof View>'.
+      Types of property 'current' are incompatible.
+        Type 'typeof View | Component<ViewProps, any, any> | null' is not assignable to type 'typeof View | null'.
+          Type 'Component<ViewProps, any, any>' is missing the following properties from type 'typeof View': prototype, forceTouchAvailable
+components/ui/table/index.tsx(175,7): error TS2322: Type 'ForwardedRef<typeof Text | Component<TextProps, any, any>>' is not assignable to type 'LegacyRef<typeof Text> | undefined'.
+  Type 'MutableRefObject<typeof Text | Component<TextProps, any, any> | null>' is not assignable to type 'LegacyRef<typeof Text> | undefined'.
+    Type 'MutableRefObject<typeof Text | Component<TextProps, any, any> | null>' is not assignable to type 'RefObject<typeof Text>'.
+      Types of property 'current' are incompatible.
+        Type 'typeof Text | Component<TextProps, any, any> | null' is not assignable to type 'typeof Text | null'.
+          Property 'prototype' is missing in type 'Component<TextProps, any, any>' but required in type 'typeof Text'.
+hooks/useVendorProfile.ts(88,19): error TS2345: Argument of type 'Partial<VendorProfile | null>' is not assignable to parameter of type 'Partial<VendorProfile>'.
+  Type 'null' is not assignable to type 'Partial<VendorProfile>'.

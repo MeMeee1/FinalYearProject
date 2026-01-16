@@ -3,7 +3,6 @@ import {
   listProducts,
   getProductById,
   getProductsBySeller,
-  getProductsByDistance,
   createProduct,
   updateProduct,
   deleteProduct,
@@ -22,7 +21,6 @@ const router = Router();
 // Public routes
 router.get('/', listProducts);
 router.get('/search', searchProducts);
-router.get('/by-distance', getProductsByDistance);
 router.get('/seller/:sellerId', getProductsBySeller);
 router.get('/:id', getProductById);
 

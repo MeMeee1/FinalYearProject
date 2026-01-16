@@ -1,9 +1,9 @@
 'use server';
-
 import { login, signup, signupVendor } from '@/api/auth';
 import { createVendor } from '@/api/vendors';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { createProduct } from '@/api/products';
 
 export async function handleLogin(email: string, password: string) {
   let redirectUrl = `/login?errorMessage=${encodeURIComponent(
@@ -53,11 +53,18 @@ export async function handleVendorSignup(
     businessAddress?: string;
     businessEmail?: string;
     businessPhone?: string;
+  },
+  productData?: {
+    name: string;
+    description: string;
+    price: number;
+    stock: number;
+    image: string;
+    sku?: string;
   }
 ) {
-  let redirectUrl = `/signUp?errorMessage=${encodeURIComponent(
-    'Failed to sign up as vendor'
-  )}`;
+  let redirectUrl: string | null = null;
+
   try {
     // First, create the user account
     const res = await signupVendor(email, password);
@@ -68,15 +75,40 @@ export async function handleVendorSignup(
       // Then create the vendor profile
       try {
         await createVendor(vendorData, res.token);
-        redirectUrl = '/login?message=' + encodeURIComponent('Vendor account created! Pending admin approval. Please login.');
+
+        // If product data is provided, create the product
+        if (productData) {
+          try {
+            await createProduct({
+              name: productData.name,
+              description: productData.description,
+              price: productData.price,
+              stock: productData.stock,
+              images: productData.image ? [productData.image] : [],
+              sku: productData.sku,
+            });
+            redirectUrl = '/login?message=' + encodeURIComponent('Vendor account and first product created! Pending admin approval. Please login.');
+          } catch (productError) {
+            console.log('Product creation error:', productError);
+            // Still redirect to login but warn about product
+            redirectUrl = '/login?message=' + encodeURIComponent('Account created but product failed to save. Please login and add it manually.');
+          }
+        } else {
+          redirectUrl = '/login?message=' + encodeURIComponent('Vendor account created! Pending admin approval. Please login.');
+        }
+
       } catch (vendorError) {
         console.log('Vendor profile creation error:', vendorError);
         redirectUrl = '/login?message=' + encodeURIComponent('Account created but vendor profile setup incomplete. Please complete your profile.');
       }
     }
   } catch (error) {
-    console.log(error);
-  } finally {
+    console.log('Signup error:', error);
+    // Return the error to the client instead of redirecting
+    return { error: error instanceof Error ? error.message : 'Failed to sign up' };
+  }
+
+  if (redirectUrl) {
     redirect(redirectUrl);
   }
 }

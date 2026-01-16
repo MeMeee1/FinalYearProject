@@ -8,6 +8,27 @@
       "when": 1767570123308,
       "tag": "0000_far_cable",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1768564050597,
+      "tag": "0001_milky_tinkerer",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1768564819358,
+      "tag": "0002_puzzling_the_anarchist",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1768565050964,
+      "tag": "0003_brief_iron_lad",
+      "breakpoints": true
     }
   ]
 }
