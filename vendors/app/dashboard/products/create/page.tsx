@@ -137,7 +137,7 @@ export default function CreateProductPage() {
   return (
     <Box className="flex-1 min-h-screen bg-gray-50 p-4 md:p-8">
       <Box className="max-w-6xl mx-auto">
-        <HStack className="justify-between items-center mb-6">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
           <VStack>
             <Heading className="text-2xl font-bold text-gray-900">Create Product</Heading>
             <Text className="text-gray-500">Add a new product to your store</Text>
@@ -145,11 +145,11 @@ export default function CreateProductPage() {
           <Button
             onPress={handleSave}
             isDisabled={isSubmitting}
-            className="bg-blue-600 hover:bg-blue-700"
+            className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto"
           >
             {isSubmitting ? <ButtonSpinner color="white" /> : <ButtonText className="text-white">Save Product</ButtonText>}
           </Button>
-        </HStack>
+        </div>
 
         {errorMessage && (
           <Box className="bg-red-50 border border-red-200 p-4 rounded-lg mb-6 flex flex-row items-center gap-2">
