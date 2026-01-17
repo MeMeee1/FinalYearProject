@@ -18,11 +18,11 @@ export default async function ProductsPage({
   try {
     const query = searchParams.q?.trim();
     const currentPage = Math.max(1, Number(searchParams.page) || 1);
-    const limit = 2;
+    const limit = 8;
 
     const response = await listActiveVendors(currentPage, limit);
     let vendors = response?.data ?? [];
-    
+
     // Client-side search filter
     if (query) {
       vendors = vendors.filter((v: any) =>
@@ -74,7 +74,7 @@ export default async function ProductsPage({
                           </div>
                         )}
                       </div>
-                      
+
                       {/* Vendor Info */}
                       <div className="flex-grow">
                         <Heading size="md" className="mb-2 line-clamp-1">{vendor.storeName}</Heading>
@@ -83,7 +83,7 @@ export default async function ProductsPage({
                             {vendor.storeDescription}
                           </Text>
                         )}
-                        
+
                         <div className="mt-auto pt-3 border-t border-gray-100">
                           <Text className="text-xs text-blue-600 font-medium">View Products →</Text>
                         </div>
