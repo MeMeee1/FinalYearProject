@@ -10,11 +10,9 @@ export const usersTable = pgTable('users', {
 
   name: varchar({ length: 255 }),
   phone: varchar({ length: 13 }),
+  address: text(),
   city: varchar({ length: 255 }).default('Abuja'),
   country: varchar({ length: 255 }).default('Nigeria'),
-
-  isApproved: boolean().default(false), // Admin must approve sellers
-  stripeAccountId: varchar({ length: 255 }), // For Stripe Connect payouts
 
   createdAt: timestamp().notNull().defaultNow(),
 });

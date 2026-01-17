@@ -48,13 +48,21 @@ export async function signup(email: string, password: string) {
   return data;
 }
 
-export async function signupVendor(email: string, password: string) {
+export async function signupVendor(
+  email: string,
+  password: string,
+  name: string,
+  phone: string,
+  address: string,
+  city: string,
+  country: string
+) {
   const res = await fetch(`${API_URL}/auth/register/seller`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify({ email, password, name, phone, address, city, country }),
   });
 
   const data = await res.json();

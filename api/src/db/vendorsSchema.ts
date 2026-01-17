@@ -3,7 +3,8 @@ import { createInsertSchema } from 'drizzle-zod';
 import { usersTable } from './usersSchema';
 export const vendorsTable = pgTable('vendors', {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
-  userId: integer().references(() => usersTable.id).notNull(),
+  userId: integer().references(() => usersTable.id).notNull().unique(),
+  stripeAccountId: varchar({ length: 255 }), // For Stripe Connect payouts
   // Store Information
   storeName: varchar({ length: 255 }).notNull(),
   storeDescription: text(),

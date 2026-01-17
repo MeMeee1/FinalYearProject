@@ -8,9 +8,16 @@ import { ArrowLeft, ArrowRight, Eye, EyeOff, X, UploadCloud, ChevronDown, AlertC
 // Removed custom components imports to use standard HTML + Tailwind
 import { API_URL } from '@/config';
 
+
 type FormData = {
   email: string;
   password: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  address: string;
+  city: string;
+  country: string;
   businessName: string;
   businessAddress: string;
   businessEmail: string;
@@ -19,8 +26,6 @@ type FormData = {
   storeDescription: string;
   storeLogo: string;
   storeBanner: string;
-  city: string;
-  country: string;
 };
 
 const step1Schema = z.object({
@@ -29,21 +34,29 @@ const step1Schema = z.object({
 });
 
 const step2Schema = z.object({
-  businessName: z.string().min(2),
-  businessAddress: z.string().min(5),
-  businessEmail: z.string().email(),
-  businessPhone: z.string().min(10),
+  firstName: z.string().min(2),
+  lastName: z.string().min(2),
+  phone: z.string().min(10),
+  address: z.string().min(5),
   city: z.literal('Abuja', { message: 'Only Abuja is supported' }),
   country: z.literal('Nigeria', { message: 'Only Nigeria is supported' }),
 });
 
 const step3Schema = z.object({
+  businessName: z.string().min(2),
+  businessAddress: z.string().min(5),
+  businessEmail: z.string().email(),
+  businessPhone: z.string().min(10),
+});
+
+const step4Schema = z.object({
   storeName: z.string().min(2),
   storeDescription: z.string().min(10),
   storeLogo: z.string().url().optional().or(z.literal('')),
   storeBanner: z.string().url().optional().or(z.literal('')),
 });
 
+// ... (ImageUploadField, FormInput, FormSelect components remain the same) ...
 const ImageUploadField = ({
   label,
   value,
@@ -135,9 +148,6 @@ const ImageUploadField = ({
   );
 };
 
-
-
-
 // Helper input component for consistency
 const FormInput = ({
   label,
@@ -227,6 +237,12 @@ export default function SignUpPage() {
   const [formData, setFormData] = useState<FormData>({
     email: '',
     password: '',
+    firstName: '',
+    lastName: '',
+    phone: '',
+    address: '',
+    city: 'Abuja',
+    country: 'Nigeria',
     businessName: '',
     businessAddress: '',
     businessEmail: '',
@@ -235,8 +251,6 @@ export default function SignUpPage() {
     storeDescription: '',
     storeLogo: '',
     storeBanner: '',
-    city: 'Abuja',
-    country: 'Nigeria',
   });
 
   const updateField = (field: string, value: string) => {
@@ -249,6 +263,7 @@ export default function SignUpPage() {
       if (s === 1) step1Schema.parse(formData);
       if (s === 2) step2Schema.parse(formData);
       if (s === 3) step3Schema.parse(formData);
+      if (s === 4) step4Schema.parse(formData);
       setErrors({});
       return true;
     } catch (err) {
@@ -265,6 +280,11 @@ export default function SignUpPage() {
 
   const handleSubmit = async () => {
     const vendorData = {
+      name: `${formData.firstName} ${formData.lastName}`,
+      phone: formData.phone,
+      address: formData.address,
+      city: formData.city,
+      country: formData.country,
       businessName: formData.businessName,
       businessAddress: formData.businessAddress,
       businessEmail: formData.businessEmail,
@@ -273,8 +293,6 @@ export default function SignUpPage() {
       storeDescription: formData.storeDescription,
       storeLogo: formData.storeLogo,
       storeBanner: formData.storeBanner,
-      city: formData.city,
-      country: formData.country,
     };
 
     const result = await handleVendorSignup(formData.email, formData.password, vendorData);
@@ -284,10 +302,6 @@ export default function SignUpPage() {
       alert(result.error);
     }
   };
-
-
-
-
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50/50 p-4 font-sans">
@@ -301,7 +315,7 @@ export default function SignUpPage() {
 
         {/* Progress Steps */}
         <div className="flex gap-2 mb-8">
-          {[1, 2, 3].map((s) => (
+          {[1, 2, 3, 4].map((s) => (
             <div key={s} className="flex-1 h-1.5 rounded-full overflow-hidden bg-gray-100">
               <div
                 className={`h-full transition-all duration-500 ease-out ${s <= step ? 'bg-blue-600 w-full' : 'w-0'}`}
@@ -352,51 +366,47 @@ export default function SignUpPage() {
 
         {step === 2 && (
           <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Business Details</h2>
-
-            <FormInput label="Business Name" placeholder="Legal Business Name" value={formData.businessName} onChange={v => updateField('businessName', v)} error={errors.businessName} />
-            <FormInput label="Business Address" placeholder="123 Market St" value={formData.businessAddress} onChange={v => updateField('businessAddress', v)} error={errors.businessAddress} />
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Personal Details</h2>
 
             <div className="grid grid-cols-2 gap-4">
-              <FormInput label="Business Email" placeholder="contact@biz.com" value={formData.businessEmail} onChange={v => updateField('businessEmail', v)} error={errors.businessEmail} />
-              <FormInput label="Phone Number" placeholder="+234..." value={formData.businessPhone} onChange={v => updateField('businessPhone', v)} error={errors.businessPhone} />
+              <FormInput label="First Name" placeholder="John" value={formData.firstName} onChange={v => updateField('firstName', v)} error={errors.firstName} />
+              <FormInput label="Last Name" placeholder="Doe" value={formData.lastName} onChange={v => updateField('lastName', v)} error={errors.lastName} />
             </div>
 
+            <FormInput label="Phone Number" placeholder="+234..." value={formData.phone} onChange={v => updateField('phone', v)} error={errors.phone} />
+            <FormInput label="Personal Address" placeholder="123 Home St" value={formData.address} onChange={v => updateField('address', v)} error={errors.address} />
+
             <div className="grid grid-cols-2 gap-4">
-              <FormSelect
-                label="City"
-                value={formData.city}
-                options={[{ label: 'Abuja', value: 'Abuja' }]}
-                onChange={v => updateField('city', v)}
-                error={errors.city}
-              />
-              <FormSelect
-                label="Country"
-                value={formData.country}
-                options={[{ label: 'Nigeria', value: 'Nigeria' }]}
-                onChange={v => updateField('country', v)}
-                error={errors.country}
-              />
+              <FormSelect label="City" value={formData.city} options={[{ label: 'Abuja', value: 'Abuja' }]} onChange={v => updateField('city', v)} error={errors.city} />
+              <FormSelect label="Country" value={formData.country} options={[{ label: 'Nigeria', value: 'Nigeria' }]} onChange={v => updateField('country', v)} error={errors.country} />
             </div>
 
             <div className="flex gap-3 mt-6">
-              <button
-                onClick={() => setStep(1)}
-                className="flex-1 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 font-medium py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
-              >
-                <ArrowLeft size={18} /> Back
-              </button>
-              <button
-                onClick={() => validateStep(2) && setStep(3)}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg shadow-sm shadow-blue-200 transition-all flex items-center justify-center gap-2 group"
-              >
-                Next Step <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-              </button>
+              <button onClick={() => setStep(1)} className="flex-1 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 font-medium py-3 rounded-lg flex items-center justify-center gap-2"><ArrowLeft size={18} /> Back</button>
+              <button onClick={() => validateStep(2) && setStep(3)} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg shadow-sm shadow-blue-200 flex items-center justify-center gap-2 group">Next Step <ArrowRight size={18} className="group-hover:translate-x-1" /></button>
             </div>
           </div>
         )}
 
         {step === 3 && (
+          <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Business Details</h2>
+
+            <FormInput label="Business Name" placeholder="Legal Business Name" value={formData.businessName} onChange={v => updateField('businessName', v)} error={errors.businessName} />
+            <FormInput label="Business Address" placeholder="123 Market St" value={formData.businessAddress} onChange={v => updateField('businessAddress', v)} error={errors.businessAddress} />
+            <div className="grid grid-cols-2 gap-4">
+              <FormInput label="Business Email" placeholder="contact@biz.com" value={formData.businessEmail} onChange={v => updateField('businessEmail', v)} error={errors.businessEmail} />
+              <FormInput label="Business Phone" placeholder="+234..." value={formData.businessPhone} onChange={v => updateField('businessPhone', v)} error={errors.businessPhone} />
+            </div>
+
+            <div className="flex gap-3 mt-6">
+              <button onClick={() => setStep(2)} className="flex-1 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 font-medium py-3 rounded-lg flex items-center justify-center gap-2"><ArrowLeft size={18} /> Back</button>
+              <button onClick={() => validateStep(3) && setStep(4)} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg shadow-sm shadow-blue-200 flex items-center justify-center gap-2 group">Next Step <ArrowRight size={18} className="group-hover:translate-x-1" /></button>
+            </div>
+          </div>
+        )}
+
+        {step === 4 && (
           <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Store Setup</h2>
 
@@ -410,13 +420,13 @@ export default function SignUpPage() {
 
             <div className="flex gap-3 mt-6">
               <button
-                onClick={() => setStep(2)}
+                onClick={() => setStep(3)}
                 className="flex-1 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 font-medium py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
               >
                 <ArrowLeft size={18} /> Back
               </button>
               <button
-                onClick={() => validateStep(3) && handleSubmit()}
+                onClick={() => validateStep(4) && handleSubmit()}
                 className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg shadow-sm shadow-blue-200 transition-all flex items-center justify-center gap-2"
               >
                 Complete Signup <ArrowRight size={18} />
@@ -437,3 +447,4 @@ export default function SignUpPage() {
     </div>
   );
 }
+

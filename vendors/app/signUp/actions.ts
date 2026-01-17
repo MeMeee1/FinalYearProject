@@ -45,16 +45,19 @@ export async function handleVendorSignup(
   email: string,
   password: string,
   vendorData: {
+    name: string;
+    phone: string;
+    address: string;
+    city: string;
+    country: string;
+    businessName: string;
     storeName: string;
-    storeDescription?: string;
-    storeLogo?: string;
-    storeBanner?: string;
-    businessName?: string;
-    businessAddress?: string;
-    businessEmail?: string;
-    businessPhone?: string;
-    city?: string;
-    country?: string;
+    storeDescription: string;
+    storeLogo: string;
+    storeBanner: string;
+    businessAddress: string;
+    businessEmail: string;
+    businessPhone: string;
   },
   productData?: {
     name: string;
@@ -69,7 +72,15 @@ export async function handleVendorSignup(
 
   try {
     // First, create the user account
-    const res = await signupVendor(email, password);
+    const res = await signupVendor(
+      email,
+      password,
+      vendorData.name,
+      vendorData.phone,
+      vendorData.address,
+      vendorData.city,
+      vendorData.country
+    );
 
     if (res.token) {
       cookies().set('token', res.token);
