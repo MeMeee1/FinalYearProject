@@ -31,6 +31,7 @@ export async function listProducts(req: Request, res: Response) {
         createdAt: productsTable.createdAt,
         updatedAt: productsTable.updatedAt,
         sellerId: productsTable.sellerId,
+        video: productsTable.video, // Add video
         vendor: {
           id: vendorsTable.id,
           storeName: vendorsTable.storeName,
@@ -85,6 +86,7 @@ export async function getProductById(req: Request, res: Response) {
         createdAt: productsTable.createdAt,
         updatedAt: productsTable.updatedAt,
         sellerId: productsTable.sellerId,
+        video: productsTable.video, // Add video
         vendor: {
           id: vendorsTable.id,
           storeName: vendorsTable.storeName,
@@ -130,6 +132,7 @@ export async function getProductsBySeller(req: Request, res: Response) {
         price: productsTable.price,
         stock: productsTable.stock,
         status: productsTable.status,
+        video: productsTable.video, // Add video
         createdAt: productsTable.createdAt,
         updatedAt: productsTable.updatedAt,
       })
@@ -402,6 +405,7 @@ export async function searchProducts(req: Request, res: Response) {
         createdAt: productsTable.createdAt,
         updatedAt: productsTable.updatedAt,
         sellerId: productsTable.sellerId,
+        video: productsTable.video, // Add video
         vendor: {
           id: vendorsTable.id,
           storeName: vendorsTable.storeName,

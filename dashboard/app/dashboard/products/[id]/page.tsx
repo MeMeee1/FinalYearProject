@@ -1,4 +1,5 @@
 import { fetchProductById } from '@/api/products';
+import ProductMediaGallery from './ProductMediaGallery';
 import Link from 'next/link';
 import { Heading } from '@/components/ui/heading';
 import { Text } from '@/components/ui/text';
@@ -13,6 +14,7 @@ export default async function ProductPage({
   params: { id: string };
 }) {
   const product = await fetchProductById(Number(id));
+  console.log('Product Page Data:', { id, name: product.name, video: product.video, hasImages: !!product.image });
 
   // Parse images
   let images: string[] = [];
@@ -52,72 +54,13 @@ export default async function ProductPage({
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
           {/* Left Column: Media (Images & Video) */}
-          <div className="lg:col-span-7 space-y-6">
-            {/* Main Image */}
-            <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
-              <div className="relative aspect-square sm:aspect-[4/3] w-full bg-gray-50">
-                {images.length > 0 ? (
-                  <Image
-                    source={{ uri: images[0] }}
-                    className="w-full h-full object-cover"
-                    alt={product.name}
-                  />
-                ) : (
-                  <div className="absolute inset-0 flex items-center justify-center text-gray-300">
-                    <Icon as={ShoppingBagIcon} className="w-24 h-24 opacity-20" />
-                  </div>
-                )}
-
-                {product.status === 'out_of_stock' && (
-                  <div className="absolute top-4 right-4">
-                    <span className="px-4 py-2 bg-red-100 text-red-700 text-sm font-bold rounded-full uppercase tracking-wider shadow-sm">
-                      Out of Stock
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Thumbnail Grid */}
-            {(images.length > 1 || product.video) && (
-              <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-4">
-                {images.map((img, index) => (
-                  <div key={index} className="aspect-square rounded-xl overflow-hidden border border-gray-200 cursor-pointer hover:border-blue-500 transition-colors bg-white">
-                    <Image
-                      source={{ uri: img }}
-                      className="w-full h-full object-cover"
-                      alt={`${product.name} - View ${index + 1}`}
-                    />
-                  </div>
-                ))}
-
-                {/* Video Indicator / Thumbnail (Optional: Play video directly or link) */}
-                {product.video && (
-                  <div className="aspect-square rounded-xl overflow-hidden border border-gray-200 cursor-pointer bg-black/5 hover:border-blue-500 transition-colors flex items-center justify-center group relative">
-                    <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors" />
-                    <Icon as={PlayCircle} className="w-8 h-8 text-gray-700 group-hover:text-blue-600 transition-colors relative z-10" />
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Video Player (if exists) */}
-            {product.video && (
-              <div className="bg-white rounded-2xl border border-gray-200 p-4 shadow-sm">
-                <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                  <Icon as={PlayCircle} className="w-5 h-5 text-blue-600" />
-                  Product Video
-                </h3>
-                <div className="relative aspect-video bg-black rounded-lg overflow-hidden">
-                  <video
-                    src={product.video}
-                    controls
-                    className="w-full h-full"
-                    poster={images[0]} // Fallback to first image as poster
-                  />
-                </div>
-              </div>
-            )}
+          <div className="lg:col-span-7">
+            <ProductMediaGallery
+              images={images}
+              productName={product.name}
+              video={product.video}
+              isOutOfStock={product.status === 'out_of_stock'}
+            />
           </div>
 
           {/* Right Column: Details */}
