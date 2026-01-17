@@ -139,3 +139,33 @@ export async function suspendVendor(vendorId: number | string, reason?: string) 
 	}
 	revalidatePath('/dashboard/vendors');
 }
+
+export async function updateVendorCommission(vendorId: number | string, commissionRate: number) {
+	const token = cookies().get('token')?.value;
+	const res = await fetch(`${API_URL}/admin/vendors/${vendorId}/commission`, {
+		method: 'PUT',
+		headers: { Authorization: token ?? '', 'Content-Type': 'application/json' },
+		body: JSON.stringify({ commissionRate }),
+	});
+
+	if (!res.ok) {
+		const errorText = await res.text().catch(() => 'Unknown error');
+		throw new Error(`Failed to update commission rate: ${res.status} - ${errorText}`);
+	}
+	revalidatePath(`/dashboard/vendors/${vendorId}`);
+}
+
+export async function updatePlatformCommission(commissionRate: number) {
+	const token = cookies().get('token')?.value;
+	const res = await fetch(`${API_URL}/admin/platform/commission`, {
+		method: 'PUT',
+		headers: { Authorization: token ?? '', 'Content-Type': 'application/json' },
+		body: JSON.stringify({ commissionRate }),
+	});
+
+	if (!res.ok) {
+		const errorText = await res.text().catch(() => 'Unknown error');
+		throw new Error(`Failed to update platform commission: ${res.status} - ${errorText}`);
+	}
+	revalidatePath('/dashboard');
+}

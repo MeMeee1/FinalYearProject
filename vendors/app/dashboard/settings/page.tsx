@@ -4,19 +4,27 @@ import { useEffect, useState } from 'react';
 
 /* API */
 import { getVendorProfile, updateVendorProfile } from '@/api/vendors';
+import { uploadProductImage } from '../products/actions';
 import LogoutButton from '../LogoutButton';
 
 export default function SettingsPage() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
 
+    const [logoFile, setLogoFile] = useState<{ file: File; preview: string } | null>(null);
+    const [bannerFile, setBannerFile] = useState<{ file: File; preview: string } | null>(null);
+
     const [formData, setFormData] = useState({
         storeName: '',
         storeDescription: '',
+        storeLogo: '',
+        storeBanner: '',
         businessName: '',
         businessAddress: '',
         businessEmail: '',
         businessPhone: '',
+        businessBankName: '',
+        businessAccountNumber: '',
     });
 
     /* LOAD PROFILE */
@@ -31,10 +39,14 @@ export default function SettingsPage() {
                 setFormData({
                     storeName: data.storeName ?? '',
                     storeDescription: data.storeDescription ?? '',
+                    storeLogo: data.storeLogo ?? '',
+                    storeBanner: data.storeBanner ?? '',
                     businessName: data.businessName ?? '',
                     businessAddress: data.businessAddress ?? '',
                     businessEmail: data.businessEmail ?? '',
                     businessPhone: data.businessPhone ?? '',
+                    businessBankName: data.businessBankName ?? '',
+                    businessAccountNumber: data.businessAccountNumber ?? '',
                 });
             }
         } catch (err) {
@@ -44,11 +56,41 @@ export default function SettingsPage() {
         }
     };
 
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'logo' | 'banner') => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            const preview = URL.createObjectURL(file);
+            if (type === 'logo') {
+                setLogoFile({ file, preview });
+            } else {
+                setBannerFile({ file, preview });
+            }
+        }
+    };
+
     /* SAVE PROFILE */
     const handleSave = async () => {
         try {
             setSaving(true);
-            await updateVendorProfile(formData);
+            let updatedFormData = { ...formData };
+
+            // Upload images if changed
+            if (logoFile) {
+                const formData = new FormData();
+                formData.append('image', logoFile.file);
+                const url = await uploadProductImage(formData);
+                if (url) updatedFormData.storeLogo = url;
+            }
+
+            if (bannerFile) {
+                const formData = new FormData();
+                formData.append('image', bannerFile.file);
+                // Reusing product image upload for banner as well for now
+                const url = await uploadProductImage(formData);
+                if (url) updatedFormData.storeBanner = url;
+            }
+
+            await updateVendorProfile(updatedFormData);
             alert('Profile updated successfully');
         } catch (err) {
             console.error('Failed to save profile', err);
@@ -88,7 +130,75 @@ export default function SettingsPage() {
                     <h2 className="text-xl font-semibold">Store Profile</h2>
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-6">
+
+                    {/* Branding Section */}
+                    <div className="grid md:grid-cols-2 gap-6 pb-6 border-b border-gray-100">
+                        <div>
+                            <label className="block text-sm font-medium mb-2">Store Logo</label>
+                            <div className="flex items-start gap-4">
+                                <div className="w-24 h-24 rounded-lg bg-gray-100 border border-gray-200 overflow-hidden flex items-center justify-center relative">
+                                    {(logoFile?.preview || formData.storeLogo) ? (
+                                        <img
+                                            src={logoFile?.preview || formData.storeLogo}
+                                            alt="Store Logo"
+                                            className="w-full h-full object-cover"
+                                        />
+                                    ) : (
+                                        <span className="text-2xl">🏪</span>
+                                    )}
+                                </div>
+                                <div>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        id="logo-upload"
+                                        className="hidden"
+                                        onChange={(e) => handleFileChange(e, 'logo')}
+                                    />
+                                    <label
+                                        htmlFor="logo-upload"
+                                        className="inline-block px-4 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium cursor-pointer hover:bg-gray-50"
+                                    >
+                                        Change Logo
+                                    </label>
+                                    <p className="text-xs text-gray-500 mt-2">Recommended: 400x400px</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium mb-2">Store Banner</label>
+                            <div className="w-full h-24 rounded-lg bg-gray-100 border border-gray-200 overflow-hidden flex items-center justify-center relative mb-2">
+                                {(bannerFile?.preview || formData.storeBanner) ? (
+                                    <img
+                                        src={bannerFile?.preview || formData.storeBanner}
+                                        alt="Store Banner"
+                                        className="w-full h-full object-cover"
+                                    />
+                                ) : (
+                                    <span className="text-2xl">🖼️</span>
+                                )}
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    id="banner-upload"
+                                    className="hidden"
+                                    onChange={(e) => handleFileChange(e, 'banner')}
+                                />
+                                <label
+                                    htmlFor="banner-upload"
+                                    className="inline-block px-4 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium cursor-pointer hover:bg-gray-50"
+                                >
+                                    Change Banner
+                                </label>
+                                <p className="text-xs text-gray-500">Recommended: 1200x300px</p>
+                            </div>
+                        </div>
+                    </div>
+
                     <div>
                         <label className="block text-sm font-medium mb-1">Store Name</label>
                         <input
@@ -98,20 +208,22 @@ export default function SettingsPage() {
                                 setFormData({ ...formData, storeName: e.target.value })
                             }
                             placeholder="Store name"
-                            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                            disabled
+                            readOnly
+                            className="w-full px-3 py-2 border rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
                         />
                     </div>
 
                     <div>
                         <label className="block text-sm font-medium mb-1">Store Description</label>
-                        <input
-                            type="text"
+                        <textarea
                             value={formData.storeDescription}
                             onChange={(e) =>
                                 setFormData({ ...formData, storeDescription: e.target.value })
                             }
                             placeholder="Short description"
-                            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                            rows={3}
+                            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 resize-none"
                         />
                     </div>
 
@@ -125,7 +237,9 @@ export default function SettingsPage() {
                                     setFormData({ ...formData, businessName: e.target.value })
                                 }
                                 placeholder="Legal business name"
-                                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                                disabled
+                                readOnly
+                                className="w-full px-3 py-2 border rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
                             />
                         </div>
 
@@ -138,7 +252,9 @@ export default function SettingsPage() {
                                     setFormData({ ...formData, businessPhone: e.target.value })
                                 }
                                 placeholder="+234..."
-                                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                                disabled
+                                readOnly
+                                className="w-full px-3 py-2 border rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
                             />
                         </div>
                     </div>
@@ -152,7 +268,9 @@ export default function SettingsPage() {
                                 setFormData({ ...formData, businessEmail: e.target.value })
                             }
                             placeholder="email@business.com"
-                            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                            disabled
+                            readOnly
+                            className="w-full px-3 py-2 border rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
                         />
                     </div>
 
@@ -167,6 +285,37 @@ export default function SettingsPage() {
                             placeholder="Full address"
                             className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                         />
+                    </div>
+
+                    {/* Bank Details */}
+                    <div className="pt-4 border-t border-gray-100">
+                        <h3 className="text-sm font-medium text-gray-900 mb-3">Bank Details</h3>
+                        <div className="grid md:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium mb-1">Bank Name</label>
+                                <input
+                                    type="text"
+                                    value={formData.businessBankName}
+                                    onChange={(e) =>
+                                        setFormData({ ...formData, businessBankName: e.target.value })
+                                    }
+                                    placeholder="e.g. Chase Bank"
+                                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium mb-1">Account Number</label>
+                                <input
+                                    type="text"
+                                    value={formData.businessAccountNumber}
+                                    onChange={(e) =>
+                                        setFormData({ ...formData, businessAccountNumber: e.target.value })
+                                    }
+                                    placeholder="0000000000"
+                                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                                />
+                            </div>
+                        </div>
                     </div>
 
                     <div className="flex justify-end pt-4">

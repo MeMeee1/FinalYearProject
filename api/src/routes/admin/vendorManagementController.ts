@@ -283,3 +283,26 @@ export async function getPlatformStats(req: Request, res: Response) {
     res.status(500).send(e);
   }
 }
+
+export async function updatePlatformCommission(req: Request, res: Response) {
+  try {
+    const { commissionRate } = req.body;
+
+    if (typeof commissionRate !== 'number' || commissionRate < 0 || commissionRate > 100) {
+      return res.status(400).json({ message: 'Invalid commission rate' });
+    }
+
+    const result = await db
+      .update(vendorsTable)
+      .set({ platformCommissionRate: commissionRate, updatedAt: new Date() })
+      .returning();
+
+    res.json({
+      message: 'Platform commission updated for all vendors',
+      updatedCount: result.length,
+    });
+  } catch (e) {
+    console.error(e);
+    res.status(500).send(e);
+  }
+}

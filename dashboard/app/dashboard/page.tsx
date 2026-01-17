@@ -4,17 +4,18 @@ import { Card } from '@/components/ui/card';
 import { Heading } from '@/components/ui/heading';
 import { Text } from '@/components/ui/text';
 import Link from 'next/link';
-import { 
-  TrendingUp, 
-  ShoppingBag, 
-  Users, 
-  DollarSign, 
-  Package, 
+import {
+  TrendingUp,
+  ShoppingBag,
+  Users,
+  DollarSign,
+  Package,
   Clock,
   ArrowUpRight,
   ArrowDownRight,
   Store
 } from 'lucide-react';
+import GlobalCommissionForm from './GlobalCommissionForm';
 
 export default async function DashboardPage() {
   const [stats, orders] = await Promise.all([
@@ -130,8 +131,8 @@ export default async function DashboardPage() {
           ) : (
             <div className="space-y-3">
               {recentOrders.map((order: any) => (
-                <Link 
-                  key={order.id} 
+                <Link
+                  key={order.id}
                   href={`/dashboard/orders/${order.id}`}
                   className="block"
                 >
@@ -143,11 +144,10 @@ export default async function DashboardPage() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                           <Text className="font-medium text-sm">Order #{order.id}</Text>
-                          <span className={`text-xs px-2 py-0.5 rounded ${
-                            order.status === 'delivered' ? 'bg-green-100 text-green-700' :
+                          <span className={`text-xs px-2 py-0.5 rounded ${order.status === 'delivered' ? 'bg-green-100 text-green-700' :
                             order.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                            'bg-blue-100 text-blue-700'
-                          }`}>
+                              'bg-blue-100 text-blue-700'
+                            }`}>
                             {order.status}
                           </span>
                         </div>
@@ -170,7 +170,7 @@ export default async function DashboardPage() {
         {/* Quick Actions - Takes 1 column */}
         <Card className="p-5">
           <Heading size="lg" className="mb-4">Quick Actions</Heading>
-          
+
           <div className="space-y-3">
             <Link href="/dashboard/vendors?status=pending">
               <div className="p-4 bg-yellow-50 rounded-lg hover:bg-yellow-100 transition-colors border border-yellow-200">
@@ -231,7 +231,7 @@ export default async function DashboardPage() {
       {stats && (
         <Card className="p-5 mb-8">
           <Heading size="lg" className="mb-4">Vendor Overview</Heading>
-          
+
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="p-4 bg-green-50 rounded-lg border border-green-200">
               <div className="flex items-center justify-between mb-2">
@@ -240,7 +240,7 @@ export default async function DashboardPage() {
               </div>
               <Heading size="xl" className="text-green-800 mb-1">{stats.activeVendors}</Heading>
               <div className="w-full bg-green-200 rounded-full h-2 mt-2">
-                <div 
+                <div
                   className="bg-green-600 h-2 rounded-full transition-all"
                   style={{ width: `${(stats.activeVendors / stats.totalVendors) * 100}%` }}
                 ></div>
@@ -254,7 +254,7 @@ export default async function DashboardPage() {
               </div>
               <Heading size="xl" className="text-yellow-800 mb-1">{stats.pendingVendors}</Heading>
               <div className="w-full bg-yellow-200 rounded-full h-2 mt-2">
-                <div 
+                <div
                   className="bg-yellow-600 h-2 rounded-full transition-all"
                   style={{ width: `${(stats.pendingVendors / stats.totalVendors) * 100}%` }}
                 ></div>
@@ -268,7 +268,7 @@ export default async function DashboardPage() {
               </div>
               <Heading size="xl" className="text-red-800 mb-1">{stats.suspendedVendors || 0}</Heading>
               <div className="w-full bg-red-200 rounded-full h-2 mt-2">
-                <div 
+                <div
                   className="bg-red-600 h-2 rounded-full transition-all"
                   style={{ width: `${((stats.suspendedVendors || 0) / stats.totalVendors) * 100}%` }}
                 ></div>
@@ -277,6 +277,9 @@ export default async function DashboardPage() {
           </div>
         </Card>
       )}
+
+      {/* Global Settings */}
+      <GlobalCommissionForm />
     </div>
   );
 }

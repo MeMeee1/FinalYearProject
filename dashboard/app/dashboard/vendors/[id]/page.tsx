@@ -3,6 +3,7 @@ import { Card } from '@/components/ui/card';
 import { Heading } from '@/components/ui/heading';
 import { Text } from '@/components/ui/text';
 import Link from 'next/link';
+import CommissionForm from './CommissionForm';
 
 export default async function VendorDetailPage({ params }: { params: { id: string } }) {
   const vendorId = params.id;
@@ -30,20 +31,30 @@ export default async function VendorDetailPage({ params }: { params: { id: strin
           </div>
         </Card>
 
+
+
+        <Card className="p-4">
+          <Heading size="md" className="mb-3">Commission</Heading>
+          <Text className="text-sm text-slate-500 mb-1">Platform Commission Rate (%)</Text>
+          <CommissionForm vendorId={vendor.id} currentRate={vendor.platformCommissionRate ?? 10} />
+        </Card>
+
         <Card className="p-4">
           <Heading size="md" className="mb-3">Created</Heading>
           <Text className="text-sm text-slate-700">{new Date(vendor.createdAt).toLocaleString()}</Text>
         </Card>
       </div>
 
-      {analytics && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-          <Card className="p-4"><Text className="text-xs text-slate-500">Products</Text><Heading size="lg">{analytics.totalProducts}</Heading></Card>
-          <Card className="p-4"><Text className="text-xs text-slate-500">Orders</Text><Heading size="lg">{analytics.totalOrders}</Heading></Card>
-          <Card className="p-4 lg:col-span-2"><Text className="text-xs text-slate-500">Revenue</Text><Heading size="lg">${Number(analytics.totalRevenue || 0).toFixed(2)}</Heading></Card>
-          <Card className="p-4 lg:col-span-2"><Text className="text-xs text-slate-500">Joined</Text><Heading size="lg">{new Date(analytics.createdAt).toLocaleDateString()}</Heading></Card>
-        </div>
-      )}
-    </div>
+      {
+        analytics && (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            <Card className="p-4"><Text className="text-xs text-slate-500">Products</Text><Heading size="lg">{analytics.totalProducts}</Heading></Card>
+            <Card className="p-4"><Text className="text-xs text-slate-500">Orders</Text><Heading size="lg">{analytics.totalOrders}</Heading></Card>
+            <Card className="p-4 lg:col-span-2"><Text className="text-xs text-slate-500">Revenue</Text><Heading size="lg">${Number(analytics.totalRevenue || 0).toFixed(2)}</Heading></Card>
+            <Card className="p-4 lg:col-span-2"><Text className="text-xs text-slate-500">Joined</Text><Heading size="lg">{new Date(analytics.createdAt).toLocaleDateString()}</Heading></Card>
+          </div>
+        )
+      }
+    </div >
   );
 }
