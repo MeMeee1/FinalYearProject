@@ -67,7 +67,41 @@ export function DashboardClient({ vendorStats, ordersData, vendorProfile }: Dash
 
   return (
     <div className="w-full max-w-7xl mx-auto">
-      {/* Welcome Section */}
+      {/* Banner Section */}
+      {activeProfile?.storeBanner && (
+        <div className="w-full h-48 md:h-64 rounded-xl overflow-hidden mb-6 relative">
+          <img
+            src={activeProfile.storeBanner}
+            alt="Store Banner"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+
+          <div className="absolute bottom-6 left-6 flex items-end gap-6">
+            {activeProfile.storeLogo && (
+              <div className="w-24 h-24 rounded-full border-4 border-white overflow-hidden bg-white shadow-lg">
+                <img
+                  src={activeProfile.storeLogo}
+                  alt="Store Logo"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
+            <div className="text-white pb-2">
+              <Heading size="2xl" className="text-white mb-1 shadow-sm">
+                {activeProfile.storeName}
+              </Heading>
+              {activeProfile.storeDescription && (
+                <Text className="text-gray-100 line-clamp-1 text-sm opacity-90">
+                  {activeProfile.storeDescription}
+                </Text>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Welcome Section - Standard (if no banner) */}
       <div className="mb-6">
         <div className="flex items-center justify-between">
           <div>
