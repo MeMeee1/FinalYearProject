@@ -62,7 +62,9 @@ export async function createProduct(
                 cookies().delete('token');
                 redirectUrl = '/login';
             } else {
-                throw new Error('Failed to create product');
+                const errorText = await res.text();
+                console.error(`Create product failed: ${res.status} - ${errorText}`);
+                throw new Error(`Failed to create product: ${errorText}`);
             }
         }
     } catch (error) {

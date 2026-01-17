@@ -193,16 +193,26 @@ export async function createProduct(req: Request, res: Response) {
     }
 
     const { name, image, images, sku, ...rest } = req.cleanBody;
+    console.log('Create Product CleanBody:', { name, image: image ? 'present' : 'missing', imagesCount: images?.length, sku });
 
     // Handle images: prefer 'images' array, fallback to 'image' string/array
-    let finalImageString = '[]';
+    let finalImageString: string | null = null;
+    let imageList: string[] = [];
+
     if (Array.isArray(images)) {
-      finalImageString = JSON.stringify(images);
+      imageList = images;
     } else if (Array.isArray(image)) {
-      finalImageString = JSON.stringify(image);
+      imageList = image;
     } else if (image) {
-      // If it's a single string, wrap in array
-      finalImageString = JSON.stringify([image]);
+      imageList = [image];
+    }
+
+    if (imageList.length > 0) {
+      if (imageList.length === 1) {
+        finalImageString = imageList[0];
+      } else {
+        finalImageString = JSON.stringify(imageList);
+      }
     }
 
     // Auto-generate SKU if missing
@@ -212,7 +222,7 @@ export async function createProduct(req: Request, res: Response) {
       name,
       ...rest,
       sku: finalSku,
-      image: finalImageString,
+      image: finalImageString, // Can be string, JSON string, or null
       sellerId: vendor[0].id,
     };
 
@@ -265,16 +275,30 @@ export async function updateProduct(req: Request, res: Response) {
     }
 
     const { image, images, ...rest } = req.cleanBody;
+    console.log('Update Product CleanBody:', { image: image ? 'present' : 'missing', imagesCount: images?.length });
     const updatedFields: any = { ...rest };
 
     // Handle image update if provided
-    if (images !== undefined) {
-      updatedFields.image = JSON.stringify(images);
-    } else if (image !== undefined) {
-      if (Array.isArray(image)) {
-        updatedFields.image = JSON.stringify(image);
+    // Handle image update if provided
+    if (images !== undefined || image !== undefined) {
+      let imageList: string[] = [];
+      if (Array.isArray(images)) {
+        imageList = images;
+      } else if (Array.isArray(image)) {
+        imageList = image;
+      } else if (image) {
+        imageList = [image];
+      }
+
+      if (imageList.length === 0) {
+        // Explicitly cleared images? Or just empty array sent.
+        // If user sent empty array, maybe they meant to delete images?
+        // Let's assume empty array means no images.
+        updatedFields.image = null;
+      } else if (imageList.length === 1) {
+        updatedFields.image = imageList[0];
       } else {
-        updatedFields.image = JSON.stringify([image]);
+        updatedFields.image = JSON.stringify(imageList);
       }
     }
 

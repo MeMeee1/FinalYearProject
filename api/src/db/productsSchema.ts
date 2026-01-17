@@ -9,6 +9,7 @@ import {
 } from 'drizzle-orm/pg-core';
 import { createInsertSchema } from 'drizzle-zod';
 import { vendorsTable } from './vendorsSchema';
+import { z } from 'zod';
 export const productsTable = pgTable('products', {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   sellerId: integer().references(() => vendorsTable.id).default(1),
@@ -34,12 +35,16 @@ export const createProductSchema = createInsertSchema(productsTable).omit({
   sellerId: true, // Omit sellerId - it's set by the backend from the authenticated vendor
   createdAt: true,
   updatedAt: true,
+}).extend({
+  images: z.array(z.string()).optional(),
 });
 
 export const updateProductSchema = createInsertSchema(productsTable)
   .omit({
     id: true,
-    createdAt: true,
     updatedAt: true,
   })
-  .partial();
+  .partial()
+  .extend({
+    images: z.array(z.string()).optional(),
+  });
