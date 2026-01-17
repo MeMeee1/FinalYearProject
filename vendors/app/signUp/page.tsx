@@ -136,14 +136,85 @@ const ImageUploadField = ({
 };
 
 
-const step4Schema = z.object({
-  productName: z.string().min(2),
-  productDescription: z.string().min(10),
-  productPrice: z.string().regex(/^\d+(\.\d{1,2})?$/, "Invalid price format"),
-  productStock: z.string().regex(/^\d+$/, "Must be a whole number"),
-  productSku: z.string().optional(),
-  productImage: z.string().url().optional().or(z.literal('')),
-});
+
+
+// Helper input component for consistency
+const FormInput = ({
+  label,
+  value,
+  onChange,
+  placeholder,
+  type = 'text',
+  error,
+  rightElement
+}: {
+  label: string,
+  value: string,
+  onChange: (val: string) => void,
+  placeholder?: string,
+  type?: string,
+  error?: string,
+  rightElement?: React.ReactNode
+}) => (
+  <div className="mb-4">
+    <label className="block text-sm font-medium text-gray-700 mb-1.5">{label}</label>
+    <div className="relative">
+      <input
+        type={type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className={`w-full px-4 py-2.5 rounded-lg border bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all 
+          ${error ? 'border-red-300 focus:border-red-500' : 'border-gray-300 focus:border-blue-500 text-gray-900'}
+          placeholder:text-gray-400 text-sm`}
+      />
+      {rightElement && (
+        <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center">
+          {rightElement}
+        </div>
+      )}
+    </div>
+    {error && <p className="text-red-500 text-xs mt-1.5 font-medium flex items-center gap-1">
+      {error}
+    </p>}
+  </div>
+);
+
+// Custom Select Input for City/Country
+const FormSelect = ({
+  label,
+  value,
+  options,
+  onChange,
+  error
+}: {
+  label: string,
+  value: string,
+  options: { label: string, value: string }[],
+  onChange: (val: string) => void,
+  error?: string
+}) => (
+  <div className="mb-4">
+    <label className="block text-sm font-medium text-gray-700 mb-1.5">{label}</label>
+    <div className="relative">
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className={`w-full appearance-none px-4 py-2.5 rounded-lg border bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all cursor-pointer
+                    ${error ? 'border-red-300 focus:border-red-500' : 'border-gray-300 focus:border-blue-500 text-gray-900'}
+                    text-sm`}
+      >
+        {options.map(opt => (
+          <option key={opt.value} value={opt.value}>{opt.label}</option>
+        ))}
+      </select>
+      <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
+        <ChevronDown size={16} />
+      </div>
+    </div>
+    {error && <p className="text-red-500 text-xs mt-1.5 font-medium">{error}</p>}
+  </div>
+);
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -153,14 +224,7 @@ export default function SignUpPage() {
   const searchParams = useSearchParams();
   const serverError = searchParams.get('errorMessage');
 
-  const [formData, setFormData] = useState<FormData & {
-    productName: string;
-    productDescription: string;
-    productPrice: string;
-    productStock: string;
-    productSku: string;
-    productImage: string;
-  }>({
+  const [formData, setFormData] = useState<FormData>({
     email: '',
     password: '',
     businessName: '',
@@ -173,12 +237,6 @@ export default function SignUpPage() {
     storeBanner: '',
     city: 'Abuja',
     country: 'Nigeria',
-    productName: '',
-    productDescription: '',
-    productPrice: '',
-    productStock: '0',
-    productSku: '',
-    productImage: '',
   });
 
   const updateField = (field: string, value: string) => {
@@ -191,7 +249,6 @@ export default function SignUpPage() {
       if (s === 1) step1Schema.parse(formData);
       if (s === 2) step2Schema.parse(formData);
       if (s === 3) step3Schema.parse(formData);
-      if (s === 4) step4Schema.parse(formData);
       setErrors({});
       return true;
     } catch (err) {
@@ -206,11 +263,7 @@ export default function SignUpPage() {
     }
   };
 
-  const [showProductModal, setShowProductModal] = useState(false);
-
-  const handleSubmit = async (includeProduct: boolean) => {
-    if (includeProduct && !validateStep(4)) return;
-
+  const handleSubmit = async () => {
     const vendorData = {
       businessName: formData.businessName,
       businessAddress: formData.businessAddress,
@@ -224,19 +277,7 @@ export default function SignUpPage() {
       country: formData.country,
     };
 
-    let productData;
-    if (includeProduct) {
-      productData = {
-        name: formData.productName,
-        description: formData.productDescription,
-        price: parseFloat(formData.productPrice),
-        stock: parseInt(formData.productStock),
-        sku: formData.productSku,
-        image: formData.productImage,
-      };
-    }
-
-    const result = await handleVendorSignup(formData.email, formData.password, vendorData, productData);
+    const result = await handleVendorSignup(formData.email, formData.password, vendorData);
 
     if (result?.error) {
       setErrors((prev) => ({ ...prev, email: result.error }));
@@ -244,83 +285,9 @@ export default function SignUpPage() {
     }
   };
 
-  // Helper input component for consistency
-  const FormInput = ({
-    label,
-    value,
-    onChange,
-    placeholder,
-    type = 'text',
-    error,
-    rightElement
-  }: {
-    label: string,
-    value: string,
-    onChange: (val: string) => void,
-    placeholder?: string,
-    type?: string,
-    error?: string,
-    rightElement?: React.ReactNode
-  }) => (
-    <div className="mb-4">
-      <label className="block text-sm font-medium text-gray-700 mb-1.5">{label}</label>
-      <div className="relative">
-        <input
-          type={type}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder={placeholder}
-          className={`w-full px-4 py-2.5 rounded-lg border bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all 
-            ${error ? 'border-red-300 focus:border-red-500' : 'border-gray-300 focus:border-blue-500 text-gray-900'}
-            placeholder:text-gray-400 text-sm`}
-        />
-        {rightElement && (
-          <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center">
-            {rightElement}
-          </div>
-        )}
-      </div>
-      {error && <p className="text-red-500 text-xs mt-1.5 font-medium flex items-center gap-1">
-        {error}
-      </p>}
-    </div>
-  );
 
-  // Custom Select Input for City/Country
-  const FormSelect = ({
-    label,
-    value,
-    options,
-    onChange,
-    error
-  }: {
-    label: string,
-    value: string,
-    options: { label: string, value: string }[],
-    onChange: (val: string) => void,
-    error?: string
-  }) => (
-    <div className="mb-4">
-      <label className="block text-sm font-medium text-gray-700 mb-1.5">{label}</label>
-      <div className="relative">
-        <select
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className={`w-full appearance-none px-4 py-2.5 rounded-lg border bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all cursor-pointer
-                      ${error ? 'border-red-300 focus:border-red-500' : 'border-gray-300 focus:border-blue-500 text-gray-900'}
-                      text-sm`}
-        >
-          {options.map(opt => (
-            <option key={opt.value} value={opt.value}>{opt.label}</option>
-          ))}
-        </select>
-        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
-          <ChevronDown size={16} />
-        </div>
-      </div>
-      {error && <p className="text-red-500 text-xs mt-1.5 font-medium">{error}</p>}
-    </div>
-  );
+
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50/50 p-4 font-sans">
@@ -449,7 +416,7 @@ export default function SignUpPage() {
                 <ArrowLeft size={18} /> Back
               </button>
               <button
-                onClick={() => validateStep(3) && setShowProductModal(true)}
+                onClick={() => validateStep(3) && handleSubmit()}
                 className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg shadow-sm shadow-blue-200 transition-all flex items-center justify-center gap-2"
               >
                 Complete Signup <ArrowRight size={18} />
@@ -466,59 +433,7 @@ export default function SignUpPage() {
         )}
       </div>
 
-      {/* Product Creation Modal */}
-      {showProductModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-          <div className="w-full max-w-lg bg-white p-8 rounded-2xl border border-gray-100 shadow-2xl scale-100 animate-in zoom-in-95 duration-200">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-gray-900">Add Your First Product</h2>
-              <button
-                onClick={() => setShowProductModal(false)}
-                className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-full hover:bg-gray-100"
-              >
-                <X size={20} />
-              </button>
-            </div>
 
-            <p className="text-sm text-gray-500 mb-6">Start selling immediately by adding a product now, or skip this step to add it later from your dashboard.</p>
-
-            <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
-              <FormInput label="Product Name" placeholder="e.g. Handmade T-Shirt" value={formData.productName} onChange={t => updateField('productName', t)} error={errors.productName} />
-              <FormInput label="Description" placeholder="Describe your product..." value={formData.productDescription} onChange={t => updateField('productDescription', t)} error={errors.productDescription} />
-
-              <div className="grid grid-cols-2 gap-4">
-                <FormInput label="Price" placeholder="0.00" type="number" value={formData.productPrice} onChange={t => updateField('productPrice', t)} error={errors.productPrice} />
-                <FormInput label="Stock" placeholder="1" type="number" value={formData.productStock} onChange={t => updateField('productStock', t)} error={errors.productStock} />
-              </div>
-
-              <FormInput
-                label="SKU (Optional)"
-                placeholder="e.g. TSHIRT-001"
-                value={formData.productSku}
-                onChange={t => updateField('productSku', t)}
-                error={errors.productSku}
-              />
-
-              <ImageUploadField label="Product Image" value={formData.productImage} onChange={t => updateField('productImage', t)} error={errors.productImage} />
-            </div>
-
-            <div className="flex gap-4 mt-8">
-              <button
-                onClick={() => handleSubmit(false)}
-                className="flex-1 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 font-medium py-2.5 rounded-lg transition-colors"
-              >
-                Skip for Now
-              </button>
-              <button
-                onClick={() => handleSubmit(true)}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg shadow-sm transition-colors"
-              >
-                Save & Finish
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

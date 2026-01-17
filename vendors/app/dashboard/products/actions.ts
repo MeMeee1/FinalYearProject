@@ -74,7 +74,8 @@ export async function createProduct(
     stock: number,
     sku: string,
     images?: string[],
-    video?: string
+    video?: string,
+    productTags?: string
 ) {
     let redirectUrl = '/dashboard/products';
     try {
@@ -86,7 +87,7 @@ export async function createProduct(
                 Authorization: `${token}`,
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ name, description, price, stock, sku, images, video }),
+            body: JSON.stringify({ name, description, price, stock, sku, images, video, productTags }),
         });
 
         if (!res.ok) {

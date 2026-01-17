@@ -20,6 +20,7 @@ const productSchema = z.object({
   price: z.number().positive('Price must be greater than zero'),
   stock: z.number().int().positive('Quantity must be greater than zero'),
   sku: z.string().optional(),
+  productTags: z.enum(['Chicken', 'Fish', 'Eggs']).optional(),
 });
 
 export default function CreateProductPage() {
@@ -28,6 +29,7 @@ export default function CreateProductPage() {
   const [price, setPrice] = useState('');
   const [stock, setStock] = useState('0');
   const [sku, setSku] = useState('');
+  const [tag, setTag] = useState('Chicken');
   const [images, setImages] = useState<{ file?: File; preview: string }[]>([]);
   const [video, setVideo] = useState<{ file?: File; preview: string } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -82,6 +84,7 @@ export default function CreateProductPage() {
           price: Number(price),
           stock: Number(stock),
           sku: sku || undefined,
+          productTags: tag as 'Chicken' | 'Fish' | 'Eggs',
         });
       } catch (err) {
         if (err instanceof z.ZodError) {
@@ -126,7 +129,8 @@ export default function CreateProductPage() {
         Number(stock),
         sku,
         uploadedUrls.length > 0 ? uploadedUrls : undefined,
-        videoUrl
+        videoUrl,
+        tag
       );
     } catch (e) {
       console.error(e);
@@ -186,6 +190,24 @@ export default function CreateProductPage() {
                       onChange={(e) => setDescription(e.target.value)}
                     />
                   </Box>
+                </FormControl>
+
+                <FormControl>
+                  <FormControlLabel className="mb-1"><FormControlLabelText className="text-gray-700 font-medium">Tag</FormControlLabelText></FormControlLabel>
+                  <div className="relative">
+                    <select
+                      value={tag}
+                      onChange={(e) => setTag(e.target.value)}
+                      className="w-full border border-gray-300 rounded-md px-3 h-10 focus:border-blue-500 hover:border-gray-400 outline-none text-gray-900 appearance-none bg-white"
+                    >
+                      <option value="Chicken">Chicken</option>
+                      <option value="Fish">Fish</option>
+                      <option value="Eggs">Eggs</option>
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                      <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
+                    </div>
+                  </div>
                 </FormControl>
               </VStack>
             </Box>
