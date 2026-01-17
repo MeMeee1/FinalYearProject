@@ -5,7 +5,7 @@ import { Heading } from '@/components/ui/heading';
 import { VStack } from '@/components/ui/vstack';
 import { HStack } from '@/components/ui/hstack';
 import { Text } from '@/components/ui/text';
-import { Input, InputField, InputSlot } from '@/components/ui/input';
+
 import { Button, ButtonText, ButtonSpinner } from '@/components/ui/button';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
@@ -88,6 +88,13 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
     const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
+
+            if (file.size > 50 * 1024 * 1024) {
+                alert('Video size must be less than 50MB');
+                e.target.value = '';
+                return;
+            }
+
             setVideo({
                 file,
                 preview: URL.createObjectURL(file)
@@ -228,9 +235,13 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
 
                                 <FormControl>
                                     <FormControlLabel className="mb-1"><FormControlLabelText className="text-gray-700 font-medium">Name</FormControlLabelText></FormControlLabel>
-                                    <Input className="border-gray-300 focus:border-blue-500 hover:border-gray-400">
-                                        <InputField value={name} onChangeText={setName} placeholder="e.g. Premium Cotton T-Shirt" className="text-gray-900 placeholder:text-gray-400" />
-                                    </Input>
+                                    <input
+                                        type="text"
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                        placeholder="e.g. Premium Cotton T-Shirt"
+                                        className="w-full border border-gray-300 rounded-md px-3 h-10 focus:border-blue-500 hover:border-gray-400 outline-none text-gray-900 placeholder:text-gray-400"
+                                    />
                                 </FormControl>
 
                                 <FormControl>
@@ -303,12 +314,16 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                                 <Heading className="text-lg font-semibold text-gray-900 border-b border-gray-100 pb-3">Pricing</Heading>
                                 <FormControl>
                                     <FormControlLabel className="mb-1"><FormControlLabelText className="text-gray-700 font-medium">Price</FormControlLabelText></FormControlLabel>
-                                    <Input className="border-gray-300 focus:border-blue-500 hover:border-gray-400">
-                                        <InputSlot className="pl-3">
-                                            <Text className="text-gray-500">$</Text>
-                                        </InputSlot>
-                                        <InputField value={price} onChangeText={setPrice} keyboardType="numeric" placeholder="0.00" className="text-gray-900 font-medium" />
-                                    </Input>
+                                    <div className="flex items-center w-full border border-gray-300 rounded-md px-3 h-10 focus-within:border-blue-500 hover:border-gray-400">
+                                        <span className="text-gray-500 mr-2">$</span>
+                                        <input
+                                            type="number"
+                                            value={price}
+                                            onChange={(e) => setPrice(e.target.value)}
+                                            placeholder="0.00"
+                                            className="flex-1 outline-none text-gray-900 font-medium h-full bg-transparent"
+                                        />
+                                    </div>
                                 </FormControl>
                             </VStack>
                         </Box>
@@ -319,16 +334,25 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
 
                                 <FormControl>
                                     <FormControlLabel className="mb-1"><FormControlLabelText className="text-gray-700 font-medium">SKU</FormControlLabelText></FormControlLabel>
-                                    <Input className="border-gray-300 focus:border-blue-500 hover:border-gray-400">
-                                        <InputField value={sku} onChangeText={setSku} placeholder="e.g. PROD-001" className="text-gray-900" />
-                                    </Input>
+                                    <input
+                                        type="text"
+                                        value={sku}
+                                        readOnly
+                                        disabled
+                                        className="w-full border border-gray-200 rounded-md px-3 h-10 bg-gray-100 text-gray-500 outline-none cursor-not-allowed"
+                                        title="SKU cannot be changed"
+                                    />
                                 </FormControl>
 
                                 <FormControl>
                                     <FormControlLabel className="mb-1"><FormControlLabelText className="text-gray-700 font-medium">Quantity</FormControlLabelText></FormControlLabel>
-                                    <Input className="border-gray-300 focus:border-blue-500 hover:border-gray-400">
-                                        <InputField value={stock} onChangeText={setStock} keyboardType="numeric" placeholder="1" className="text-gray-900" />
-                                    </Input>
+                                    <input
+                                        type="number"
+                                        value={stock}
+                                        onChange={(e) => setStock(e.target.value)}
+                                        placeholder="1"
+                                        className="w-full border border-gray-300 rounded-md px-3 h-10 focus:border-blue-500 hover:border-gray-400 outline-none text-gray-900"
+                                    />
                                 </FormControl>
                             </VStack>
                         </Box>
