@@ -1,0 +1,1 @@
+ALTER TABLE "products" ADD COLUMN "productTags" varchar(255) DEFAULT 'Chicken' NOT NULL;

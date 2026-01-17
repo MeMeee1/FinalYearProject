@@ -53,6 +53,8 @@ export async function handleVendorSignup(
     businessAddress?: string;
     businessEmail?: string;
     businessPhone?: string;
+    city?: string;
+    country?: string;
   },
   productData?: {
     name: string;

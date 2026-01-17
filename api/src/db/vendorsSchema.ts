@@ -13,6 +13,8 @@ export const vendorsTable = pgTable('vendors', {
   // Business Details
   businessName: varchar({ length: 255 }),
   businessAddress: text(),
+  city: varchar({ length: 100 }),
+  country: varchar({ length: 100 }),
 
   // Contact
   businessEmail: varchar({ length: 255 }),

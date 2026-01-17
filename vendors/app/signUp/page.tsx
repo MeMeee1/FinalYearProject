@@ -4,25 +4,8 @@ import { useState, useRef } from 'react';
 import { z } from 'zod';
 import { handleVendorSignup } from './actions';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { ArrowLeft, ArrowRight, Eye, EyeOff, X } from 'lucide-react-native';
-import { Box } from '@/components/ui/box';
-import { VStack } from '@/components/ui/vstack';
-import { HStack } from '@/components/ui/hstack';
-import { Heading } from '@/components/ui/heading';
-import { Text } from '@/components/ui/text';
-import {
-  FormControl,
-  FormControlLabel,
-  FormControlLabelText,
-  FormControlError,
-  FormControlErrorText,
-  FormControlErrorIcon,
-  FormControlLabelText as FormControlLabelTextOriginal
-} from '@/components/ui/form-control';
-import { Input, InputField, InputIcon, InputSlot } from '@/components/ui/input';
-import { Button, ButtonText, ButtonIcon } from '@/components/ui/button';
-import { Progress, ProgressFilledTrack } from '@/components/ui/progress';
-import { AlertCircleIcon } from '@/components/ui/icon';
+import { ArrowLeft, ArrowRight, Eye, EyeOff, X, UploadCloud, ChevronDown, AlertCircle } from 'lucide-react-native';
+// Removed custom components imports to use standard HTML + Tailwind
 import { API_URL } from '@/config';
 
 type FormData = {
@@ -36,6 +19,8 @@ type FormData = {
   storeDescription: string;
   storeLogo: string;
   storeBanner: string;
+  city: string;
+  country: string;
 };
 
 const step1Schema = z.object({
@@ -48,6 +33,8 @@ const step2Schema = z.object({
   businessAddress: z.string().min(5),
   businessEmail: z.string().email(),
   businessPhone: z.string().min(10),
+  city: z.literal('Abuja', { message: 'Only Abuja is supported' }),
+  country: z.literal('Nigeria', { message: 'Only Nigeria is supported' }),
 });
 
 const step3Schema = z.object({
@@ -79,8 +66,6 @@ const ImageUploadField = ({
     try {
       const formData = new FormData();
       formData.append('image', file);
-      // Optional: Add folder param if you want specific organization in Cloudinary
-      // formData.append('folder', 'vendor-assets');
 
       const res = await fetch(`${API_URL}/upload/image`, {
         method: 'POST',
@@ -96,44 +81,43 @@ const ImageUploadField = ({
       alert('Failed to upload image. Please try again.');
     } finally {
       setLoading(false);
-      // Reset input so same file can be selected again if needed
       if (inputRef.current) inputRef.current.value = '';
     }
   };
 
   return (
-    <FormControl isInvalid={!!error}>
-      <FormControlLabel>
-        <FormControlLabelText>{label}</FormControlLabelText>
-      </FormControlLabel>
-      <Box className="border border-gray-300 rounded-md p-4 items-center justify-center border-dashed bg-gray-50 h-32 overflow-hidden">
+    <div className="mb-4">
+      <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+      <div
+        className={`relative border-2 border-dashed rounded-xl p-4 h-32 flex flex-col items-center justify-center transition-all cursor-pointer bg-gray-50 hover:bg-gray-100 hover:border-gray-400 ${error ? 'border-red-500 bg-red-50' : 'border-gray-200'}`}
+        onClick={() => !value && inputRef.current?.click()}
+      >
         {value ? (
-          <Box className="relative w-full h-full justify-center items-center">
-            {/* Using standard img tag for web preview simplification. 
-                In a purely Native environment, use <Image source={{ uri: value }} ... /> from react-native */}
+          <div className="relative w-full h-full flex justify-center items-center group">
             <img
               src={value}
               alt="Preview"
-              style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+              className="w-full h-full object-contain rounded"
             />
-            <Button
-              size="xs"
-              action="negative"
-              onPress={() => onChange('')}
-              className="absolute -top-3 -right-3 rounded-full p-1 h-8 w-8 z-10"
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onChange('');
+              }}
+              className="absolute -top-3 -right-3 bg-white text-red-500 rounded-full p-1.5 shadow-md border border-gray-100 hover:scale-110 transition-transform"
             >
-              <ButtonIcon as={X} />
-            </Button>
-          </Box>
+              <X size={16} />
+            </button>
+          </div>
         ) : (
-          <Button
-            variant="outline"
-            action="secondary"
-            onPress={() => inputRef.current?.click()}
-            isDisabled={loading}
-          >
-            <ButtonText>{loading ? 'Uploading...' : 'Upload Image'}</ButtonText>
-          </Button>
+          <div className="flex flex-col items-center text-center">
+            <div className="p-2 bg-blue-50 rounded-full mb-2 text-blue-600">
+              <UploadCloud size={20} />
+            </div>
+            <span className="text-sm font-medium text-gray-600">
+              {loading ? 'Uploading...' : 'Click to Upload'}
+            </span>
+          </div>
         )}
         <input
           type="file"
@@ -141,14 +125,13 @@ const ImageUploadField = ({
           className="hidden"
           accept="image/*"
           onChange={handleUpload}
-          style={{ display: 'none' }}
+          disabled={loading}
         />
-      </Box>
-      <FormControlError>
-        <FormControlErrorIcon as={AlertCircleIcon} />
-        <FormControlErrorText>{error}</FormControlErrorText>
-      </FormControlError>
-    </FormControl>
+      </div>
+      {error && <p className="text-red-500 text-xs mt-1 font-medium flex items-center gap-1">
+        <AlertCircle size={12} /> {error}
+      </p>}
+    </div>
   );
 };
 
@@ -156,7 +139,7 @@ const ImageUploadField = ({
 const step4Schema = z.object({
   productName: z.string().min(2),
   productDescription: z.string().min(10),
-  productPrice: z.string().regex(/^\d+(\.\d{1,2})?$/, "Invalid price format"), // Validate as string first
+  productPrice: z.string().regex(/^\d+(\.\d{1,2})?$/, "Invalid price format"),
   productStock: z.string().regex(/^\d+$/, "Must be a whole number"),
   productSku: z.string().optional(),
   productImage: z.string().url().optional().or(z.literal('')),
@@ -188,6 +171,8 @@ export default function SignUpPage() {
     storeDescription: '',
     storeLogo: '',
     storeBanner: '',
+    city: 'Abuja',
+    country: 'Nigeria',
     productName: '',
     productDescription: '',
     productPrice: '',
@@ -235,6 +220,8 @@ export default function SignUpPage() {
       storeDescription: formData.storeDescription,
       storeLogo: formData.storeLogo,
       storeBanner: formData.storeBanner,
+      city: formData.city,
+      country: formData.country,
     };
 
     let productData;
@@ -257,243 +244,281 @@ export default function SignUpPage() {
     }
   };
 
-  return (
-    <Box className="min-h-screen flex items-center justify-center bg-gray-50 p-4 relative">
-      <Box className="w-full max-w-md bg-white p-6 rounded-xl border border-gray-200">
+  // Helper input component for consistency
+  const FormInput = ({
+    label,
+    value,
+    onChange,
+    placeholder,
+    type = 'text',
+    error,
+    rightElement
+  }: {
+    label: string,
+    value: string,
+    onChange: (val: string) => void,
+    placeholder?: string,
+    type?: string,
+    error?: string,
+    rightElement?: React.ReactNode
+  }) => (
+    <div className="mb-4">
+      <label className="block text-sm font-medium text-gray-700 mb-1.5">{label}</label>
+      <div className="relative">
+        <input
+          type={type}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          className={`w-full px-4 py-2.5 rounded-lg border bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all 
+            ${error ? 'border-red-300 focus:border-red-500' : 'border-gray-300 focus:border-blue-500 text-gray-900'}
+            placeholder:text-gray-400 text-sm`}
+        />
+        {rightElement && (
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center">
+            {rightElement}
+          </div>
+        )}
+      </div>
+      {error && <p className="text-red-500 text-xs mt-1.5 font-medium flex items-center gap-1">
+        {error}
+      </p>}
+    </div>
+  );
 
-        {/* Progress bar */}
-        <Box className="mb-6">
-          <Progress value={(step / 3) * 100} className="w-full h-2">
-            <ProgressFilledTrack className="bg-blue-600" />
-          </Progress>
-        </Box>
+  // Custom Select Input for City/Country
+  const FormSelect = ({
+    label,
+    value,
+    options,
+    onChange,
+    error
+  }: {
+    label: string,
+    value: string,
+    options: { label: string, value: string }[],
+    onChange: (val: string) => void,
+    error?: string
+  }) => (
+    <div className="mb-4">
+      <label className="block text-sm font-medium text-gray-700 mb-1.5">{label}</label>
+      <div className="relative">
+        <select
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className={`w-full appearance-none px-4 py-2.5 rounded-lg border bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all cursor-pointer
+                      ${error ? 'border-red-300 focus:border-red-500' : 'border-gray-300 focus:border-blue-500 text-gray-900'}
+                      text-sm`}
+        >
+          {options.map(opt => (
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
+          ))}
+        </select>
+        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
+          <ChevronDown size={16} />
+        </div>
+      </div>
+      {error && <p className="text-red-500 text-xs mt-1.5 font-medium">{error}</p>}
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50/50 p-4 font-sans">
+      <div className="w-full max-w-lg bg-white p-8 rounded-2xl border border-gray-100 shadow-xl shadow-gray-200/50">
+
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Vendor Application</h1>
+          <p className="text-sm text-gray-500 mt-2">Join our marketplace and start selling today.</p>
+        </div>
+
+        {/* Progress Steps */}
+        <div className="flex gap-2 mb-8">
+          {[1, 2, 3].map((s) => (
+            <div key={s} className="flex-1 h-1.5 rounded-full overflow-hidden bg-gray-100">
+              <div
+                className={`h-full transition-all duration-500 ease-out ${s <= step ? 'bg-blue-600 w-full' : 'w-0'}`}
+              />
+            </div>
+          ))}
+        </div>
 
         {step === 1 && (
-          <VStack space="md">
-            <Heading className="text-xl font-semibold mb-2">Account Credentials</Heading>
+          <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Account Credentials</h2>
 
-            <FormControl isInvalid={!!errors.email}>
-              <FormControlLabel>
-                <FormControlLabelText>Email</FormControlLabelText>
-              </FormControlLabel>
-              <Input>
-                <InputField
-                  placeholder="Email"
-                  value={formData.email}
-                  onChangeText={(text: string) => updateField('email', text)}
-                />
-              </Input>
-              <FormControlError>
-                <FormControlErrorIcon as={AlertCircleIcon} />
-                <FormControlErrorText>{errors.email}</FormControlErrorText>
-              </FormControlError>
-            </FormControl>
+            <FormInput
+              label="Email Address"
+              placeholder="name@company.com"
+              value={formData.email}
+              onChange={(v) => updateField('email', v)}
+              error={errors.email}
+            />
 
-            <FormControl isInvalid={!!errors.password}>
-              <FormControlLabel>
-                <FormControlLabelText>Password</FormControlLabelText>
-              </FormControlLabel>
-              <Input>
-                <InputField
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="Password"
-                  value={formData.password}
-                  onChangeText={(text: string) => updateField('password', text)}
-                />
-                <InputSlot className="pr-3" onPress={() => setShowPassword(!showPassword)}>
-                  <InputIcon as={showPassword ? Eye : EyeOff} className="text-gray-500" />
-                </InputSlot>
-              </Input>
-              <FormControlError>
-                <FormControlErrorIcon as={AlertCircleIcon} />
-                <FormControlErrorText>{errors.password}</FormControlErrorText>
-              </FormControlError>
-            </FormControl>
+            <FormInput
+              label="Password"
+              type={showPassword ? 'text' : 'password'}
+              placeholder="••••••••"
+              value={formData.password}
+              onChange={(v) => updateField('password', v)}
+              error={errors.password}
+              rightElement={
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              }
+            />
 
-            <Button
-              className="mt-4"
-              onPress={() => validateStep(1) && setStep(2)}
+            <button
+              onClick={() => validateStep(1) && setStep(2)}
+              className="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg shadow-sm shadow-blue-200 transition-all flex items-center justify-center gap-2 group"
             >
-              <ButtonText>Next</ButtonText>
-              <ButtonIcon as={ArrowRight} />
-            </Button>
-          </VStack>
+              Next Step
+              <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+            </button>
+          </div>
         )}
 
         {step === 2 && (
-          <VStack space="md">
-            <Heading className="text-xl font-semibold mb-2">Business Details</Heading>
+          <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Business Details</h2>
 
-            {['businessName', 'businessAddress', 'businessEmail', 'businessPhone'].map(
-              (f) => (
-                <FormControl key={f} isInvalid={!!errors[f]}>
-                  <FormControlLabel>
-                    <FormControlLabelText className="capitalize">
-                      {f.replace(/([A-Z])/g, ' $1')}
-                    </FormControlLabelText>
-                  </FormControlLabel>
-                  <Input>
-                    <InputField
-                      placeholder={f.replace(/([A-Z])/g, ' $1')}
-                      value={(formData as any)[f]}
-                      onChangeText={(text: string) => updateField(f, text)}
-                    />
-                  </Input>
-                  <FormControlError>
-                    <FormControlErrorIcon as={AlertCircleIcon} />
-                    <FormControlErrorText>{errors[f]}</FormControlErrorText>
-                  </FormControlError>
-                </FormControl>
-              )
-            )}
+            <FormInput label="Business Name" placeholder="Legal Business Name" value={formData.businessName} onChange={v => updateField('businessName', v)} error={errors.businessName} />
+            <FormInput label="Business Address" placeholder="123 Market St" value={formData.businessAddress} onChange={v => updateField('businessAddress', v)} error={errors.businessAddress} />
 
-            <HStack space="md" className="mt-4">
-              <Button variant="outline" action="secondary" onPress={() => setStep(1)} className="flex-1">
-                <ButtonIcon as={ArrowLeft} />
-                <ButtonText>Back</ButtonText>
-              </Button>
-              <Button
-                className="flex-1"
-                onPress={() => validateStep(2) && setStep(3)}
+            <div className="grid grid-cols-2 gap-4">
+              <FormInput label="Business Email" placeholder="contact@biz.com" value={formData.businessEmail} onChange={v => updateField('businessEmail', v)} error={errors.businessEmail} />
+              <FormInput label="Phone Number" placeholder="+234..." value={formData.businessPhone} onChange={v => updateField('businessPhone', v)} error={errors.businessPhone} />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <FormSelect
+                label="City"
+                value={formData.city}
+                options={[{ label: 'Abuja', value: 'Abuja' }]}
+                onChange={v => updateField('city', v)}
+                error={errors.city}
+              />
+              <FormSelect
+                label="Country"
+                value={formData.country}
+                options={[{ label: 'Nigeria', value: 'Nigeria' }]}
+                onChange={v => updateField('country', v)}
+                error={errors.country}
+              />
+            </div>
+
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => setStep(1)}
+                className="flex-1 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 font-medium py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
               >
-                <ButtonText>Next</ButtonText>
-                <ButtonIcon as={ArrowRight} />
-              </Button>
-            </HStack>
-          </VStack>
+                <ArrowLeft size={18} /> Back
+              </button>
+              <button
+                onClick={() => validateStep(2) && setStep(3)}
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg shadow-sm shadow-blue-200 transition-all flex items-center justify-center gap-2 group"
+              >
+                Next Step <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+              </button>
+            </div>
+          </div>
         )}
 
         {step === 3 && (
-          <VStack space="md">
-            <Heading className="text-xl font-semibold mb-2">Store Setup</Heading>
+          <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Store Setup</h2>
 
-            {/* Text fields for Store Name and Description */}
-            {['storeName', 'storeDescription'].map(
-              (f) => (
-                <FormControl key={f} isInvalid={!!errors[f]}>
-                  <FormControlLabel>
-                    <FormControlLabelText className="capitalize">
-                      {f.replace(/([A-Z])/g, ' $1')}
-                    </FormControlLabelText>
-                  </FormControlLabel>
-                  <Input>
-                    <InputField
-                      placeholder={f.replace(/([A-Z])/g, ' $1')}
-                      value={(formData as any)[f]}
-                      onChangeText={(text: string) => updateField(f, text)}
-                    />
-                  </Input>
-                  <FormControlError>
-                    <FormControlErrorIcon as={AlertCircleIcon} />
-                    <FormControlErrorText>{errors[f]}</FormControlErrorText>
-                  </FormControlError>
-                </FormControl>
-              )
-            )}
+            <FormInput label="Store Name" placeholder="My Awesome Store" value={formData.storeName} onChange={v => updateField('storeName', v)} error={errors.storeName} />
+            <FormInput label="Description" placeholder="What do you sell?" value={formData.storeDescription} onChange={v => updateField('storeDescription', v)} error={errors.storeDescription} />
 
-            {/* Image Upload for Logo */}
-            <ImageUploadField
-              label="Store Logo"
-              value={formData.storeLogo}
-              onChange={(url) => updateField('storeLogo', url)}
-              error={errors.storeLogo}
-            />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <ImageUploadField label="Store Logo" value={formData.storeLogo} onChange={v => updateField('storeLogo', v)} error={errors.storeLogo} />
+              <ImageUploadField label="Store Banner" value={formData.storeBanner} onChange={v => updateField('storeBanner', v)} error={errors.storeBanner} />
+            </div>
 
-            {/* Image Upload for Banner */}
-            <ImageUploadField
-              label="Store Banner"
-              value={formData.storeBanner}
-              onChange={(url) => updateField('storeBanner', url)}
-              error={errors.storeBanner}
-            />
-
-            <HStack space="md" className="mt-4">
-              <Button variant="outline" action="secondary" onPress={() => setStep(2)} className="flex-1">
-                <ButtonIcon as={ArrowLeft} />
-                <ButtonText>Back</ButtonText>
-              </Button>
-              <Button className="flex-1" onPress={() => validateStep(3) && setShowProductModal(true)}>
-                <ButtonText>Complete Signup</ButtonText>
-                <ButtonIcon as={ArrowRight} />
-              </Button>
-            </HStack>
-          </VStack>
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => setStep(2)}
+                className="flex-1 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 font-medium py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
+              >
+                <ArrowLeft size={18} /> Back
+              </button>
+              <button
+                onClick={() => validateStep(3) && setShowProductModal(true)}
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg shadow-sm shadow-blue-200 transition-all flex items-center justify-center gap-2"
+              >
+                Complete Signup <ArrowRight size={18} />
+              </button>
+            </div>
+          </div>
         )}
 
         {serverError && (
-          <Box className="mt-4 p-3 bg-red-100 rounded-md border border-red-200">
-            <Text className="text-red-700">{serverError}</Text>
-          </Box>
+          <div className="mt-6 p-4 bg-red-50 rounded-lg border border-red-100 flex items-start gap-3">
+            <AlertCircle className="text-red-500 mt-0.5" size={20} />
+            <p className="text-sm text-red-700 font-medium">{serverError}</p>
+          </div>
         )}
-      </Box>
+      </div>
 
       {/* Product Creation Modal */}
       {showProductModal && (
-        <Box className="absolute top-0 left-0 right-0 bottom-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <Box className="w-full max-w-md bg-white p-6 rounded-xl border border-gray-200 shadow-xl">
-            <HStack className="justify-between items-center mb-4">
-              <Heading className="text-xl font-semibold">Add Your First Product</Heading>
-              <Button size="xs" variant="link" onPress={() => setShowProductModal(false)}>
-                <ButtonIcon as={X} className="text-gray-500" />
-              </Button>
-            </HStack>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div className="w-full max-w-lg bg-white p-8 rounded-2xl border border-gray-100 shadow-2xl scale-100 animate-in zoom-in-95 duration-200">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold text-gray-900">Add Your First Product</h2>
+              <button
+                onClick={() => setShowProductModal(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-full hover:bg-gray-100"
+              >
+                <X size={20} />
+              </button>
+            </div>
 
-            <Text className="text-gray-500 mb-4">Start selling immediately by adding a product now or skip for later.</Text>
+            <p className="text-sm text-gray-500 mb-6">Start selling immediately by adding a product now, or skip this step to add it later from your dashboard.</p>
 
-            <VStack space="md">
-              <FormControl isInvalid={!!errors.productName}>
-                <FormControlLabel><FormControlLabelText>Product Name</FormControlLabelText></FormControlLabel>
-                <Input><InputField placeholder="e.g. Handmade T-Shirt" value={formData.productName} onChangeText={(t: string) => updateField('productName', t)} /></Input>
-                <FormControlError><FormControlErrorIcon as={AlertCircleIcon} /><FormControlErrorText>{errors.productName}</FormControlErrorText></FormControlError>
-              </FormControl>
+            <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+              <FormInput label="Product Name" placeholder="e.g. Handmade T-Shirt" value={formData.productName} onChange={t => updateField('productName', t)} error={errors.productName} />
+              <FormInput label="Description" placeholder="Describe your product..." value={formData.productDescription} onChange={t => updateField('productDescription', t)} error={errors.productDescription} />
 
-              <FormControl isInvalid={!!errors.productDescription}>
-                <FormControlLabel><FormControlLabelText>Description</FormControlLabelText></FormControlLabel>
-                <Input><InputField placeholder="Describe your product..." value={formData.productDescription} onChangeText={(t: string) => updateField('productDescription', t)} /></Input>
-                <FormControlError><FormControlErrorIcon as={AlertCircleIcon} /><FormControlErrorText>{errors.productDescription}</FormControlErrorText></FormControlError>
-              </FormControl>
+              <div className="grid grid-cols-2 gap-4">
+                <FormInput label="Price" placeholder="0.00" type="number" value={formData.productPrice} onChange={t => updateField('productPrice', t)} error={errors.productPrice} />
+                <FormInput label="Stock" placeholder="1" type="number" value={formData.productStock} onChange={t => updateField('productStock', t)} error={errors.productStock} />
+              </div>
 
-              <HStack space="md">
-                <FormControl className="flex-1" isInvalid={!!errors.productPrice}>
-                  <FormControlLabel><FormControlLabelText>Price</FormControlLabelText></FormControlLabel>
-                  <Input><InputField placeholder="0.00" keyboardType="numeric" value={formData.productPrice} onChangeText={(t: string) => updateField('productPrice', t)} /></Input>
-                  <FormControlError><FormControlErrorIcon as={AlertCircleIcon} /><FormControlErrorText>{errors.productPrice}</FormControlErrorText></FormControlError>
-                </FormControl>
-
-                <FormControl className="flex-1" isInvalid={!!errors.productStock}>
-                  <FormControlLabel><FormControlLabelText>Quantity / Stock</FormControlLabelText></FormControlLabel>
-                  <Input><InputField placeholder="1" keyboardType="numeric" value={formData.productStock} onChangeText={(t: string) => updateField('productStock', t)} /></Input>
-                  <FormControlError><FormControlErrorIcon as={AlertCircleIcon} /><FormControlErrorText>{errors.productStock}</FormControlErrorText></FormControlError>
-                </FormControl>
-              </HStack>
-
-              <FormControl isInvalid={!!errors.productSku}>
-                <FormControlLabel>
-                  <FormControlLabelText>SKU (Stock Keeping Unit)</FormControlLabelText>
-                </FormControlLabel>
-                <Input><InputField placeholder="e.g. TSHIRT-001" value={formData.productSku} onChangeText={(t: string) => updateField('productSku', t)} /></Input>
-                <Text className="text-xs text-gray-500 mt-1">Unique ID for inventory management (Optional)</Text>
-              </FormControl>
-
-              <ImageUploadField
-                label="Product Image"
-                value={formData.productImage}
-                onChange={(url) => updateField('productImage', url)}
-                error={errors.productImage}
+              <FormInput
+                label="SKU (Optional)"
+                placeholder="e.g. TSHIRT-001"
+                value={formData.productSku}
+                onChange={t => updateField('productSku', t)}
+                error={errors.productSku}
               />
 
-              <HStack space="md" className="mt-4">
-                <Button variant="outline" action="secondary" onPress={() => handleSubmit(false)} className="flex-1">
-                  <ButtonText>Skip This</ButtonText>
-                </Button>
-                <Button className="flex-1" onPress={() => handleSubmit(true)}>
-                  <ButtonText>Save & Finish</ButtonText>
-                </Button>
-              </HStack>
-            </VStack>
-          </Box>
-        </Box>
+              <ImageUploadField label="Product Image" value={formData.productImage} onChange={t => updateField('productImage', t)} error={errors.productImage} />
+            </div>
+
+            <div className="flex gap-4 mt-8">
+              <button
+                onClick={() => handleSubmit(false)}
+                className="flex-1 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 font-medium py-2.5 rounded-lg transition-colors"
+              >
+                Skip for Now
+              </button>
+              <button
+                onClick={() => handleSubmit(true)}
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg shadow-sm transition-colors"
+              >
+                Save & Finish
+              </button>
+            </div>
+          </div>
+        </div>
       )}
-    </Box>
+    </div>
   );
 }

@@ -19,7 +19,8 @@ export const productsTable = pgTable('products', {
   image: text(), // Changed to text to support JSON string of multiple images
   video: text(), // URL to the product video
   price: doublePrecision().notNull(),
-
+  //Tags
+  productTags: varchar({ length: 255, enum: ['Chicken', 'Fish', 'Eggs'] }).notNull().default('Chicken'),
   // Inventory
   stock: integer().notNull().default(0),
   sku: varchar({ length: 100 }),
