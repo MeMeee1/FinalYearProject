@@ -192,8 +192,8 @@ export async function createProduct(req: Request, res: Response) {
       return res.status(403).json({ message: 'Vendor account is not active' });
     }
 
-    const { name, image, images, sku, ...rest } = req.cleanBody;
-    console.log('Create Product CleanBody:', { name, image: image ? 'present' : 'missing', imagesCount: images?.length, sku });
+    const { name, image, images, video, sku, ...rest } = req.cleanBody;
+    console.log('Create Product CleanBody:', { name, image: image ? 'present' : 'missing', imagesCount: images?.length, sku, video: video ? 'present' : 'missing' });
 
     // Handle images: prefer 'images' array, fallback to 'image' string/array
     let finalImageString: string | null = null;
@@ -223,6 +223,7 @@ export async function createProduct(req: Request, res: Response) {
       ...rest,
       sku: finalSku,
       image: finalImageString, // Can be string, JSON string, or null
+      video, // Add video field
       sellerId: vendor[0].id,
     };
 
@@ -274,9 +275,13 @@ export async function updateProduct(req: Request, res: Response) {
       return res.status(403).json({ message: 'Not authorized to update this product' });
     }
 
-    const { image, images, ...rest } = req.cleanBody;
-    console.log('Update Product CleanBody:', { image: image ? 'present' : 'missing', imagesCount: images?.length });
+    const { image, images, video, ...rest } = req.cleanBody;
+    console.log('Update Product CleanBody:', { image: image ? 'present' : 'missing', imagesCount: images?.length, video: video ? 'present' : 'missing' });
     const updatedFields: any = { ...rest };
+
+    if (video !== undefined) {
+      updatedFields.video = video;
+    }
 
     // Handle image update if provided
     // Handle image update if provided

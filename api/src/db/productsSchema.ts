@@ -17,6 +17,7 @@ export const productsTable = pgTable('products', {
   name: varchar({ length: 255 }).notNull(),
   description: text(),
   image: text(), // Changed to text to support JSON string of multiple images
+  video: text(), // URL to the product video
   price: doublePrecision().notNull(),
 
   // Inventory
@@ -37,6 +38,7 @@ export const createProductSchema = createInsertSchema(productsTable).omit({
   updatedAt: true,
 }).extend({
   images: z.array(z.string()).optional(),
+  video: z.string().optional(),
 });
 
 export const updateProductSchema = createInsertSchema(productsTable)

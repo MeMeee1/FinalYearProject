@@ -36,13 +36,45 @@ export async function uploadProductImage(formData: FormData) {
     }
 }
 
+export async function uploadProductVideo(formData: FormData) {
+    try {
+        const token = cookies().get('token')?.value;
+        const file = formData.get('video');
+        if (!file) {
+            throw new Error('No file provided');
+        }
+
+        const res = await fetch(`${API_URL}/upload/video`, {
+            method: 'POST',
+            headers: {
+                Authorization: `${token}`,
+            },
+            body: formData,
+        });
+
+        if (!res.ok) {
+            console.error('Upload failed with status:', res.status);
+            const text = await res.text();
+            console.error('Response:', text);
+            throw new Error(`Upload failed: ${res.status}`);
+        }
+
+        const data = await res.json();
+        return data.url;
+    } catch (error) {
+        console.error('Error uploading video:', error);
+        return null;
+    }
+}
+
 export async function createProduct(
     name: string,
     description: string,
     price: number,
     stock: number,
     sku: string,
-    images?: string[]
+    images?: string[],
+    video?: string
 ) {
     let redirectUrl = '/dashboard/products';
     try {
@@ -54,7 +86,7 @@ export async function createProduct(
                 Authorization: `${token}`,
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ name, description, price, stock, sku, images }),
+            body: JSON.stringify({ name, description, price, stock, sku, images, video }),
         });
 
         if (!res.ok) {
@@ -97,20 +129,12 @@ export async function updateProduct(
         price: number;
         stock: number;
         sku: string;
-        images?: string[]; // Frontend sends array of strings
-        image?: string; // Or single string
+        images?: string[];
+        image?: string;
+        video?: string;
     }
 ) {
-    // Note: The backend expects 'image' (as stringified JSON) or 'images' array.
-    // Our controller logic handles both. We'll send 'images' array directly if supported, or JSON string.
-    // Based on my controller update: `if (images !== undefined) updatedFields.image = JSON.stringify(images);`
-
-    // So we can send `images`.
-
     const token = cookies().get('token')?.value;
-
-    // Transform arrays to what backend expects if raw JSON body
-    // Actually `fetch` body stringify will keep array as array.
 
     const res = await fetch(`${API_URL}/products/${id}`, {
         method: 'PUT',

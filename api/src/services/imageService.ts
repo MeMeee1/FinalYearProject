@@ -11,7 +11,7 @@ import { Readable } from 'stream';
 export const uploadToCloudinary = (buffer: Buffer, folder: string = 'dashboard-app'): Promise<{ secure_url: string; public_id: string }> => {
     return new Promise((resolve, reject) => {
         const stream = cloudinary.uploader.upload_stream(
-            { folder },
+            { folder, resource_type: 'auto' },
             (error, result) => {
                 if (error) return reject(error);
                 if (result) {
