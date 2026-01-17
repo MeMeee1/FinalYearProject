@@ -195,7 +195,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
     }
 
     return (
-        <Box className="flex-1 min-h-screen bg-gray-50 p-4 md:p-8">
+        <div className="flex-1 min-h-screen bg-gray-50 p-4 md:p-8 pb-40">
             <Box className="max-w-6xl mx-auto">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                     <VStack>
@@ -360,6 +360,6 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                     </div>
                 </div>
             </Box>
-        </Box>
+        </div>
     );
 }
