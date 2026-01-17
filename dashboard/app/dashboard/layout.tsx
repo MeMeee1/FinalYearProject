@@ -77,6 +77,10 @@ function Sidebar() {
         <Text className="hover:text-blue-600 transition-colors py-2 px-3 rounded hover:bg-blue-50">Vendors</Text>
       </Link>
 
+      <Link href="/dashboard/reviews" className="w-full">
+        <Text className="hover:text-blue-600 transition-colors py-2 px-3 rounded hover:bg-blue-50">Reviews</Text>
+      </Link>
+
       <Link href="/dashboard/analytics" className="w-full">
         <Text className="hover:text-blue-600 transition-colors py-2 px-3 rounded hover:bg-blue-50">Analytics</Text>
       </Link>
@@ -105,7 +109,7 @@ function MobileNavbar() {
         <Icon as={ThreeDotsIcon} className="w-6 h-6" />
         <span className="text-xs">Orders</span>
       </Link>
-      
+
       <Link href="/dashboard/vendors" className="flex flex-col items-center gap-1">
         <Icon as={MessageCircleIcon} className="w-6 h-6" />
         <span className="text-xs">Vendors</span>

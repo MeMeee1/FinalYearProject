@@ -8,7 +8,7 @@ import { redirect } from 'next/navigation';
 import { Text } from '@/components/ui/text';
 import Link from 'next/link';
 import { Icon } from '@/components/ui/icon';
-import { LayoutGrid, ShoppingBag, TrendingUp, Settings as SettingsIcon } from 'lucide-react';
+import { LayoutGrid, ShoppingBag, TrendingUp, Settings as SettingsIcon, Star } from 'lucide-react';
 
 type DashboardLayoutProps = {
   children: React.ReactNode;
@@ -109,6 +109,7 @@ function Sidebar({ isActive }: { isActive: boolean }) {
     { href: '/dashboard', label: 'Dashboard', icon: LayoutGrid, alwaysShow: true },
     { href: '/dashboard/products', label: 'Products', icon: ShoppingBag, alwaysShow: false },
     { href: '/dashboard/orders', label: 'Orders', icon: ShoppingBag, alwaysShow: false },
+    { href: '/dashboard/reviews', label: 'Reviews', icon: Star, alwaysShow: false },
     { href: '/dashboard/analytics', label: 'Analytics', icon: TrendingUp, alwaysShow: false },
   ];
 
@@ -151,6 +152,11 @@ function MobileNavbar({ isActive }: { isActive: boolean }) {
           <Link href="/dashboard/orders" className="flex flex-col items-center gap-1 flex-1">
             <Icon as={ShoppingBag} className="w-5 h-5 text-gray-600" />
             <span className="text-xs text-gray-600 font-medium">Orders</span>
+          </Link>
+
+          <Link href="/dashboard/reviews" className="flex flex-col items-center gap-1 flex-1">
+            <Icon as={Star} className="w-5 h-5 text-gray-600" />
+            <span className="text-xs text-gray-600 font-medium">Reviews</span>
           </Link>
 
           <Link href="/dashboard/analytics" className="flex flex-col items-center gap-1 flex-1">

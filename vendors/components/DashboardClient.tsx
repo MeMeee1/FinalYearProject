@@ -18,6 +18,7 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { useVendorStore } from '@/store/vendorStore';
+import { useRouter } from 'next/navigation';
 
 interface DashboardClientProps {
   vendorStats: any;
@@ -29,6 +30,21 @@ export function DashboardClient({ vendorStats, ordersData, vendorProfile }: Dash
   const { vendorProfile: storeProfile, isLoading, error, refreshProfile, fetchProfile } = useVendorProfile();
   const setVendorStoreProfile = useVendorStore(state => state.setVendorProfile);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const router = useRouter();
+
+  const handleRefresh = async () => {
+    try {
+      setIsRefreshing(true);
+      await refreshProfile();
+      // Force server component refresh to update sidebar/layout
+      router.refresh();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   // Initialize profile on component mount if provided from server
   useEffect(() => {
@@ -101,7 +117,6 @@ export function DashboardClient({ vendorStats, ordersData, vendorProfile }: Dash
         </div>
       )}
 
-      {/* Welcome Section - Standard (if no banner) */}
       <div className="mb-6">
         <div className="flex items-center justify-between">
           <div>
@@ -114,12 +129,13 @@ export function DashboardClient({ vendorStats, ordersData, vendorProfile }: Dash
           </div>
           {(isPending || isSuspended) && (
             <button
-              onClick={() => refreshProfile()}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200"
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${isRefreshing ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-blue-100 text-blue-600 hover:bg-blue-200'}`}
               title="Refresh status from database"
             >
-              <RefreshCw className="w-4 h-4" />
-              <span className="hidden sm:inline text-sm">Refresh Status</span>
+              <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+              <span className="hidden sm:inline text-sm">{isRefreshing ? 'Checking...' : 'Refresh Status'}</span>
             </button>
           )}
         </div>

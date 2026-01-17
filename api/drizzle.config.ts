@@ -7,6 +7,7 @@ export default defineConfig({
     './src/db/usersSchema.ts',
     './src/db/ordersSchema.ts',
     './src/db/vendorsSchema.ts',
+    './src/db/reviewsSchema.ts',
   ],
   dialect: 'postgresql',
   dbCredentials: {
