@@ -158,7 +158,7 @@ export default function CreateProductPage() {
           </Box>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8" style={{ paddingBottom: '150px' }}>
           <div className="lg:col-span-2 space-y-6">
             <Box className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
               <VStack space="xl">
