@@ -38,71 +38,110 @@ export default async function ProductsPage({
     };
 
     return (
-      <div className="w-full max-w-[1400px] mx-auto px-2 sm:px-4 lg:px-6 py-4 sm:py-6">
-        {/* Header */}
-        <div className="mb-4 sm:mb-6 lg:mb-8">
-          <Heading size="xl" className="mb-3 sm:mb-4 text-lg sm:text-xl">Browse Products by Vendor</Heading>
-          <SearchBar />
-        </div>
-
-        {/* Main content area */}
-        <div>
-          {vendors.length === 0 ? (
-            <div className="text-center py-10">
-              <p className="text-slate-500 text-lg">
-                {query ? 'No matching vendors found' : 'No vendors available'}
-              </p>
+      <div className="w-full min-h-screen bg-gray-50/50">
+        <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+          {/* Header Section */}
+          <div className="mb-8 sm:mb-12 space-y-4">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div>
+                <Heading size="2xl" className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight">
+                  Marketplace Vendors
+                </Heading>
+                <Text className="mt-2 text-lg text-gray-500">
+                  Discover unique products from our curated list of sellers
+                </Text>
+              </div>
+              <div className="w-full sm:w-auto min-w-[300px]">
+                <SearchBar />
+              </div>
             </div>
-          ) : (
-            <>
-              {/* Vendor Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-5 mb-8">
-                {vendors.map((vendor: any) => (
-                  <Link key={vendor.id} href={`/dashboard/products/vendor/${vendor.id}`} className="block">
-                    <Card className="w-full h-full p-4 rounded-lg hover:shadow-lg transition-shadow duration-300 flex flex-col border border-gray-200">
-                      {/* Vendor Logo/Banner */}
-                      <div className="relative pt-[60%] mb-4 overflow-hidden rounded-md bg-gradient-to-br from-blue-50 to-indigo-100">
-                        {vendor.storeLogo ? (
-                          <Image
-                            source={{ uri: vendor.storeLogo }}
-                            className="absolute top-0 left-0 w-full h-full object-cover"
-                            alt={vendor.storeName}
-                          />
-                        ) : (
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <Icon as={ShoppingBagIcon} className="w-12 h-12 text-indigo-300" />
+          </div>
+
+          {/* Main Content */}
+          <div>
+            {vendors.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-gray-100 shadow-sm">
+                <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+                  <Icon as={ShoppingBagIcon} className="w-8 h-8 text-gray-400" />
+                </div>
+                <Heading size="md" className="text-gray-900 mb-2">
+                  {query ? 'No matching vendors found' : 'No vendors available'}
+                </Heading>
+                <Text className="text-gray-500 max-w-md text-center">
+                  {query ? `We couldn't find any vendors matching "${query}". Try adjusting your search terms.` : 'Check back later for new sellers.'}
+                </Text>
+              </div>
+            ) : (
+              <>
+                {/* Vendors Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
+                  {vendors.map((vendor: any) => (
+                    <Link key={vendor.id} href={`/dashboard/products/vendor/${vendor.id}`} className="block group h-full">
+                      <Card className="h-full bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col hover:-translate-y-1">
+                        {/* Vendor Cover/Logo Area */}
+                        <div className="relative h-48 bg-gradient-to-br from-indigo-50 to-blue-50 group-hover:from-indigo-100 group-hover:to-blue-100 transition-colors duration-500">
+                          {vendor.storeLogo ? (
+                            <Image
+                              source={{ uri: vendor.storeLogo }}
+                              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                              alt={vendor.storeName}
+                            />
+                          ) : (
+                            <div className="absolute inset-0 flex flex-col items-center justify-center text-indigo-200">
+                              <Icon as={ShoppingBagIcon} className="w-16 h-16 mb-2 opacity-50" />
+                              <span className="text-xs font-medium uppercase tracking-wider opacity-60">No Logo</span>
+                            </div>
+                          )}
+
+                          {/* Overlay Gradient */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-60" />
+
+                          {/* Store Name Over Image for Impact */}
+                          <div className="absolute bottom-4 left-4 right-4 text-white">
+                            <h3 className="text-xl font-bold truncate drop-shadow-md">{vendor.storeName}</h3>
                           </div>
-                        )}
-                      </div>
-
-                      {/* Vendor Info */}
-                      <div className="flex-grow">
-                        <Heading size="md" className="mb-2 line-clamp-1">{vendor.storeName}</Heading>
-                        {vendor.storeDescription && (
-                          <Text className="text-sm text-slate-600 line-clamp-2 mb-3">
-                            {vendor.storeDescription}
-                          </Text>
-                        )}
-
-                        <div className="mt-auto pt-3 border-t border-gray-100">
-                          <Text className="text-xs text-blue-600 font-medium">View Products →</Text>
                         </div>
-                      </div>
-                    </Card>
-                  </Link>
-                ))}
-              </div>
 
-              {/* Pagination */}
-              <div className="mt-6 sm:mt-8 pt-4 border-t border-gray-200">
-                <Pagination
-                  currentPage={pagination.page || currentPage}
-                  totalPages={pagination.totalPages || 1}
-                  searchQuery={query}
-                />
-              </div>
-            </>
-          )}
+                        {/* Card Body */}
+                        <div className="p-5 flex flex-col flex-grow">
+                          <div className="flex-grow">
+                            {vendor.storeDescription ? (
+                              <Text className="text-sm text-gray-600 line-clamp-3 leading-relaxed">
+                                {vendor.storeDescription}
+                              </Text>
+                            ) : (
+                              <Text className="text-sm text-gray-400 italic">
+                                No description available
+                              </Text>
+                            )}
+                          </div>
+
+                          {/* Footer Action */}
+                          <div className="mt-6 pt-4 border-t border-gray-50 flex items-center justify-between group/btn">
+                            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Visit Store</span>
+                            <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center group-hover/btn:bg-blue-600 transition-colors duration-300">
+                              <span className="text-blue-600 group-hover/btn:text-white transition-colors duration-300">→</span>
+                            </div>
+                          </div>
+                        </div>
+                      </Card>
+                    </Link>
+                  ))}
+                </div>
+
+                {/* Pagination */}
+                <div className="flex justify-center border-t border-gray-200 pt-8">
+                  <div className="w-full max-w-md">
+                    <Pagination
+                      currentPage={pagination.page || currentPage}
+                      totalPages={pagination.totalPages || 1}
+                      searchQuery={query}
+                    />
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
     );
