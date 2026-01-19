@@ -71,6 +71,13 @@
       "when": 1768666338925,
       "tag": "0009_wealthy_leader",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1768765200990,
+      "tag": "0010_peaceful_talkback",
+      "breakpoints": true
     }
   ]
 }

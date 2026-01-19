@@ -1,6 +1,8 @@
 import { integer, pgTable, varchar, text, timestamp, doublePrecision } from 'drizzle-orm/pg-core';
 import { createInsertSchema } from 'drizzle-zod';
 import { usersTable } from './usersSchema';
+import { fulfillmentPointsTable, lgaEnum } from './fulfillmentPointsSchema';
+
 export const vendorsTable = pgTable('vendors', {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   userId: integer().references(() => usersTable.id).notNull().unique(),
@@ -15,6 +17,7 @@ export const vendorsTable = pgTable('vendors', {
   businessName: varchar({ length: 255 }),
   businessAddress: text(),
   city: varchar({ length: 100 }),
+  lga: lgaEnum(), // Vendor's LGA
   country: varchar({ length: 100 }),
 
   // Contact
@@ -25,6 +28,8 @@ export const vendorsTable = pgTable('vendors', {
 
   // Status
   status: varchar({ length: 50, enum: ['pending', 'active', 'suspended'] }).notNull().default('pending'), // pending, active, suspended
+
+  assignedVerificationPointId: integer().references(() => fulfillmentPointsTable.id), // Where they need to go for verification
 
   // Commission
   platformCommissionRate: doublePrecision().default(10.0), // Platform takes 10%
@@ -38,6 +43,8 @@ export const createVendorSchema = createInsertSchema(vendorsTable).omit({
   createdAt: true,
   updatedAt: true,
   userId: true,
+  assignedVerificationPointId: true, // System assigned, not user input
+  status: true,
 });
 export const updateVendorSchema = createInsertSchema(vendorsTable)
   .omit({

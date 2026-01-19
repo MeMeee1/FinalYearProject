@@ -5,9 +5,7 @@ import { z } from 'zod';
 import { handleVendorSignup } from './actions';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { ArrowLeft, ArrowRight, Eye, EyeOff, X, UploadCloud, ChevronDown, AlertCircle } from 'lucide-react-native';
-// Removed custom components imports to use standard HTML + Tailwind
 import { API_URL } from '@/config';
-
 
 type FormData = {
   email: string;
@@ -17,6 +15,7 @@ type FormData = {
   phone: string;
   address: string;
   city: string;
+  lga: string;
   country: string;
   businessName: string;
   businessAddress: string;
@@ -39,6 +38,7 @@ const step2Schema = z.object({
   phone: z.string().min(10),
   address: z.string().min(5),
   city: z.literal('Abuja', { message: 'Only Abuja is supported' }),
+  lga: z.enum(['Abaji', 'Abuja Municipal', 'Bwari', 'Gwagwalada', 'Kuje', 'Kwali'], { message: 'Please select a valid LGA' }),
   country: z.literal('Nigeria', { message: 'Only Nigeria is supported' }),
 });
 
@@ -56,7 +56,6 @@ const step4Schema = z.object({
   storeBanner: z.string().url().optional().or(z.literal('')),
 });
 
-// ... (ImageUploadField, FormInput, FormSelect components remain the same) ...
 const ImageUploadField = ({
   label,
   value,
@@ -148,7 +147,6 @@ const ImageUploadField = ({
   );
 };
 
-// Helper input component for consistency
 const FormInput = ({
   label,
   value,
@@ -190,7 +188,6 @@ const FormInput = ({
   </div>
 );
 
-// Custom Select Input for City/Country
 const FormSelect = ({
   label,
   value,
@@ -242,6 +239,7 @@ export default function SignUpPage() {
     phone: '',
     address: '',
     city: 'Abuja',
+    lga: 'Abuja Municipal',
     country: 'Nigeria',
     businessName: '',
     businessAddress: '',
@@ -285,6 +283,7 @@ export default function SignUpPage() {
       address: formData.address,
       city: formData.city,
       country: formData.country,
+      lga: formData.lga,
       businessName: formData.businessName,
       businessAddress: formData.businessAddress,
       businessEmail: formData.businessEmail,
@@ -302,6 +301,15 @@ export default function SignUpPage() {
       alert(result.error);
     }
   };
+
+  const lgaOptions = [
+    { label: 'Abaji', value: 'Abaji' },
+    { label: 'Abuja Municipal (AMAC)', value: 'Abuja Municipal' },
+    { label: 'Bwari', value: 'Bwari' },
+    { label: 'Gwagwalada', value: 'Gwagwalada' },
+    { label: 'Kuje', value: 'Kuje' },
+    { label: 'Kwali', value: 'Kwali' },
+  ];
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50/50 p-4 font-sans">
@@ -378,8 +386,10 @@ export default function SignUpPage() {
 
             <div className="grid grid-cols-2 gap-4">
               <FormSelect label="City" value={formData.city} options={[{ label: 'Abuja', value: 'Abuja' }]} onChange={v => updateField('city', v)} error={errors.city} />
-              <FormSelect label="Country" value={formData.country} options={[{ label: 'Nigeria', value: 'Nigeria' }]} onChange={v => updateField('country', v)} error={errors.country} />
+              <FormSelect label="Area Council (LGA)" value={formData.lga} options={lgaOptions} onChange={v => updateField('lga', v)} error={errors.lga} />
             </div>
+
+            <FormSelect label="Country" value={formData.country} options={[{ label: 'Nigeria', value: 'Nigeria' }]} onChange={v => updateField('country', v)} error={errors.country} />
 
             <div className="flex gap-3 mt-6">
               <button onClick={() => setStep(1)} className="flex-1 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 font-medium py-3 rounded-lg flex items-center justify-center gap-2"><ArrowLeft size={18} /> Back</button>
@@ -442,9 +452,6 @@ export default function SignUpPage() {
           </div>
         )}
       </div>
-
-
     </div>
   );
 }
-

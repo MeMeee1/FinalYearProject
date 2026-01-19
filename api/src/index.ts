@@ -8,6 +8,7 @@ import vendorsRoutes from './routes/vendors/index.js';
 import adminRoutes from './routes/admin/index.js';
 import uploadRoutes from './routes/upload/index.js';
 import reviewsRoutes from './routes/reviews.js';
+import fulfillmentPointsRoutes from './routes/fulfillmentPoints.js';
 // import stripeRoutes from './routes/stripe/index.js';
 
 import serverless from 'serverless-http';
@@ -40,6 +41,7 @@ app.use('/vendors', vendorsRoutes);
 app.use('/admin', adminRoutes);
 app.use('/upload', uploadRoutes);
 app.use('/reviews', reviewsRoutes);
+app.use('/fulfillment-points', fulfillmentPointsRoutes);
 // app.use('/stripe', stripeRoutes);
 
 if (process.env.NODE_ENV === 'dev') {

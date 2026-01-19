@@ -4,6 +4,7 @@ import { vendorsTable } from '../../db/vendorsSchema.js';
 import { usersTable } from '../../db/usersSchema.js';
 import { productsTable } from '../../db/productsSchema.js';
 import { ordersTable } from '../../db/ordersSchema.js';
+import { fulfillmentPointsTable } from '../../db/fulfillmentPointsSchema.js';
 import { eq, sql } from 'drizzle-orm';
 
 // Add this temporary debug endpoint
@@ -117,23 +118,28 @@ export async function getVendorProfile(req: Request, res: Response) {
       return res.status(401).json({ message: 'Unauthorized' });
     }
 
-    const vendor = await db
-      .select()
+    // Join with fulfillment points to get verification details if assigned
+    const vendorResult = await db
+      .select({
+        vendor: vendorsTable,
+        fulfillmentPoint: fulfillmentPointsTable
+      })
       .from(vendorsTable)
+      .leftJoin(fulfillmentPointsTable, eq(vendorsTable.assignedVerificationPointId, fulfillmentPointsTable.id))
       .where(eq(vendorsTable.userId, req.userId as number));
 
-    console.log('[DEBUG] Vendor search result:', vendor);
+    console.log('[DEBUG] Vendor search result:', vendorResult);
 
-    if (!vendor || vendor.length === 0) {
+    if (!vendorResult || vendorResult.length === 0) {
       console.log('[DEBUG] No vendor found for userId:', req.userId, '. Creating default vendor profile.');
-      
+
       // Auto-create a default vendor profile
       try {
         const user = await db
           .select()
           .from(usersTable)
           .where(eq(usersTable.id, req.userId as number));
-        
+
         if (!user || user.length === 0) {
           return res.status(401).json({ message: 'User not found' });
         }
@@ -143,7 +149,7 @@ export async function getVendorProfile(req: Request, res: Response) {
           storeName: user[0].name || 'My Store',
           businessName: user[0].name || 'My Business',
           businessEmail: user[0].email || '',
-          status: 'pending',
+          status: 'pending' as 'pending' | 'active' | 'suspended',
         };
 
         const [newVendor] = await db
@@ -152,14 +158,22 @@ export async function getVendorProfile(req: Request, res: Response) {
           .returning();
 
         console.log('[DEBUG] Created default vendor profile:', newVendor);
-        return res.status(201).json(newVendor);
+        // Return new vendor with null fulfillment point
+        return res.status(201).json({ ...newVendor, fulfillmentPoint: null });
       } catch (createError) {
         console.error('[DEBUG] Error creating default vendor profile:', createError);
         return res.status(500).json({ message: 'Failed to create vendor profile' });
       }
     }
 
-    res.json(vendor[0]);
+    const { vendor, fulfillmentPoint } = vendorResult[0];
+
+    // Return flat object with nested fulfillmentPoint or merged properties if preferred.
+    // Client currently expects vendor properties at root.
+    res.json({
+      ...vendor,
+      fulfillmentPoint: fulfillmentPoint // Include the full point object
+    });
   } catch (e) {
     console.log(e);
     res.status(500).send(e);
@@ -182,9 +196,33 @@ export async function createVendor(req: Request, res: Response) {
       return res.status(400).json({ message: 'Vendor profile already exists' });
     }
 
+    let assignedVerificationPointId = null;
+    const vendorLga = req.cleanBody.lga;
+
+    if (vendorLga) {
+      // Find a verification point in the same LGA
+      // We explicitly cast the enum column to text for comparison to avoid strict type issues if they arise
+      const verificationPoints = await db.execute(sql`
+        SELECT id FROM fulfillment_points 
+        WHERE lga = ${vendorLga} 
+        AND "isActive" = true 
+        AND "canVerifyVendors" = true
+        LIMIT 1
+      `);
+
+      if (verificationPoints.rows.length > 0) {
+        assignedVerificationPointId = verificationPoints.rows[0].id;
+        console.log(`[createVendor] Auto-assigned verification point ${assignedVerificationPointId} for LGA ${vendorLga}`);
+      } else {
+        console.log(`[createVendor] No verification point found for LGA ${vendorLga}`);
+      }
+    }
+
     const vendorData = {
       ...req.cleanBody,
       userId: req.userId,
+      assignedVerificationPointId: assignedVerificationPointId,
+      status: 'pending' as 'pending' | 'active' | 'suspended', // Explicit cast to satisfy Drizzle types
     };
 
     const [vendor] = await db
