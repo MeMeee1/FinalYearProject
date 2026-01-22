@@ -118,16 +118,18 @@ export async function getRecommendations(lga: string): Promise<Product[]> {
     return Array.isArray(data) ? data : (data.data || []);
 }
 
-export async function searchProducts(query: string = '', lga?: string, sort?: string): Promise<Product[]> {
+export async function searchProducts(query: string = '', lga?: string, sort?: string, page: number = 1, limit: number = 10): Promise<any> {
     const params = new URLSearchParams();
     if (query) params.append('q', query);
     if (lga && lga !== 'All') params.append('lga', lga);
     if (sort) params.append('sort', sort);
+    params.append('page', page.toString());
+    params.append('limit', limit.toString());
 
     const res = await fetch(`${API_URL}/products/search?${params.toString()}`);
     const data = await res.json();
     if (!res.ok) throw new Error('Failed to search products');
-    return Array.isArray(data) ? data : (data.data || []);
+    return data;
 }
 
 export async function getProductCategories(): Promise<string[]> {
