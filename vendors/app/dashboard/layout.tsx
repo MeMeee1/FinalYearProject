@@ -9,6 +9,7 @@ import { Text } from '@/components/ui/text';
 import Link from 'next/link';
 import { Icon } from '@/components/ui/icon';
 import { LayoutGrid, ShoppingBag, TrendingUp, Settings as SettingsIcon, Star } from 'lucide-react';
+import { VendorProfileSync } from '@/components/VendorProfileSync';
 
 type DashboardLayoutProps = {
   children: React.ReactNode;
@@ -65,17 +66,20 @@ export default async function DashboardLayout({ children }: DashboardLayoutProps
   console.log('[LAYOUT] Is Active:', isActive, '(status:', vendorProfile?.status, ')');
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden">
-      {/* Header */}
-      <Header />
+    <>
+      <VendorProfileSync initialProfile={vendorProfile} />
+      <div className="h-screen flex flex-col overflow-hidden">
+        {/* Header */}
+        <Header />
 
-      <div className="flex flex-1 overflow-hidden">
-        <Sidebar isActive={isActive} />
-        <Box className="flex-1 overflow-y-auto bg-gray-50 p-2 sm:p-4 pb-20 md:pb-4">{children}</Box>
+        <div className="flex flex-1 overflow-hidden">
+          <Sidebar isActive={isActive} />
+          <Box className="flex-1 overflow-y-auto bg-gray-50 p-2 sm:p-4 pb-20 md:pb-4">{children}</Box>
+        </div>
+
+        <MobileNavbar isActive={isActive} />
       </div>
-
-      <MobileNavbar isActive={isActive} />
-    </div>
+    </>
   );
 }
 

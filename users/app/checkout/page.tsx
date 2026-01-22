@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Box } from '@/components/ui/box';
@@ -16,67 +15,67 @@ export default function Checkout() {
     const router = useRouter();
 
     return (
-        <Box className="flex-1 min-h-screen bg-gray-50 pb-24">
-            <Box className="bg-white p-4 shadow-sm">
+        <Box className="flex-1 min-h-screen bg-[#121212] pb-24">
+            <Box className="bg-[#121212] p-4 shadow-sm border-b border-gray-800 sticky top-0 z-10">
                 <HStack className="items-center space-x-4">
                     <Button
                         variant="link"
                         className="p-0"
                         onPress={() => router.back()}
                     >
-                        <ButtonIcon as={ArrowLeftIcon} className="text-black" />
+                        <ButtonIcon as={ArrowLeftIcon} className="text-white" />
                     </Button>
-                    <Heading size="lg">Checkout</Heading>
+                    <Heading size="lg" className="text-white font-bold">Checkout</Heading>
                 </HStack>
             </Box>
 
             <Box className="p-4">
                 <VStack space="lg">
                     {/* Delivery Address */}
-                    <Box className="bg-white p-4 rounded-xl shadow-sm">
-                        <Heading size="md" className="mb-3">Delivery Address</Heading>
+                    <Box className="bg-[#282828] p-6 rounded-2xl shadow-sm border border-gray-800">
+                        <Heading size="md" className="mb-4 text-white">Delivery Address</Heading>
                         <VStack space="md">
-                            <Input>
-                                <InputField placeholder="Street Address" />
+                            <Input size="lg" className="rounded-xl bg-[#181818] border-0 h-12">
+                                <InputField placeholder="Street Address" className="text-white placeholder:text-gray-600 font-medium" />
                             </Input>
-                            <Input>
-                                <InputField placeholder="City" />
+                            <Input size="lg" className="rounded-xl bg-[#181818] border-0 h-12">
+                                <InputField placeholder="City" className="text-white placeholder:text-gray-600 font-medium" />
                             </Input>
-                            <Input>
-                                <InputField placeholder="LGA" defaultValue="Ikeja" />
+                            <Input size="lg" className="rounded-xl bg-[#181818] border-0 h-12">
+                                <InputField placeholder="LGA" defaultValue="Ikeja" className="text-white placeholder:text-gray-600 font-medium" />
                             </Input>
-                            <Input>
-                                <InputField placeholder="Phone Number" keyboardType="phone-pad" />
+                            <Input size="lg" className="rounded-xl bg-[#181818] border-0 h-12">
+                                <InputField placeholder="Phone Number" keyboardType="phone-pad" className="text-white placeholder:text-gray-600 font-medium" />
                             </Input>
                         </VStack>
                     </Box>
 
                     {/* Order Summary */}
-                    <Box className="bg-white p-4 rounded-xl shadow-sm">
-                        <Heading size="md" className="mb-3">Order Summary</Heading>
+                    <Box className="bg-[#282828] p-6 rounded-2xl shadow-sm border border-gray-800">
+                        <Heading size="md" className="mb-4 text-white">Order Summary</Heading>
                         <VStack space="sm">
                             <HStack className="justify-between">
-                                <Text className="text-gray-500">Items (3)</Text>
-                                <Text className="font-semibold">₦23,000</Text>
+                                <Text className="text-gray-400">Items (3)</Text>
+                                <Text className="font-semibold text-white">₦23,000</Text>
                             </HStack>
                             <HStack className="justify-between">
-                                <Text className="text-gray-500">Delivery</Text>
-                                <Text className="font-semibold">₦2,000</Text>
+                                <Text className="text-gray-400">Delivery</Text>
+                                <Text className="font-semibold text-white">₦2,000</Text>
                             </HStack>
-                            <Box className="h-[1px] bg-gray-100 my-2" />
-                            <HStack className="justify-between">
-                                <Heading size="md">Total</Heading>
-                                <Heading size="md" className="text-primary-600">₦25,000</Heading>
+                            <Box className="h-[1px] bg-gray-700 my-4" />
+                            <HStack className="justify-between items-center">
+                                <Heading size="md" className="text-white">Total</Heading>
+                                <Heading size="xl" className="text-[#1DB954] font-bold">₦25,000</Heading>
                             </HStack>
                         </VStack>
                     </Box>
                 </VStack>
             </Box>
 
-            <Box className="absolute bottom-0 left-0 right-0 bg-white p-4 border-t border-gray-100">
+            <Box className="fixed bottom-0 left-0 right-0 bg-[#121212]/95 backdrop-blur-md p-6 border-t border-gray-800">
                 <Link href="/payment" passHref legacyBehavior>
-                    <Button size="lg" className="w-full rounded-xl bg-primary-600 shadow-md">
-                        <ButtonText className="font-bold">Proceed to Payment</ButtonText>
+                    <Button size="xl" className="w-full rounded-full bg-[#1DB954] hover:bg-[#1ed760] shadow-lg border-0 h-14">
+                        <ButtonText className="font-bold text-black text-lg">Proceed to Payment</ButtonText>
                     </Button>
                 </Link>
             </Box>

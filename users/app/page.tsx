@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -9,14 +8,13 @@ import { Text } from '@/components/ui/text';
 import { Heading } from '@/components/ui/heading';
 import { Input, InputField, InputSlot, InputIcon } from '@/components/ui/input';
 import { Button, ButtonText, ButtonIcon } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Image } from '@/components/ui/image';
-import { SearchIcon, ShoppingCartIcon, UserIcon } from 'lucide-react-native';
+import { SearchIcon, ShoppingCartIcon, UserIcon, MapPinIcon } from 'lucide-react-native';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { getRecommendations, searchProducts, getUserProfile, getProductCategories } from '@/lib/api';
+import { getRecommendations, getUserProfile, getProductCategories } from '@/lib/api';
 import { Product } from '@/lib/types';
 import { ProductCard } from '@/components/ProductCard';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 export default function Home() {
   const router = useRouter();
@@ -25,88 +23,103 @@ export default function Home() {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<string[]>(['All']);
   const [userLga, setUserLga] = useState('Ikeja');
+  const [userName, setUserName] = useState('');
 
   useEffect(() => {
-    // Fetch user profile to get LGA
     getUserProfile().then((user: any) => {
-      if (user && user.lga) setUserLga(user.lga);
+      if (user) {
+        if (user.lga) setUserLga(user.lga);
+        if (user.name) setUserName(user.name.split(' ')[0]);
+      }
     }).catch((err) => {
       console.error(err);
       router.push('/login');
     });
 
-    // Fetch categories
     getProductCategories().then(cats => {
       setCategories(['All', ...cats]);
     }).catch(err => console.error(err));
   }, []);
 
   useEffect(() => {
-    // Fetch recommendations based on LGA
     getRecommendations(userLga).then(setProducts);
   }, [userLga]);
 
   const handleSearch = async () => {
-    // Implement search logic or navigation to search results
-    console.log('Searching for:', searchQuery);
-    // const results = await searchProducts(searchQuery);
-    // setProducts(results);
+    if (searchQuery.trim()) {
+      router.push(`/products?q=${encodeURIComponent(searchQuery)}`);
+    }
   };
 
   return (
-    <Box className="flex-1 min-h-screen bg-background-0 pb-20">
-      {/* Header / Search Section */}
-      <Box className="bg-primary-500 p-6 rounded-b-[30px] shadow-md">
-        <VStack space="md">
-          <HStack className="justify-between items-center">
-            <Heading className="text-white text-2xl font-bold">ShopLocal</Heading>
-            <Link href="/cart">
-              <Button variant="link" size="sm" className="bg-white/20 rounded-full p-2 mr-2">
-                <ButtonIcon as={ShoppingCartIcon} className="text-white" />
-              </Button>
-            </Link>
-            <Link href="/profile">
-              <Button variant="link" size="sm" className="bg-white/20 rounded-full p-2">
-                <ButtonIcon as={UserIcon} className="text-white" />
-              </Button>
-            </Link>
-          </HStack>
-
-          <VStack space="xs">
-            <Text className="text-white/80">Delivering to</Text>
-            <HStack space="xs" className="items-center">
-              <Text className="text-white font-bold text-lg">{userLga}, Lagos</Text>
+    <Box className="flex-1 min-h-screen bg-background pb-24">
+      {/* Header */}
+      <Box className="bg-background/95 backdrop-blur-md px-6 pt-12 pb-6 border-b border-border sticky top-0 z-50">
+        <HStack className="justify-between items-center mb-6">
+          <VStack>
+            <Text className="text-muted-foreground text-xs font-bold uppercase tracking-wider mb-1">Delivering to</Text>
+            <HStack className="items-center space-x-1">
+              <MapPinIcon size={16} color="hsl(var(--primary))" />
+              <Text className="text-foreground font-bold text-lg">{userLga}, Abuja</Text>
             </HStack>
           </VStack>
+          <HStack space="md" className="items-center">
+            <ThemeToggle />
+            <Link href="/cart">
+              <Box className="bg-secondary p-3 rounded-full hover:bg-muted transition-colors relative">
+                <ShoppingCartIcon size={20} className="text-foreground" />
+              </Box>
+            </Link>
+            <Link href="/profile">
+              <Box className="bg-secondary p-3 rounded-full hover:bg-muted transition-colors">
+                <UserIcon size={20} className="text-foreground" />
+              </Box>
+            </Link>
+          </HStack>
+        </HStack>
 
-          <Input variant="outline" size="lg" className="bg-white border-0 rounded-full shadow-sm mt-2">
-            <InputSlot className="pl-3">
-              <InputIcon as={SearchIcon} className="text-gray-400" />
+        <VStack space="md">
+          <Box>
+            <Heading className="text-3xl font-extrabold text-foreground">
+              Hello, <Text className="text-primary">{userName || 'Shopper'}</Text>
+            </Heading>
+            <Text className="text-muted-foreground mt-1 text-lg">What are you looking for today?</Text>
+          </Box>
+
+          <Input size="xl" className="bg-secondary border-0 rounded-full h-14 focus:bg-muted">
+            <InputSlot className="pl-4">
+              <InputIcon as={SearchIcon} className="text-muted-foreground" />
             </InputSlot>
             <InputField
-              placeholder="Search products..."
+              placeholder="Search fresh products..."
               value={searchQuery}
               onChangeText={setSearchQuery}
               onSubmitEditing={handleSearch}
+              className="text-foreground placeholder:text-muted-foreground font-medium"
             />
           </Input>
         </VStack>
       </Box>
 
       {/* Categories */}
-      <Box className="pt-6 pl-6">
-        <Heading size="sm" className="mb-3 text-typography-700">Categories</Heading>
-        <HStack space="sm" className="overflow-x-auto pb-2 pr-6">
-          {categories.map((cat) => (
+      <Box className="pt-8">
+        <Box className="px-6 mb-4">
+          <Heading size="sm" className="font-bold text-foreground uppercase tracking-widest text-xs">Categories</Heading>
+        </Box>
+        <HStack space="sm" className="overflow-x-auto pb-4 px-6 scrollbar-hide">
+          {categories.map((cat, index) => (
             <Button
-              key={cat}
+              key={`${cat}-${index}`}
               size="sm"
-              action={activeCategory === cat ? 'primary' : 'secondary'}
-              variant={activeCategory === cat ? 'solid' : 'outline'}
               onPress={() => setActiveCategory(cat)}
-              className={`rounded-full px-4 ${activeCategory === cat ? 'bg-primary-500 border-primary-500' : 'border-gray-300'}`}
+              className={`rounded-full px-6 py-2 border h-10 ${activeCategory === cat
+                  ? 'bg-primary border-primary'
+                  : 'bg-secondary border-transparent hover:bg-muted'
+                }`}
             >
-              <ButtonText className={activeCategory === cat ? 'text-white' : 'text-typography-600'}>{cat}</ButtonText>
+              <ButtonText className={`font-semibold ${activeCategory === cat ? 'text-primary-foreground' : 'text-foreground'}`}>
+                {cat}
+              </ButtonText>
             </Button>
           ))}
         </HStack>
@@ -114,25 +127,27 @@ export default function Home() {
 
       {/* Recommendations */}
       <Box className="p-6">
-        <HStack className="justify-between items-center mb-4">
-          <Heading size="md" className="text-typography-800">Recommended in {userLga}</Heading>
+        <HStack className="justify-between items-end mb-6">
+          <Heading size="xl" className="text-foreground font-bold">Recommended</Heading>
+          <Link href="/products">
+            <Text className="text-primary font-bold text-sm mb-1 hover:text-primary/80">View All</Text>
+          </Link>
         </HStack>
 
-        <Box className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+        <Box className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6">
           {products.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </Box>
 
-        <Box className="mt-8 mb-4">
+        <Box className="mt-12">
           <Link href="/products" passHref legacyBehavior>
-            <Button size="lg" className="w-full rounded-xl bg-gray-100 border border-gray-200" variant="outline">
-              <ButtonText className="text-primary-600 font-bold">See All Products</ButtonText>
+            <Button size="xl" className="w-full rounded-full bg-primary hover:bg-primary/90 h-14 border-0" variant="solid">
+              <ButtonText className="text-primary-foreground font-bold text-lg">Explore All Products</ButtonText>
             </Button>
           </Link>
         </Box>
       </Box>
-
     </Box>
   );
 }

@@ -72,62 +72,62 @@ export default function Signup() {
     };
 
     return (
-        <Box className="flex-1 min-h-screen bg-white p-6 justify-center">
+        <Box className="flex-1 min-h-screen bg-[#121212] p-6 justify-center">
             <VStack space="xl" className="max-w-md mx-auto w-full">
-                <VStack space="xs">
-                    <Heading size="3xl" className="font-bold text-primary-600">
+                <VStack space="xs" className="mb-4">
+                    <Heading size="3xl" className="font-extrabold text-[#1DB954]">
                         {step === 1 ? 'Create Account' : 'Location Details'}
                     </Heading>
-                    <Text className="text-gray-500">
+                    <Text className="text-gray-400">
                         {step === 1 ? 'Join us and start shopping' : 'Tell us where to deliver'}
                     </Text>
                 </VStack>
 
                 {/* Progress Indicator */}
-                <HStack space="xs" className="mb-2">
-                    <Box className={`h-2 flex-1 rounded-full ${step >= 1 ? 'bg-primary-600' : 'bg-gray-200'}`} />
-                    <Box className={`h-2 flex-1 rounded-full ${step >= 2 ? 'bg-primary-600' : 'bg-gray-200'}`} />
+                <HStack space="xs" className="mb-6">
+                    <Box className={`h-1 flex-1 rounded-full ${step >= 1 ? 'bg-[#1DB954]' : 'bg-[#282828]'}`} />
+                    <Box className={`h-1 flex-1 rounded-full ${step >= 2 ? 'bg-[#1DB954]' : 'bg-[#282828]'}`} />
                 </HStack>
 
-                <VStack space="md">
+                <VStack space="lg">
                     {step === 1 && (
                         <>
                             <FormControl>
                                 <FormControlLabel>
-                                    <FormControlLabelText>Full Name</FormControlLabelText>
+                                    <FormControlLabelText className="text-gray-400 text-xs uppercase font-bold tracking-wider">Full Name</FormControlLabelText>
                                 </FormControlLabel>
-                                <Input size="lg" className="rounded-xl">
-                                    <InputSlot className="pl-3">
+                                <Input size="xl" className="rounded-full bg-[#282828] border-0 h-14">
+                                    <InputSlot className="pl-4">
                                         <InputIcon as={UserIcon} className="text-gray-400" />
                                     </InputSlot>
-                                    <InputField placeholder="John Doe" value={name} onChangeText={setName} />
+                                    <InputField placeholder="John Doe" value={name} onChangeText={setName} className="text-white placeholder:text-gray-600 font-medium" />
                                 </Input>
                             </FormControl>
 
                             <FormControl>
                                 <FormControlLabel>
-                                    <FormControlLabelText>Email</FormControlLabelText>
+                                    <FormControlLabelText className="text-gray-400 text-xs uppercase font-bold tracking-wider">Email</FormControlLabelText>
                                 </FormControlLabel>
-                                <Input size="lg" className="rounded-xl">
-                                    <InputSlot className="pl-3">
+                                <Input size="xl" className="rounded-full bg-[#282828] border-0 h-14">
+                                    <InputSlot className="pl-4">
                                         <InputIcon as={MailIcon} className="text-gray-400" />
                                     </InputSlot>
-                                    <InputField placeholder="hello@example.com" keyboardType="email-address" value={email} onChangeText={setEmail} />
+                                    <InputField placeholder="hello@example.com" keyboardType="email-address" value={email} onChangeText={setEmail} className="text-white placeholder:text-gray-600 font-medium" />
                                 </Input>
                             </FormControl>
 
                             <FormControl isInvalid={!!error && step === 1}>
                                 <FormControlLabel>
-                                    <FormControlLabelText>Password</FormControlLabelText>
+                                    <FormControlLabelText className="text-gray-400 text-xs uppercase font-bold tracking-wider">Password</FormControlLabelText>
                                 </FormControlLabel>
-                                <Input size="lg" className="rounded-xl">
-                                    <InputSlot className="pl-3">
+                                <Input size="xl" className="rounded-full bg-[#282828] border-0 h-14">
+                                    <InputSlot className="pl-4">
                                         <InputIcon as={LockIcon} className="text-gray-400" />
                                     </InputSlot>
-                                    <InputField placeholder="••••••••" type="password" value={password} onChangeText={setPassword} />
+                                    <InputField placeholder="••••••••" type="password" value={password} onChangeText={setPassword} className="text-white placeholder:text-gray-600 font-medium" />
                                 </Input>
                                 <FormControlError>
-                                    <FormControlErrorText>{error}</FormControlErrorText>
+                                    <FormControlErrorText className="text-red-500 mt-2 text-center">{error}</FormControlErrorText>
                                 </FormControlError>
                             </FormControl>
                         </>
@@ -137,45 +137,45 @@ export default function Signup() {
                         <>
                             <FormControl>
                                 <FormControlLabel>
-                                    <FormControlLabelText>Address</FormControlLabelText>
+                                    <FormControlLabelText className="text-gray-400 text-xs uppercase font-bold tracking-wider">Address</FormControlLabelText>
                                 </FormControlLabel>
-                                <Input size="lg" className="rounded-xl">
-                                    <InputSlot className="pl-3">
+                                <Input size="xl" className="rounded-full bg-[#282828] border-0 h-14">
+                                    <InputSlot className="pl-4">
                                         <InputIcon as={HomeIcon} className="text-gray-400" />
                                     </InputSlot>
-                                    <InputField placeholder="123 Street Name" value={address} onChangeText={setAddress} />
+                                    <InputField placeholder="123 Street Name" value={address} onChangeText={setAddress} className="text-white placeholder:text-gray-600 font-medium" />
                                 </Input>
                             </FormControl>
 
                             <FormControl>
                                 <FormControlLabel>
-                                    <FormControlLabelText>City</FormControlLabelText>
+                                    <FormControlLabelText className="text-gray-400 text-xs uppercase font-bold tracking-wider">City</FormControlLabelText>
                                 </FormControlLabel>
-                                <Input size="lg" className="rounded-xl">
-                                    <InputSlot className="pl-3">
+                                <Input size="xl" className="rounded-full bg-[#282828] border-0 h-14">
+                                    <InputSlot className="pl-4">
                                         <InputIcon as={MapPinIcon} className="text-gray-400" />
                                     </InputSlot>
-                                    <InputField placeholder="Abuja" value={city} onChangeText={setCity} />
+                                    <InputField placeholder="Abuja" value={city} onChangeText={setCity} className="text-white placeholder:text-gray-600 font-medium" />
                                 </Input>
                             </FormControl>
 
                             <FormControl>
                                 <FormControlLabel>
-                                    <FormControlLabelText>LGA</FormControlLabelText>
+                                    <FormControlLabelText className="text-gray-400 text-xs uppercase font-bold tracking-wider">LGA</FormControlLabelText>
                                 </FormControlLabel>
                                 <Select onValueChange={setLga} selectedValue={lga}>
-                                    <SelectTrigger variant="outline" size="lg" className="rounded-xl justify-between">
-                                        <SelectInput placeholder="Select LGA" />
+                                    <SelectTrigger variant="outline" size="xl" className="rounded-full bg-[#282828] border-0 justify-between h-14">
+                                        <SelectInput placeholder="Select LGA" className="text-white placeholder:text-gray-600 font-medium" />
                                         <SelectIcon className="mr-3" as={ChevronDownIcon} />
                                     </SelectTrigger>
                                     <SelectPortal>
                                         <SelectBackdrop />
-                                        <SelectContent>
+                                        <SelectContent className="bg-[#282828] border-gray-700">
                                             <SelectDragIndicatorWrapper>
-                                                <SelectDragIndicator />
+                                                <SelectDragIndicator className="bg-gray-500" />
                                             </SelectDragIndicatorWrapper>
                                             {LGAs.map(item => (
-                                                <SelectItem label={item} value={item} key={item} />
+                                                <SelectItem label={item} value={item} key={item} className="text-white hover:bg-[#3E3E3E]" />
                                             ))}
                                         </SelectContent>
                                     </SelectPortal>
@@ -184,44 +184,44 @@ export default function Signup() {
 
                             <FormControl isInvalid={!!error && step === 2}>
                                 <FormControlLabel>
-                                    <FormControlLabelText>Country</FormControlLabelText>
+                                    <FormControlLabelText className="text-gray-400 text-xs uppercase font-bold tracking-wider">Country</FormControlLabelText>
                                 </FormControlLabel>
-                                <Input size="lg" className="rounded-xl">
-                                    <InputSlot className="pl-3">
+                                <Input size="xl" className="rounded-full bg-[#282828] border-0 h-14">
+                                    <InputSlot className="pl-4">
                                         <InputIcon as={GlobeIcon} className="text-gray-400" />
                                     </InputSlot>
-                                    <InputField placeholder="Nigeria" value={country} onChangeText={setCountry} />
+                                    <InputField placeholder="Nigeria" value={country} onChangeText={setCountry} className="text-white placeholder:text-gray-600 font-medium" />
                                 </Input>
                                 <FormControlError>
-                                    <FormControlErrorText>{error}</FormControlErrorText>
+                                    <FormControlErrorText className="text-red-500 mt-2 text-center">{error}</FormControlErrorText>
                                 </FormControlError>
                             </FormControl>
                         </>
                     )}
 
                     {step === 1 ? (
-                        <Button size="lg" className="rounded-xl bg-primary-600 shadow-md mt-4" onPress={nextStep}>
-                            <ButtonText className="font-bold">Next Step</ButtonText>
-                            <ButtonIcon as={ChevronRightIcon} className="ml-2 text-white" />
+                        <Button size="xl" className="rounded-full bg-[#1DB954] hover:bg-[#1ed760] shadow-lg mt-6 h-14 border-0" onPress={nextStep}>
+                            <ButtonText className="font-bold text-black text-lg">Next Step</ButtonText>
+                            <ButtonIcon as={ChevronRightIcon} className="ml-2 text-black" />
                         </Button>
                     ) : (
                         <VStack space="md">
-                            <Button size="lg" className="rounded-xl bg-primary-600 shadow-md mt-4" onPress={handleSignup} disabled={loading}>
-                                {loading ? <ButtonSpinner color="white" /> : <ButtonText className="font-bold">Create Account</ButtonText>}
+                            <Button size="xl" className="rounded-full bg-[#1DB954] hover:bg-[#1ed760] shadow-lg mt-4 h-14 border-0" onPress={handleSignup} disabled={loading}>
+                                {loading ? <ButtonSpinner color="black" /> : <ButtonText className="font-bold text-black text-lg">Create Account</ButtonText>}
                             </Button>
-                            <Button variant="outline" size="lg" className="rounded-xl border-gray-300" onPress={prevStep} disabled={loading}>
-                                <ButtonIcon as={ChevronLeftIcon} className="mr-2 text-gray-500" />
-                                <ButtonText className="text-gray-500 font-bold">Back</ButtonText>
+                            <Button variant="outline" size="xl" className="rounded-full border-gray-600 hover:bg-[#282828] h-14" onPress={prevStep} disabled={loading}>
+                                <ButtonIcon as={ChevronLeftIcon} className="mr-2 text-gray-400" />
+                                <ButtonText className="text-gray-400 font-bold">Back</ButtonText>
                             </Button>
                         </VStack>
                     )}
 
                 </VStack>
 
-                <HStack className="justify-center mt-4 mb-8">
-                    <Text className="text-gray-500">Already have an account? </Text>
+                <HStack className="justify-center mt-8 mb-8">
+                    <Text className="text-gray-400">Already have an account? </Text>
                     <Link href="/login">
-                        <Text className="text-primary-600 font-bold">Sign In</Text>
+                        <Text className="text-white font-bold hover:underline">Sign In</Text>
                     </Link>
                 </HStack>
             </VStack>

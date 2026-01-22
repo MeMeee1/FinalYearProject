@@ -3,12 +3,13 @@
 import { useEffect, useState } from 'react';
 
 /* API */
-import { getVendorProfile, updateVendorProfile } from '@/api/vendors';
+import { updateVendorProfile } from '@/api/vendors';
 import { uploadProductImage } from '../products/actions';
 import LogoutButton from '../LogoutButton';
+import { useVendorProfile } from '@/hooks/useVendorProfile';
 
 export default function SettingsPage() {
-    const [loading, setLoading] = useState(true);
+    const { vendorProfile, isLoading: loading, refreshProfile } = useVendorProfile();
     const [saving, setSaving] = useState(false);
 
     const [logoFile, setLogoFile] = useState<{ file: File; preview: string } | null>(null);
@@ -27,34 +28,23 @@ export default function SettingsPage() {
         businessAccountNumber: '',
     });
 
-    /* LOAD PROFILE */
+    /* SYNC FORM DATA WITH STORE */
     useEffect(() => {
-        loadProfile();
-    }, []);
-
-    const loadProfile = async () => {
-        try {
-            const data = await getVendorProfile();
-            if (data) {
-                setFormData({
-                    storeName: data.storeName ?? '',
-                    storeDescription: data.storeDescription ?? '',
-                    storeLogo: data.storeLogo ?? '',
-                    storeBanner: data.storeBanner ?? '',
-                    businessName: data.businessName ?? '',
-                    businessAddress: data.businessAddress ?? '',
-                    businessEmail: data.businessEmail ?? '',
-                    businessPhone: data.businessPhone ?? '',
-                    businessBankName: data.businessBankName ?? '',
-                    businessAccountNumber: data.businessAccountNumber ?? '',
-                });
-            }
-        } catch (err) {
-            console.error('Failed to load profile', err);
-        } finally {
-            setLoading(false);
+        if (vendorProfile) {
+            setFormData({
+                storeName: vendorProfile.storeName ?? '',
+                storeDescription: vendorProfile.storeDescription ?? '',
+                storeLogo: vendorProfile.storeLogo ?? '',
+                storeBanner: vendorProfile.storeBanner ?? '',
+                businessName: vendorProfile.businessName ?? '',
+                businessAddress: vendorProfile.businessAddress ?? '',
+                businessEmail: vendorProfile.businessEmail ?? '',
+                businessPhone: vendorProfile.businessPhone ?? '',
+                businessBankName: (vendorProfile as any).businessBankName ?? '',
+                businessAccountNumber: (vendorProfile as any).businessAccountNumber ?? '',
+            });
         }
-    };
+    }, [vendorProfile]);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'logo' | 'banner') => {
         if (e.target.files && e.target.files[0]) {
@@ -91,6 +81,7 @@ export default function SettingsPage() {
             }
 
             await updateVendorProfile(updatedFormData);
+            await refreshProfile(); // Refresh from server to get latest data
             alert('Profile updated successfully');
         } catch (err) {
             console.error('Failed to save profile', err);

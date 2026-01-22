@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -65,7 +64,6 @@ export default function Profile() {
         if (!file) return;
 
         try {
-            // Optimistic update or show loading state if needed
             const url = await uploadImage(file);
             setImage(url);
         } catch (err: any) {
@@ -100,7 +98,7 @@ export default function Profile() {
     };
 
     if (loading) {
-        return <Box className="flex-1 justify-center items-center"><ButtonSpinner color="black" /></Box>;
+        return <Box className="flex-1 justify-center items-center bg-background"><ButtonSpinner color="hsl(var(--primary))" /></Box>;
     }
 
     if (!user) {
@@ -108,22 +106,23 @@ export default function Profile() {
     }
 
     return (
-        <Box className="flex-1 min-h-screen bg-white">
-            <Box className="bg-primary-600 p-6 pb-20 rounded-b-[30px] shadow-md">
-                <HStack className="items-center justify-between">
+        <Box className="flex-1 min-h-screen bg-background">
+            {/* Header Section */}
+            <Box className="bg-background border-b border-border p-6 pb-12">
+                <HStack className="items-center justify-between mb-6">
                     <Button
                         variant="link"
                         className="p-0"
                         onPress={() => router.back()}
                     >
-                        <ButtonIcon as={ArrowLeftIcon} className="text-white" />
+                        <ButtonIcon as={ArrowLeftIcon} className="text-foreground" />
                     </Button>
-                    <Heading size="xl" className="text-white font-bold">My Profile</Heading>
+                    <Heading size="xl" className="text-foreground font-bold">My Profile</Heading>
                     <Box className="w-6" />
                 </HStack>
-                <Box className="items-center mt-6">
+                <Box className="items-center mt-2">
                     <Box className="relative">
-                        <Box className="w-24 h-24 bg-white/20 rounded-full items-center justify-center border-4 border-white overflow-hidden">
+                        <Box className="w-28 h-28 bg-secondary rounded-full items-center justify-center border-4 border-primary overflow-hidden shadow-lg shadow-primary/20">
                             {image ? (
                                 <Image
                                     source={{ uri: image }}
@@ -131,14 +130,14 @@ export default function Profile() {
                                     alt="Profile Image"
                                 />
                             ) : (
-                                <Text className="text-4xl text-white font-bold">{name.charAt(0) || 'U'}</Text>
+                                <Text className="text-4xl text-primary font-bold">{name.charAt(0) || 'U'}</Text>
                             )}
                         </Box>
                         <Button
-                            className="absolute bottom-0 right-0 bg-white rounded-full p-2 w-8 h-8 items-center justify-center border border-gray-200"
+                            className="absolute bottom-0 right-0 bg-primary rounded-full p-2 w-9 h-9 items-center justify-center border border-background shadow-md"
                             onPress={() => fileInputRef.current?.click()}
                         >
-                            <ButtonIcon as={CameraIcon} className="text-primary-600 w-4 h-4" />
+                            <ButtonIcon as={CameraIcon} className="text-primary-foreground w-5 h-5" />
                         </Button>
                         <input
                             type="file"
@@ -148,92 +147,97 @@ export default function Profile() {
                             onChange={handleImageUpload}
                         />
                     </Box>
-                    <Text className="text-white mt-3 font-medium text-lg">{user?.email}</Text>
+                    <Text className="text-foreground mt-4 font-bold text-xl">{user?.name || 'User'}</Text>
+                    <Text className="text-muted-foreground text-sm">{user?.email}</Text>
                 </Box>
             </Box>
 
-            <Box className="p-6 -mt-10 flex-1">
-                <Box className="bg-white rounded-xl shadow-lg p-6 flex-1">
+            <Box className="p-6 flex-1 bg-background">
+                <Box className="flex-1">
                     <VStack space="xl">
                         <FormControl>
                             <FormControlLabel>
-                                <FormControlLabelText>Full Name</FormControlLabelText>
+                                <FormControlLabelText className="text-muted-foreground text-xs uppercase font-bold tracking-wider">Full Name</FormControlLabelText>
                             </FormControlLabel>
-                            <Input size="lg" className="rounded-xl bg-gray-50 border-gray-200">
-                                <InputField value={name} onChangeText={setName} placeholder="Enter your name" />
+                            <Input size="lg" className="rounded-xl bg-secondary border-0 h-12">
+                                <InputField value={name} onChangeText={setName} placeholder="Enter your name" className="text-foreground placeholder:text-muted-foreground font-medium" />
                             </Input>
                         </FormControl>
 
                         <FormControl>
                             <FormControlLabel>
-                                <FormControlLabelText>Address</FormControlLabelText>
+                                <FormControlLabelText className="text-muted-foreground text-xs uppercase font-bold tracking-wider">Address</FormControlLabelText>
                             </FormControlLabel>
-                            <Input size="lg" className="rounded-xl bg-gray-50 border-gray-200">
-                                <InputField value={address} onChangeText={setAddress} placeholder="Enter your address" />
+                            <Input size="lg" className="rounded-xl bg-secondary border-0 h-12">
+                                <InputField value={address} onChangeText={setAddress} placeholder="Enter your address" className="text-foreground placeholder:text-muted-foreground font-medium" />
                             </Input>
                         </FormControl>
 
-                        <FormControl>
-                            <FormControlLabel>
-                                <FormControlLabelText>City</FormControlLabelText>
-                            </FormControlLabel>
-                            <Input size="lg" className="rounded-xl bg-gray-50 border-gray-200">
-                                <InputField value={city} onChangeText={setCity} placeholder="Enter your city" />
-                            </Input>
-                        </FormControl>
+                        <HStack space="md">
+                            <FormControl className="flex-1">
+                                <FormControlLabel>
+                                    <FormControlLabelText className="text-muted-foreground text-xs uppercase font-bold tracking-wider">City</FormControlLabelText>
+                                </FormControlLabel>
+                                <Input size="lg" className="rounded-xl bg-secondary border-0 h-12">
+                                    <InputField value={city} onChangeText={setCity} placeholder="Enter your city" className="text-foreground placeholder:text-muted-foreground font-medium" />
+                                </Input>
+                            </FormControl>
 
-                        <FormControl>
-                            <FormControlLabel>
-                                <FormControlLabelText>LGA</FormControlLabelText>
-                            </FormControlLabel>
-                            <Select onValueChange={setLga} selectedValue={lga}>
-                                <SelectTrigger variant="outline" size="lg" className="rounded-xl bg-gray-50 border-gray-200 justify-between">
-                                    <SelectInput placeholder="Select LGA" />
-                                    <SelectIcon className="mr-3" as={ChevronDownIcon} />
-                                </SelectTrigger>
-                                <SelectPortal>
-                                    <SelectBackdrop />
-                                    <SelectContent>
-                                        <SelectDragIndicatorWrapper>
-                                            <SelectDragIndicator />
-                                        </SelectDragIndicatorWrapper>
-                                        {LGAs.map(item => (
-                                            <SelectItem label={item} value={item} key={item} />
-                                        ))}
-                                    </SelectContent>
-                                </SelectPortal>
-                            </Select>
-                        </FormControl>
+                            <FormControl className="flex-1">
+                                <FormControlLabel>
+                                    <FormControlLabelText className="text-muted-foreground text-xs uppercase font-bold tracking-wider">LGA</FormControlLabelText>
+                                </FormControlLabel>
+                                <Select onValueChange={setLga} selectedValue={lga}>
+                                    <SelectTrigger variant="outline" size="lg" className="rounded-xl bg-secondary border-0 justify-between h-12">
+                                        <SelectInput placeholder="Select LGA" className="text-foreground placeholder:text-muted-foreground font-medium" />
+                                        <SelectIcon className="mr-3 text-muted-foreground" as={ChevronDownIcon} />
+                                    </SelectTrigger>
+                                    <SelectPortal>
+                                        <SelectBackdrop />
+                                        <SelectContent className="bg-popover border-border">
+                                            <SelectDragIndicatorWrapper>
+                                                <SelectDragIndicator className="bg-muted-foreground/30" />
+                                            </SelectDragIndicatorWrapper>
+                                            {LGAs.map(item => (
+                                                <SelectItem label={item} value={item} key={item} className="text-popover-foreground hover:bg-accent" />
+                                            ))}
+                                        </SelectContent>
+                                    </SelectPortal>
+                                </Select>
+                            </FormControl>
+                        </HStack>
 
-                        <FormControl>
-                            <FormControlLabel>
-                                <FormControlLabelText>Country</FormControlLabelText>
-                            </FormControlLabel>
-                            <Input size="lg" className="rounded-xl bg-gray-100 border-gray-200" isReadOnly={true}>
-                                <InputField value={country} placeholder="Nigeria" className="text-gray-500" />
-                            </Input>
-                        </FormControl>
+                        <HStack space="md">
+                            <FormControl className="flex-1">
+                                <FormControlLabel>
+                                    <FormControlLabelText className="text-muted-foreground text-xs uppercase font-bold tracking-wider">Country</FormControlLabelText>
+                                </FormControlLabel>
+                                <Input size="lg" className="rounded-xl bg-muted/50 border-0 h-12" isReadOnly={true}>
+                                    <InputField value={country} placeholder="Nigeria" className="text-muted-foreground font-medium" />
+                                </Input>
+                            </FormControl>
 
-                        <FormControl>
-                            <FormControlLabel>
-                                <FormControlLabelText>Date of Birth</FormControlLabelText>
-                            </FormControlLabel>
-                            <Input size="lg" className="rounded-xl bg-gray-50 border-gray-200">
-                                {/* Using text input for simplicity, expecting YYYY-MM-DD */}
-                                <InputField value={dob} onChangeText={setDob} placeholder="YYYY-MM-DD" type="text" />
-                            </Input>
-                        </FormControl>
+                            <FormControl className="flex-1">
+                                <FormControlLabel>
+                                    <FormControlLabelText className="text-muted-foreground text-xs uppercase font-bold tracking-wider">Date of Birth</FormControlLabelText>
+                                </FormControlLabel>
+                                <Input size="lg" className="rounded-xl bg-secondary border-0 h-12">
+                                    <InputField value={dob} onChangeText={setDob} placeholder="YYYY-MM-DD" type="text" className="text-foreground placeholder:text-muted-foreground font-medium" />
+                                </Input>
+                            </FormControl>
+                        </HStack>
 
-                        {error ? <Text className="text-red-500">{error}</Text> : null}
+                        {error ? <Text className="text-destructive text-center">{error}</Text> : null}
 
-                        <Button size="lg" className="rounded-xl bg-primary-600 shadow-md mt-4" onPress={handleUpdate} disabled={saving}>
-                            {saving ? <ButtonSpinner color="white" /> : <ButtonText className="font-bold">Update Profile</ButtonText>}
-                        </Button>
+                        <Box className="mt-4">
+                            <Button size="xl" className="rounded-full bg-primary hover:bg-primary/90 h-14 border-0" onPress={handleUpdate} disabled={saving}>
+                                {saving ? <ButtonSpinner color="hsl(var(--primary-foreground))" /> : <ButtonText className="font-bold text-primary-foreground text-lg">Save Changes</ButtonText>}
+                            </Button>
 
-                        <Button variant="outline" size="lg" className="rounded-xl border-red-500 mt-2" onPress={handleLogout}>
-                            <ButtonText className="text-red-500 font-bold">Log Out</ButtonText>
-                            <ButtonIcon as={LogOutIcon} className="ml-2 text-red-500" />
-                        </Button>
+                            <Button variant="link" size="lg" className="mt-4" onPress={handleLogout}>
+                                <ButtonText className="text-muted-foreground hover:text-foreground font-medium">Log Out</ButtonText>
+                            </Button>
+                        </Box>
                     </VStack>
                 </Box>
             </Box>

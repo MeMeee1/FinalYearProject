@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -36,20 +35,23 @@ export default function Login() {
     };
 
     return (
-        <Box className="flex-1 min-h-screen bg-white p-6 justify-center">
+        <Box className="flex-1 min-h-screen bg-[#121212] p-6 justify-center">
             <VStack space="xl" className="max-w-md mx-auto w-full">
-                <VStack space="xs">
-                    <Heading size="3xl" className="font-bold text-primary-600">Welcome Back</Heading>
-                    <Text className="text-gray-500">Sign in to continue shopping</Text>
+                <VStack space="xs" className="items-center mb-8">
+                    <Box className="w-16 h-16 bg-[#1DB954] rounded-full items-center justify-center mb-4">
+                        <Heading size="2xl" className="text-black font-extrabold">S</Heading>
+                    </Box>
+                    <Heading size="3xl" className="font-extrabold text-white">Welcome Back</Heading>
+                    <Text className="text-gray-400">Sign in to continue shopping</Text>
                 </VStack>
 
                 <VStack space="lg">
                     <FormControl isInvalid={!!error}>
                         <FormControlLabel>
-                            <FormControlLabelText>Email</FormControlLabelText>
+                            <FormControlLabelText className="text-gray-400 text-xs uppercase font-bold tracking-wider">Email</FormControlLabelText>
                         </FormControlLabel>
-                        <Input size="lg" className="rounded-xl">
-                            <InputSlot className="pl-3">
+                        <Input size="xl" className="rounded-full bg-[#282828] border-0 h-14">
+                            <InputSlot className="pl-4">
                                 <InputIcon as={MailIcon} className="text-gray-400" />
                             </InputSlot>
                             <InputField
@@ -57,16 +59,17 @@ export default function Login() {
                                 keyboardType="email-address"
                                 value={email}
                                 onChangeText={setEmail}
+                                className="text-white placeholder:text-gray-600 font-medium"
                             />
                         </Input>
                     </FormControl>
 
                     <FormControl isInvalid={!!error}>
                         <FormControlLabel>
-                            <FormControlLabelText>Password</FormControlLabelText>
+                            <FormControlLabelText className="text-gray-400 text-xs uppercase font-bold tracking-wider">Password</FormControlLabelText>
                         </FormControlLabel>
-                        <Input size="lg" className="rounded-xl">
-                            <InputSlot className="pl-3">
+                        <Input size="xl" className="rounded-full bg-[#282828] border-0 h-14">
+                            <InputSlot className="pl-4">
                                 <InputIcon as={LockIcon} className="text-gray-400" />
                             </InputSlot>
                             <InputField
@@ -74,25 +77,26 @@ export default function Login() {
                                 type="password"
                                 value={password}
                                 onChangeText={setPassword}
+                                className="text-white placeholder:text-gray-600 font-medium"
                             />
                         </Input>
-                        <Link href="#" className="self-end mt-2">
-                            <Text className="text-primary-600 text-sm font-semibold">Forgot Password?</Text>
+                        <Link href="#" className="self-end mt-3">
+                            <Text className="text-[#1DB954] text-sm font-bold hover:text-[#1ed760]">Forgot Password?</Text>
                         </Link>
                         <FormControlError>
-                            <FormControlErrorText>{error}</FormControlErrorText>
+                            <FormControlErrorText className="text-red-500 mt-2 text-center">{error}</FormControlErrorText>
                         </FormControlError>
                     </FormControl>
 
-                    <Button size="lg" className="rounded-xl bg-primary-600 shadow-md mt-4" onPress={handleLogin} disabled={loading}>
-                        {loading ? <ButtonSpinner color="white" /> : <ButtonText className="font-bold">Sign In</ButtonText>}
+                    <Button size="xl" className="rounded-full bg-[#1DB954] hover:bg-[#1ed760] shadow-lg mt-6 h-14 border-0" onPress={handleLogin} disabled={loading}>
+                        {loading ? <ButtonSpinner color="black" /> : <ButtonText className="font-bold text-black text-lg">Sign In</ButtonText>}
                     </Button>
                 </VStack>
 
-                <HStack className="justify-center mt-4">
-                    <Text className="text-gray-500">Don't have an account? </Text>
+                <HStack className="justify-center mt-8">
+                    <Text className="text-gray-400">Don't have an account? </Text>
                     <Link href="/signup">
-                        <Text className="text-primary-600 font-bold">Sign Up</Text>
+                        <Text className="text-white font-bold hover:underline">Sign Up</Text>
                     </Link>
                 </HStack>
             </VStack>
