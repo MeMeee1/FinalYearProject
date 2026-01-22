@@ -9,7 +9,7 @@ export async function createOrder(items: any[]) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: token,
+      Authorization: token || '',
     },
     body: JSON.stringify({ order: {}, items }),
   });
@@ -19,6 +19,42 @@ export async function createOrder(items: any[]) {
   if (!res.ok) {
     console.log(data);
     throw new Error('Error');
+  }
+
+  return data;
+}
+
+export async function listOrders() {
+  const token = useAuth.getState().token;
+
+  const res = await fetch(`${API_URL}/orders`, {
+    headers: {
+      Authorization: token || '',
+    },
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error('Error fetching orders');
+  }
+
+  return data;
+}
+
+export async function getOrder(id: number) {
+  const token = useAuth.getState().token;
+
+  const res = await fetch(`${API_URL}/orders/${id}`, {
+    headers: {
+      Authorization: token || '',
+    },
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error('Error fetching order');
   }
 
   return data;

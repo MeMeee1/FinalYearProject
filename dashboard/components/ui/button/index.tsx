@@ -23,9 +23,9 @@ import type { VariantProps } from '@gluestack-ui/nativewind-utils';
 const SCOPE = 'BUTTON';
 const ButtonWrapper = React.forwardRef<
   React.ElementRef<typeof Pressable>,
-  PressableProps
+  PressableProps & { type?: 'submit' | 'reset' | 'button' }
 >(({ ...props }, ref) => {
-  return <Pressable {...props} ref={ref} />;
+  return <Pressable {...(props as any)} ref={ref} />;
 });
 
 type IPrimitiveIcon = React.ComponentPropsWithoutRef<typeof Svg> & {
@@ -360,7 +360,7 @@ type IButtonProps = Omit<
   React.ComponentPropsWithoutRef<typeof UIButton>,
   'context'
 > &
-  VariantProps<typeof buttonStyle> & { className?: string };
+  VariantProps<typeof buttonStyle> & { className?: string; type?: 'submit' | 'reset' | 'button' };
 
 const Button = React.forwardRef<
   React.ElementRef<typeof UIButton>,

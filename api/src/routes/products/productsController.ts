@@ -3,7 +3,7 @@ import { db } from '../../db/index.js';
 import { productsTable } from '../../db/productsSchema.js';
 import { vendorsTable } from '../../db/vendorsSchema.js';
 import { usersTable } from '../../db/usersSchema.js';
-import { eq, and, sql, like, or, ilike } from 'drizzle-orm';
+import { eq, and, sql, like, or, ilike, desc, asc } from 'drizzle-orm';
 import _ from 'lodash';
 
 export async function listProducts(req: Request, res: Response) {
@@ -377,13 +377,16 @@ export async function deleteProduct(req: Request, res: Response) {
 
 export async function searchProducts(req: Request, res: Response) {
   try {
-    const searchQuery = req.query.q as string; // search query
+    const searchQuery = req.query.q as string;
+    const lga = req.query.lga as string;
+    const sort = req.query.sort as string;
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 10;
 
-    if (!searchQuery || searchQuery.trim() === '') {
-      return res.status(400).json({ message: 'Search query is required' });
-    }
+    // Remove mandatory search query check to allow listing all products with filters
+    // if (!searchQuery || searchQuery.trim() === '') {
+    //   return res.status(400).json({ message: 'Search query is required' });
+    // }
 
     if (page < 1 || limit < 1) {
       return res.status(400).json({ message: 'Page and limit must be positive numbers' });
@@ -391,7 +394,33 @@ export async function searchProducts(req: Request, res: Response) {
 
     const offset = (page - 1) * limit;
 
-    // Search products by name or description
+    // Build conditions
+    const conditions = [eq(productsTable.status, 'active')];
+
+    if (searchQuery && searchQuery.trim() !== '') {
+      conditions.push(or(
+        ilike(productsTable.name, `%${searchQuery}%`),
+        ilike(productsTable.description, `%${searchQuery}%`),
+        ilike(vendorsTable.storeName, `%${searchQuery}%`),
+      ));
+    }
+
+    if (lga && lga.trim() !== '' && lga !== 'All') {
+      conditions.push(eq(vendorsTable.lga, lga as any));
+    }
+
+    // Determine Sort Order
+    let orderBy: any = desc(productsTable.createdAt); // Default: Newest first
+
+    if (sort === 'price_asc') {
+      orderBy = asc(productsTable.price);
+    } else if (sort === 'price_desc') {
+      orderBy = desc(productsTable.price);
+    } else if (sort === 'oldest') {
+      orderBy = asc(productsTable.createdAt);
+    }
+
+    // Search products
     const products = await db
       .select({
         id: productsTable.id,
@@ -405,45 +434,29 @@ export async function searchProducts(req: Request, res: Response) {
         createdAt: productsTable.createdAt,
         updatedAt: productsTable.updatedAt,
         sellerId: productsTable.sellerId,
-        video: productsTable.video, // Add video
+        video: productsTable.video,
+        productTags: productsTable.productTags,
         vendor: {
           id: vendorsTable.id,
           storeName: vendorsTable.storeName,
           storeDescription: vendorsTable.storeDescription,
           businessAddress: vendorsTable.businessAddress,
+          lga: vendorsTable.lga,
         },
       })
       .from(productsTable)
       .leftJoin(vendorsTable, eq(productsTable.sellerId, vendorsTable.id))
-      .where(
-        and(
-          eq(productsTable.status, 'active'),
-          or(
-            ilike(productsTable.name, `%${searchQuery}%`),
-            ilike(productsTable.description, `%${searchQuery}%`),
-            ilike(vendorsTable.storeName, `%${searchQuery}%`),
-          )
-        )
-      )
+      .where(and(...(conditions as any)))
+      .orderBy(orderBy)
       .limit(limit)
       .offset(offset);
-
-    console.log('Search results:', products);
 
     // Get total count for pagination
     const [{ count }] = await db
       .select({ count: sql<number>`count(*)` })
       .from(productsTable)
-      .where(
-        and(
-          eq(productsTable.status, 'active'),
-          or(
-            like(productsTable.name, `%${searchQuery}%`),
-            like(productsTable.description, `%${searchQuery}%`),
-
-          )
-        )
-      );
+      .leftJoin(vendorsTable, eq(productsTable.sellerId, vendorsTable.id))
+      .where(and(...(conditions as any)));
 
     const totalPages = Math.ceil(count / limit);
 
@@ -458,6 +471,16 @@ export async function searchProducts(req: Request, res: Response) {
       },
       searchQuery,
     });
+  } catch (e) {
+    console.log(e);
+    res.status(500).send(e);
+  }
+}
+
+export async function getProductCategories(req: Request, res: Response) {
+  try {
+    const categories = ['Chicken', 'Fish', 'Eggs'];
+    res.json(categories);
   } catch (e) {
     console.log(e);
     res.status(500).send(e);

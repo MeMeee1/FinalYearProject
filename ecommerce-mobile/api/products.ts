@@ -38,3 +38,12 @@ export async function fetchProductById(id: number): Promise<Product> {
   }
   return data;
 }
+
+export async function searchProducts(query: string): Promise<{ data: Product[] }> {
+  const res = await fetch(`${API_URL}/products/search?q=${query}`);
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error('Error');
+  }
+  return data;
+}

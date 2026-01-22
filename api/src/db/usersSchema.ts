@@ -1,4 +1,4 @@
-import { integer, pgTable, varchar, text, timestamp, boolean } from 'drizzle-orm/pg-core';
+import { integer, pgTable, varchar, text, timestamp } from 'drizzle-orm/pg-core';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { lgaEnum } from './fulfillmentPointsSchema';
 
@@ -11,7 +11,10 @@ export const usersTable = pgTable('users', {
 
   name: varchar({ length: 255 }),
   address: text(), // General address
+  city: varchar({ length: 100 }).default('Abuja'),
+  country: varchar({ length: 100 }).default('Nigeria'),
   lga: lgaEnum(), // For personalized recommendations
+  dateOfBirth: timestamp(),
   image: text(),
 
   updatedAt: timestamp(),

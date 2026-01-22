@@ -3,6 +3,7 @@ import express, { json, urlencoded, Request } from 'express';
 import cors from 'cors';
 import productsRoutes from './routes/products/index.js';
 import authRoutes from './routes/auth/index.js';
+import usersRoutes from './routes/users/index.js';
 import ordersRoutes from './routes/orders/index.js';
 import vendorsRoutes from './routes/vendors/index.js';
 import adminRoutes from './routes/admin/index.js';
@@ -36,6 +37,7 @@ app.get('/ping/:id', (req, res) => {
 
 app.use('/products', productsRoutes);
 app.use('/auth', authRoutes);
+app.use('/users', usersRoutes);
 app.use('/orders', ordersRoutes);
 app.use('/vendors', vendorsRoutes);
 app.use('/admin', adminRoutes);

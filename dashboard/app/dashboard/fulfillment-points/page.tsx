@@ -5,9 +5,8 @@ import { Card } from '@/components/ui/card';
 import { Heading } from '@/components/ui/heading';
 import { Text } from '@/components/ui/text';
 import { Button } from '@/components/ui/button';
-import { Plus, MapPin, Edit, Trash, Store } from 'lucide-react';
+import { Plus, MapPin, Edit, Trash, Store, X } from 'lucide-react';
 import { API_URL } from '@/config';
-import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useForm } from 'react-hook-form';
 import { useToast } from '@/components/ui/use-toast';
 
@@ -79,31 +78,36 @@ export default function FulfillmentPointsPage() {
                     <Text className="text-gray-500 mt-2">Manage pickup locations and verification centers (Vet Offices).</Text>
                 </div>
 
-                <Dialog open={isDialogOpen} onOpenChange={(open) => {
-                    setIsDialogOpen(open);
-                    if (!open) setEditingPoint(null);
-                }}>
-                    <DialogTrigger asChild>
-                        <Button className="gap-2" onClick={() => setEditingPoint(null)}>
-                            <Plus size={16} /> Add New Point
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-[500px]">
-                        <DialogHeader>
-                            <DialogTitle>{editingPoint ? 'Edit Fulfillment Point' : 'Add Fulfillment Point'}</DialogTitle>
-                            <DialogDescription>
-                                Create a new location for order pickups and vendor verification.
-                            </DialogDescription>
-                        </DialogHeader>
-                        <FulfillmentPointForm
-                            initialData={editingPoint}
-                            onSuccess={() => {
-                                setIsDialogOpen(false);
-                                fetchPoints();
-                            }}
-                        />
-                    </DialogContent>
-                </Dialog>
+                <Button className="gap-2" onPress={() => { setIsDialogOpen(true); setEditingPoint(null); }}>
+                    <Plus size={16} /> Add New Point
+                </Button>
+
+                {isDialogOpen && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+                        <div className="bg-white rounded-lg shadow-xl w-full max-w-[500px] overflow-hidden">
+                            <div className="p-6 border-b">
+                                <div className="flex items-center justify-between mb-2">
+                                    <Heading size="xl">{editingPoint ? 'Edit Fulfillment Point' : 'Add Fulfillment Point'}</Heading>
+                                    <button onClick={() => setIsDialogOpen(false)} className="text-gray-500 hover:text-gray-700">
+                                        <X size={20} />
+                                    </button>
+                                </div>
+                                <Text className="text-gray-500">
+                                    Create a new location for order pickups and vendor verification.
+                                </Text>
+                            </div>
+                            <div className="p-6">
+                                <FulfillmentPointForm
+                                    initialData={editingPoint}
+                                    onSuccess={() => {
+                                        setIsDialogOpen(false);
+                                        fetchPoints();
+                                    }}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

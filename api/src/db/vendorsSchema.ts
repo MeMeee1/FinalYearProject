@@ -7,6 +7,7 @@ export const vendorsTable = pgTable('vendors', {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   userId: integer().references(() => usersTable.id).notNull().unique(),
   stripeAccountId: varchar({ length: 255 }), // For Stripe Connect payouts
+
   // Store Information
   storeName: varchar({ length: 255 }).notNull(),
   storeDescription: text(),
@@ -16,9 +17,7 @@ export const vendorsTable = pgTable('vendors', {
   // Business Details
   businessName: varchar({ length: 255 }),
   businessAddress: text(),
-  city: varchar({ length: 100 }),
   lga: lgaEnum(), // Vendor's LGA
-  country: varchar({ length: 100 }),
 
   // Contact
   businessEmail: varchar({ length: 255 }),
@@ -38,6 +37,7 @@ export const vendorsTable = pgTable('vendors', {
   updatedAt: timestamp().notNull().defaultNow(),
 
 });
+
 export const createVendorSchema = createInsertSchema(vendorsTable).omit({
   id: true,
   createdAt: true,
@@ -46,6 +46,7 @@ export const createVendorSchema = createInsertSchema(vendorsTable).omit({
   assignedVerificationPointId: true, // System assigned, not user input
   status: true,
 });
+
 export const updateVendorSchema = createInsertSchema(vendorsTable)
   .omit({
     id: true,

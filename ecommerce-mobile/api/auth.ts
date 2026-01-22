@@ -14,6 +14,9 @@ export async function login(email: string, password: string) {
     console.log(data);
     throw Error('Failed to login');
   }
+  if (data.role !== 'user') {
+    throw Error('Not authorized');
+  }
   return data;
 }
 

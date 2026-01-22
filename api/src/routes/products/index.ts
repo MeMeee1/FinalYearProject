@@ -7,6 +7,7 @@ import {
   updateProduct,
   deleteProduct,
   searchProducts,
+  getProductCategories
 } from './productsController.js';
 import { validateData } from '../../middlewares/validationMiddleware.js';
 
@@ -20,6 +21,7 @@ const router = Router();
 
 // Public routes
 router.get('/', listProducts);
+router.get('/categories', getProductCategories);
 router.get('/search', searchProducts);
 router.get('/seller/:sellerId', getProductsBySeller);
 router.get('/:id', getProductById);
