@@ -5,25 +5,45 @@ import { eq } from 'drizzle-orm';
 
 export async function createOrder(req: Request, res: Response) {
   try {
-    const { order, items } = req.cleanBody;
-
+    const { items } = req.cleanBody;
     const userId = req.userId;
-    console.log(userId);
+
     if (!userId) {
-      res.status(400).json({ message: 'Invalid order data' });
+      return res.status(401).json({ message: 'Unauthorized' });
     }
+
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ message: 'Order items are required' });
+    }
+
+    // Calculate amounts
+    const subtotal = items.reduce((acc: number, item: any) => acc + (item.price * item.quantity), 0);
+    const platformFee = subtotal * 0.1; // 10% platform fee
+    const shippingCost = 2000; // Fixed shipping for now
+    const totalAmount = subtotal + shippingCost;
+    const sellerAmount = subtotal - platformFee;
 
     const [newOrder] = await db
       .insert(ordersTable)
-      // @ts-ignore
-      .values({ userId: userId })
+      .values({
+        userId: Number(userId),
+        totalAmount: Number(totalAmount),
+        platformFee: Number(platformFee),
+        sellerAmount: Number(sellerAmount),
+        shippingCost: Number(shippingCost),
+        status: 'New'
+      })
       .returning();
 
-    // TODO: validate products ids, and take their actual price from db
     const orderItems = items.map((item: any) => ({
-      ...item,
       orderId: newOrder.id,
+      productId: item.id || item.productId,
+      sellerId: item.sellerId || 1,
+      quantity: item.quantity,
+      price: item.price,
+      subtotal: item.price * item.quantity
     }));
+
     const newOrderItems = await db
       .insert(orderItemsTable)
       .values(orderItems)
@@ -32,7 +52,7 @@ export async function createOrder(req: Request, res: Response) {
     res.status(201).json({ ...newOrder, items: newOrderItems });
   } catch (e) {
     console.log(e);
-    res.status(400).json({ message: 'Invalid order data' });
+    res.status(500).json({ message: 'Internal server error while creating order' });
   }
 }
 

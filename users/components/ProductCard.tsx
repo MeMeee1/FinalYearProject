@@ -7,12 +7,53 @@ import { Heading } from '@/components/ui/heading';
 import { Image } from '@/components/ui/image';
 import { Product } from '@/lib/types';
 import Link from 'next/link';
+import { useCart } from '@/context/CartContext';
+import { Button } from './ui/button';
+import { PlusIcon } from 'lucide-react-native';
+import { reduceStock } from '@/lib/api';
+import { useState, useCallback } from 'react';
+import { useStockSync } from '@/hooks/useStockSync';
 
 interface ProductCardProps {
     product: Product;
 }
 
 export function ProductCard({ product }: ProductCardProps) {
+    const { addToCart } = useCart();
+    const [localStock, setLocalStock] = useState(product.stock);
+
+    const handleSyncUpdate = useCallback((data: { productId: number, newStock: number }) => {
+        if (data.productId === product.id) {
+            setLocalStock(data.newStock);
+        }
+    }, [product.id]);
+
+    useStockSync(handleSyncUpdate);
+
+    const handleQuickAdd = async (e: any) => {
+        e.stopPropagation();
+        e.preventDefault();
+
+        if (localStock <= 0) {
+            alert('Out of stock!');
+            return;
+        }
+
+        try {
+            // First update UI/Context
+            addToCart(product, 1);
+
+            // Reduce stock in DB
+            await reduceStock(product.id, 1);
+
+            // Update local stock display
+            setLocalStock(prev => prev - 1);
+        } catch (err: any) {
+            console.error(err);
+            alert(err.message || 'Node synchronization failed.');
+        }
+    };
+
     return (
         <Link href={`/product/${product.id}`} passHref legacyBehavior>
             <Box className="cursor-pointer group flex-1 transition-all duration-500 hover:-translate-y-2">
@@ -43,13 +84,17 @@ export function ProductCard({ product }: ProductCardProps) {
 
                         <HStack className="justify-between items-center pt-4 border-t border-border/50">
                             <VStack>
-                                <Text className="text-muted-foreground text-[9px] font-black uppercase tracking-widest">Pricing</Text>
+                                <Text className="text-muted-foreground text-[9px] font-black uppercase tracking-widest">Pricing | Stock: {localStock}</Text>
                                 <Text className="text-foreground font-black text-xl tracking-tighter">₦{product.price.toLocaleString()}</Text>
                             </VStack>
-                            <Box className="rounded-2xl w-12 h-12 bg-secondary group-hover:bg-primary transition-all duration-500 flex items-center justify-center shadow-lg group-active:scale-90 overflow-hidden relative">
+                            <Button
+                                variant="link"
+                                onPress={handleQuickAdd}
+                                className="rounded-2xl w-12 h-12 bg-secondary group-hover:bg-primary transition-all duration-500 flex items-center justify-center shadow-lg group-active:scale-90 overflow-hidden p-0"
+                            >
                                 <Box className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
-                                <Text className="text-primary group-hover:text-primary-foreground font-black text-2xl relative z-10 transition-colors">+</Text>
-                            </Box>
+                                <PlusIcon size={20} color="hsl(var(--primary))" className="group-hover:text-black transition-colors" />
+                            </Button>
                         </HStack>
                     </VStack>
                 </Card>

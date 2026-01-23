@@ -7,7 +7,8 @@ import {
   updateProduct,
   deleteProduct,
   searchProducts,
-  getProductCategories
+  getProductCategories,
+  reduceStock
 } from './productsController.js';
 import { validateData } from '../../middlewares/validationMiddleware.js';
 
@@ -25,6 +26,7 @@ router.get('/categories', getProductCategories);
 router.get('/search', searchProducts);
 router.get('/seller/:sellerId', getProductsBySeller);
 router.get('/:id', getProductById);
+router.post('/:id/reduce', reduceStock);
 
 // Protected routes (seller/admin only)
 router.post(

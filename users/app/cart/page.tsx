@@ -12,42 +12,12 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { CartItem } from '@/lib/types';
 import { useState } from 'react';
+import { useCart } from '@/context/CartContext';
 
 export default function Cart() {
     const router = useRouter();
-    // Mock Cart Data (in a real app, this would come from a global state or API)
-    const [items, setItems] = useState<CartItem[]>([
-        {
-            id: 1,
-            name: 'Local Rice',
-            price: 15000,
-            quantity: 2,
-            image: 'https://placehold.co/400x400/png?text=Rice',
-            description: 'Premium locally sourced rice from the northern regions.', stock: 10, sku: 'RICE-001', status: 'Available', createdAt: '', updatedAt: '', sellerId: 1, video: null
-        },
-        {
-            id: 2,
-            name: 'Palm Oil',
-            price: 8000,
-            quantity: 1,
-            image: 'https://placehold.co/400x400/png?text=Oil',
-            description: 'Pure, unadulterated palm oil for all your cooking needs.', stock: 10, sku: 'OIL-002', status: 'Available', createdAt: '', updatedAt: '', sellerId: 1, video: null
-        }
-    ]);
-
-    const updateQuantity = (id: number, delta: number) => {
-        setItems(items.map(item =>
-            item.id === id ? { ...item, quantity: Math.max(1, item.quantity + delta) } : item
-        ));
-    };
-
-    const removeItem = (id: number) => {
-        setItems(items.filter(item => item.id !== id));
-    };
-
-    const subtotal = items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+    const { items, updateQuantity, removeFromCart, subtotal, total } = useCart();
     const delivery = items.length > 0 ? 2000 : 0;
-    const total = subtotal + delivery;
 
     return (
         <Box className="flex-1 min-h-screen bg-background pb-40">
@@ -74,56 +44,63 @@ export default function Cart() {
             </Box>
 
             {items.length > 0 ? (
-                <Box className="p-6 max-w-4xl mx-auto">
-                    <VStack space="xl">
+                <Box className="p-6 w-full max-w-4xl mx-auto">
+                    <VStack space="2xl" className="w-full">
                         {/* Cart Items List */}
-                        <VStack space="md">
+                        <VStack space="lg" className="w-full">
                             {items.map((item) => (
-                                <Box key={item.id} className="bg-card/40 backdrop-blur-md p-4 rounded-[2rem] border border-border/40 group transition-all hover:bg-card/60">
-                                    <HStack space="md" className="items-center">
-                                        <Box className="relative w-24 h-24 rounded-2xl overflow-hidden bg-muted border border-border/40">
+                                <Box key={item.id} className="bg-card/60 backdrop-blur-md p-6 rounded-[2.5rem] border border-border/40 group transition-all hover:bg-card/80 hover:shadow-2xl hover:shadow-primary/5 w-full">
+                                    <HStack space="xl" className="items-center w-full">
+                                        <Box className="relative w-32 h-32 rounded-3xl overflow-hidden bg-muted border border-border/40 shadow-inner">
                                             <Image
                                                 source={{ uri: item.image || '' }}
                                                 alt={item.name}
-                                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                                             />
                                         </Box>
 
-                                        <VStack className="flex-1 justify-between h-24 py-1">
+                                        <VStack className="flex-1 justify-between min-h-[128px] py-1">
                                             <Box>
-                                                <HStack className="justify-between items-start">
-                                                    <VStack>
-                                                        <Text className="text-[10px] text-muted-foreground font-black uppercase tracking-widest mb-0.5">{item.sku || 'N/A'}</Text>
-                                                        <Heading size="sm" className="font-black text-foreground tracking-tight">{item.name}</Heading>
+                                                <HStack className="justify-between items-start w-full">
+                                                    <VStack className="flex-1 mr-4">
+                                                        <Text className="text-[10px] text-primary font-black uppercase tracking-[0.3em] mb-1">{item.sku || 'N/A'}</Text>
+                                                        <Heading size="md" className="font-black text-foreground tracking-tighter leading-tight">{item.name}</Heading>
                                                     </VStack>
-                                                    <Button variant="link" size="sm" className="p-0 h-8 w-8 rounded-lg hover:bg-red-500/10" onPress={() => removeItem(item.id)}>
-                                                        <TrashIcon size={16} color="hsl(var(--muted-foreground))" className="group-hover:text-red-500 transition-colors" />
-                                                    </Button>
-                                                </HStack>
-                                                <Text className="text-primary text-sm font-black mt-1">₦{item.price.toLocaleString()}</Text>
-                                            </Box>
-
-                                            <HStack className="justify-between items-center">
-                                                <HStack className="bg-secondary/40 p-1 rounded-xl border border-border/40 items-center">
                                                     <Button
                                                         variant="link"
-                                                        className="w-8 h-8 rounded-lg bg-background/40 items-center justify-center hover:bg-background/60"
+                                                        className="p-3 bg-secondary/30 rounded-2xl hover:bg-red-500/10 transition-colors"
+                                                        onPress={() => removeFromCart(item.id)}
+                                                    >
+                                                        <TrashIcon size={18} color="hsl(var(--muted-foreground))" className="group-hover:text-red-500 transition-colors" />
+                                                    </Button>
+                                                </HStack>
+                                                <Text className="text-foreground text-xl font-black mt-2 tracking-tighter">₦{item.price.toLocaleString()}</Text>
+                                            </Box>
+
+                                            <HStack className="justify-between items-center mt-4">
+                                                <HStack className="bg-background/40 p-1.5 rounded-2xl border border-border/40 items-center">
+                                                    <Button
+                                                        variant="link"
+                                                        className="w-10 h-10 rounded-xl bg-secondary/50 items-center justify-center hover:bg-secondary/80 transition-all active:scale-95"
                                                         onPress={() => updateQuantity(item.id, -1)}
                                                     >
                                                         <MinusIcon size={12} color="hsl(var(--foreground))" />
                                                     </Button>
-                                                    <Box className="w-10 items-center">
-                                                        <Text className="text-foreground font-black text-sm">{item.quantity}</Text>
+                                                    <Box className="w-12 items-center">
+                                                        <Text className="text-foreground font-black text-base">{item.quantity}</Text>
                                                     </Box>
                                                     <Button
                                                         variant="link"
-                                                        className="w-8 h-8 rounded-lg bg-background/40 items-center justify-center hover:bg-background/60"
+                                                        className="w-10 h-10 rounded-xl bg-secondary/50 items-center justify-center hover:bg-secondary/80 transition-all active:scale-95"
                                                         onPress={() => updateQuantity(item.id, 1)}
                                                     >
                                                         <PlusIcon size={12} color="hsl(var(--foreground))" />
                                                     </Button>
                                                 </HStack>
-                                                <Text className="text-foreground font-black text-sm">₦{(item.price * item.quantity).toLocaleString()}</Text>
+                                                <VStack className="items-end">
+                                                    <Text className="text-[8px] text-muted-foreground font-black uppercase tracking-widest mb-0.5">Item Total</Text>
+                                                    <Text className="text-foreground font-black text-lg tracking-tighter">₦{(item.price * item.quantity).toLocaleString()}</Text>
+                                                </VStack>
                                             </HStack>
                                         </VStack>
                                     </HStack>
@@ -132,76 +109,72 @@ export default function Cart() {
                         </VStack>
 
                         {/* Summary Card */}
-                        <Box className="bg-card/60 backdrop-blur-3xl p-8 rounded-[2.5rem] border border-border/50 shadow-2xl">
-                            <VStack space="lg">
-                                <Heading className="text-foreground font-black tracking-tight text-xl mb-2">Valuation Summary</Heading>
-                                <VStack space="md">
+                        <Box className="bg-card/60 backdrop-blur-3xl p-10 rounded-[3rem] border border-border/50 shadow-2xl w-full">
+                            <VStack space="xl">
+                                <Heading className="text-foreground font-black tracking-tighter text-3xl mb-4">Valuation Summary</Heading>
+                                <VStack space="lg">
                                     <HStack className="justify-between items-center">
-                                        <Text className="text-muted-foreground font-bold text-xs uppercase tracking-widest">Base Valuation</Text>
-                                        <Text className="font-black text-foreground">₦{subtotal.toLocaleString()}</Text>
+                                        <Text className="text-muted-foreground font-black text-[10px] uppercase tracking-[0.25em]">Base Valuation</Text>
+                                        <Text className="font-black text-foreground text-xl">₦{subtotal.toLocaleString()}</Text>
                                     </HStack>
                                     <HStack className="justify-between items-center">
-                                        <Text className="text-muted-foreground font-bold text-xs uppercase tracking-widest">Logistics Fee</Text>
-                                        <HStack space="xs" className="items-center">
-                                            <Box className="bg-blue-500/10 px-2 py-0.5 rounded-md border border-blue-500/20">
-                                                <Text className="text-blue-400 text-[8px] font-black uppercase">Standard</Text>
+                                        <Text className="text-muted-foreground font-black text-[10px] uppercase tracking-[0.25em]">Logistics Fee</Text>
+                                        <HStack space="md" className="items-center">
+                                            <Box className="bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
+                                                <Text className="text-primary text-[8px] font-black uppercase tracking-widest">Standard</Text>
                                             </Box>
-                                            <Text className="font-black text-foreground">₦{delivery.toLocaleString()}</Text>
+                                            <Text className="font-black text-foreground text-xl">₦{delivery.toLocaleString()}</Text>
                                         </HStack>
                                     </HStack>
-                                    <Box className="h-[1px] bg-border/40 my-2" />
-                                    <HStack className="justify-between items-end">
+                                    <Box className="h-[1px] bg-border/40 my-4" />
+                                    <HStack className="justify-between items-center">
                                         <VStack>
-                                            <Text className="text-muted-foreground font-black text-[10px] uppercase tracking-[0.3em] mb-1">Total Procurement Cost</Text>
-                                            <Heading size="xl" className="text-primary font-black tracking-tighter leading-none">₦{total.toLocaleString()}</Heading>
+                                            <Text className="text-muted-foreground font-black text-[10px] uppercase tracking-[0.4em] mb-2">Total Procurement Cost</Text>
+                                            <Heading size="3xl" className="text-primary font-black tracking-tighter leading-none">₦{total.toLocaleString()}</Heading>
                                         </VStack>
-                                        <Box className="bg-primary/20 px-3 py-1.5 rounded-full border border-primary/30">
-                                            <Text className="text-primary font-black text-[10px] uppercase tracking-widest">VAT Included</Text>
+                                        <Box className="bg-primary px-4 py-2 rounded-2xl shadow-lg shadow-primary/20">
+                                            <Text className="text-black font-black text-[10px] uppercase tracking-widest">VAT Included</Text>
                                         </Box>
                                     </HStack>
                                 </VStack>
                             </VStack>
                         </Box>
+
+                        {/* Action Deck (Now in Scroll Area) */}
+                        <Box className="mt-4 pb-12">
+                            <Link href="/checkout" passHref legacyBehavior>
+                                <Button size="xl" className="w-full rounded-[2.5rem] bg-primary hover:scale-[1.02] shadow-[0_24px_48px_rgba(29,185,84,0.3)] border-0 h-24 transition-all active:scale-[0.98] group overflow-hidden relative">
+                                    <Box className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
+                                    <HStack space="xl" className="items-center relative z-10">
+                                        <Box className="bg-black/10 p-4 rounded-2xl group-hover:rotate-12 transition-transform shadow-inner">
+                                            <ShoppingBagIcon size={28} color="black" />
+                                        </Box>
+                                        <VStack className="items-start">
+                                            <ButtonText className="font-black text-black text-2xl uppercase tracking-[0.2em] leading-none">Authorize Checkout</ButtonText>
+                                            <Text className="text-black/60 text-[10px] font-black uppercase tracking-[0.3em] mt-2">Proceed to Secure Payment Gateway</Text>
+                                        </VStack>
+                                    </HStack>
+                                </Button>
+                            </Link>
+                        </Box>
                     </VStack>
                 </Box>
             ) : (
-                <Box className="flex-1 justify-center items-center p-8">
-                    <VStack space="xl" className="items-center">
-                        <Box className="w-32 h-32 bg-secondary/20 rounded-[3rem] items-center justify-center border border-border/30">
-                            <ShoppingBagIcon size={48} color="hsl(var(--muted-foreground))" strokeWidth={1} />
+                <Box className="flex-1 justify-center items-center py-32">
+                    <VStack space="2xl" className="items-center max-w-xs">
+                        <Box className="w-40 h-40 bg-secondary/20 rounded-[4rem] items-center justify-center border border-border/30 shadow-inner">
+                            <ShoppingBagIcon size={64} color="hsl(var(--muted-foreground))" strokeWidth={1} />
                         </Box>
-                        <VStack className="items-center" space="xs">
-                            <Heading className="text-foreground font-black tracking-tight">Empty Manifest</Heading>
-                            <Text className="text-muted-foreground text-center font-medium">Your procurement list is currently empty. Start exploring the network to add items.</Text>
+                        <VStack className="items-center" space="md">
+                            <Heading size="xl" className="text-foreground font-black tracking-tighter">Empty Manifest</Heading>
+                            <Text className="text-muted-foreground text-center font-medium leading-relaxed">Your procurement list is currently empty. Start exploring the network to add items.</Text>
                         </VStack>
                         <Link href="/" passHref legacyBehavior>
-                            <Button size="xl" className="rounded-2xl bg-primary px-8">
-                                <ButtonText className="text-black font-black uppercase tracking-widest">Explore Network</ButtonText>
+                            <Button size="xl" className="rounded-2xl bg-primary px-10 h-16 shadow-lg shadow-primary/20">
+                                <ButtonText className="text-black font-black uppercase tracking-widest text-sm">Explore Products</ButtonText>
                             </Button>
                         </Link>
                     </VStack>
-                </Box>
-            )}
-
-            {/* Bottom Action Bar */}
-            {items.length > 0 && (
-                <Box className="fixed bottom-0 left-0 right-0 bg-background/80 backdrop-blur-3xl p-8 border-t border-border/30 pb-12 z-50">
-                    <Box className="max-w-4xl mx-auto">
-                        <Link href="/checkout" passHref legacyBehavior>
-                            <Button size="xl" className="w-full rounded-[2rem] bg-primary hover:scale-[1.02] shadow-[0_24px_48px_rgba(var(--primary),0.3)] border-0 h-20 transition-all active:scale-[0.98] group overflow-hidden relative">
-                                <Box className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
-                                <HStack space="md" className="items-center relative z-10">
-                                    <Box className="bg-black/10 p-2 rounded-xl group-hover:rotate-12 transition-transform">
-                                        <ShoppingBagIcon size={20} color="black" />
-                                    </Box>
-                                    <VStack className="items-start">
-                                        <ButtonText className="font-black text-black text-lg uppercase tracking-[0.2em] leading-none">Authorize Checkout</ButtonText>
-                                        <Text className="text-black/60 text-[8px] font-black uppercase tracking-widest mt-1">Proceed to Secure Payment Gateway</Text>
-                                    </VStack>
-                                </HStack>
-                            </Button>
-                        </Link>
-                    </Box>
                 </Box>
             )}
         </Box>

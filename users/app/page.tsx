@@ -42,8 +42,8 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    getRecommendations(userLga).then(setProducts);
-  }, [userLga]);
+    getRecommendations(userLga, activeCategory).then(setProducts);
+  }, [userLga, activeCategory]);
 
   const handleSearch = async () => {
     if (searchQuery.trim()) {

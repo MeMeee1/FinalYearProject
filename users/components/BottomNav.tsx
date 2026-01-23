@@ -6,6 +6,7 @@ import { Text } from '@/components/ui/text';
 import { HomeIcon, SearchIcon, ShoppingBagIcon, PackageIcon, UserIcon } from 'lucide-react-native';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useCart } from '@/context/CartContext';
 
 const NAV_ITEMS = [
     { label: 'Feed', icon: HomeIcon, href: '/' },
@@ -21,6 +22,7 @@ function ProfileLink() {
 
 export function BottomNav() {
     const pathname = usePathname();
+    const { itemCount } = useCart();
 
     // Hide BottomNav on certain pages where it might interfere with actions
     const hideOnPaths = ['/checkout', '/payment', '/product/'];
@@ -52,8 +54,16 @@ export function BottomNav() {
                         return (
                             <Link href={item.href} key={item.label} passHref legacyBehavior>
                                 <Box className="items-center py-2 px-4 cursor-pointer group transition-all">
-                                    <Box className={`mb-1 p-2 rounded-2xl transition-all ${isActive ? 'bg-primary shadow-lg shadow-primary/20 scale-110' : 'group-hover:bg-secondary/40'}`}>
+                                    <Box className={`mb-1 p-2 rounded-2xl transition-all relative ${isActive ? 'bg-primary shadow-lg shadow-primary/20 scale-110' : 'group-hover:bg-secondary/40'}`}>
                                         <Icon size={20} color={isActive ? "black" : "hsl(var(--muted-foreground))"} />
+
+                                        {item.label === 'Cart' && itemCount > 0 && (
+                                            <Box className="absolute -top-1 -right-1 bg-primary w-5 h-5 rounded-full items-center justify-center border-2 border-background shadow-lg">
+                                                <Text className="text-[9px] font-black text-black leading-none">
+                                                    {itemCount > 99 ? '99+' : itemCount}
+                                                </Text>
+                                            </Box>
+                                        )}
                                     </Box>
                                     <Text className={`text-[8px] font-black uppercase tracking-widest ${isActive ? 'text-primary' : 'text-muted-foreground/60'}`}>
                                         {item.label}

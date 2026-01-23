@@ -6,12 +6,13 @@ import { VStack } from '@/components/ui/vstack';
 import { HStack } from '@/components/ui/hstack';
 import { Text } from '@/components/ui/text';
 import { Heading } from '@/components/ui/heading';
-import { Button, ButtonIcon } from '@/components/ui/button';
+
 import { ArrowLeftIcon, PackageIcon, ChevronRightIcon, ClockIcon, CheckCircle2Icon, AlertCircleIcon } from 'lucide-react-native';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { getUserOrders, Order } from '@/lib/api';
 
+import { Button, ButtonText, ButtonIcon } from '@/components/ui/button';
 export default function Orders() {
     const router = useRouter();
     const [orders, setOrders] = useState<Order[]>([]);
@@ -104,7 +105,7 @@ export default function Orders() {
                                             </VStack>
                                             <VStack className="items-end" space="xs">
                                                 <Text className="text-[10px] text-muted-foreground font-black uppercase tracking-widest text-right">Settled Value</Text>
-                                                <Text className="text-primary font-black text-xl tracking-tighter">₦{order.total.toLocaleString()}</Text>
+                                                <Text className="text-primary font-black text-xl tracking-tighter">₦{(order.totalAmount || order.total || 0).toLocaleString()}</Text>
                                             </VStack>
                                         </HStack>
 

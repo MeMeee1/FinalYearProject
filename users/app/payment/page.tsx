@@ -8,12 +8,38 @@ import { Heading } from '@/components/ui/heading';
 import { Button, ButtonText, ButtonIcon } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ArrowLeftIcon, CreditCardIcon, ShieldCheckIcon, LockIcon, BanknoteIcon } from 'lucide-react-native';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
+import { useCart } from '@/context/CartContext';
+import { createOrder } from '@/lib/api';
 
 export default function Payment() {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const { total, items, clearCart } = useCart();
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [selectedMethod, setSelectedMethod] = useState('card');
+
+    const address = searchParams.get('address') || '';
+    const city = searchParams.get('city') || '';
+    const lga = searchParams.get('lga') || '';
+    const phone = searchParams.get('phone') || '';
+
+    const handleExecutePayment = async () => {
+        setIsSubmitting(true);
+        try {
+            const pickupLocation = `${address}, ${city}, ${lga}`.trim();
+            // Just pass the items as they are, they already match CartItem[]
+            await createOrder(items, pickupLocation);
+            clearCart();
+            router.push('/orders');
+        } catch (err: any) {
+            console.error(err);
+            alert(err.message || 'Payment execution failed. System rollback initialized.');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
 
     return (
         <Box className="flex-1 min-h-screen bg-background pb-40">
@@ -40,7 +66,7 @@ export default function Payment() {
                     <Box className="bg-primary/90 p-10 rounded-[3rem] shadow-[0_32px_64px_rgba(var(--primary-rgb),0.3)] items-center relative overflow-hidden">
                         <Box className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16" />
                         <Text className="text-black/60 mb-4 font-black uppercase tracking-[0.25em] text-[10px]">Net Authorization Value</Text>
-                        <Heading className="text-black font-black text-6xl tracking-tighter leading-none mb-2">₦25,000</Heading>
+                        <Heading className="text-black font-black text-6xl tracking-tighter leading-none mb-2">₦{total.toLocaleString()}</Heading>
                         <HStack space="xs" className="items-center bg-black/10 px-3 py-1 rounded-full">
                             <LockIcon size={10} color="black" />
                             <Text className="text-black font-bold uppercase tracking-widest text-[8px]">Secure Transaction Loop</Text>
@@ -51,23 +77,24 @@ export default function Payment() {
                         <Heading className="text-foreground font-black tracking-tight text-xl ml-2 mb-2">Payment Infrastructure</Heading>
 
                         {/* Card Method */}
-                        <Box
-                            className={`p-6 rounded-[2.5rem] border-2 transition-all cursor-pointer ${selectedMethod === 'card' ? 'border-primary bg-primary/10 shadow-lg shadow-primary/10' : 'border-border/40 bg-card/40'}`}
+                        <Button
+                            variant="link"
+                            className={`p-6 h-auto rounded-[2.5rem] border-2 transition-all cursor-pointer ${selectedMethod === 'card' ? 'border-primary bg-primary/10 shadow-lg shadow-primary/10' : 'border-border/40 bg-card/40'}`}
                             onPress={() => setSelectedMethod('card')}
                         >
-                            <HStack className="items-center justify-between">
+                            <HStack className="items-center justify-between w-full">
                                 <HStack space="md" className="items-center">
                                     <Box className={`w-14 h-14 rounded-2xl items-center justify-center ${selectedMethod === 'card' ? 'bg-primary shadow-lg shadow-primary/20' : 'bg-secondary/40'}`}>
                                         <CreditCardIcon size={24} color={selectedMethod === 'card' ? 'black' : 'hsl(var(--muted-foreground))'} />
                                     </Box>
-                                    <VStack>
+                                    <VStack className="items-start">
                                         <Heading size="sm" className="text-foreground font-black tracking-tight">Financial Card</Heading>
-                                        <Text className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">Mastercard, Visa, Verve</Text>
+                                        <Text className="text-[10px] text-muted-foreground font-black uppercase tracking-widest text-left">Mastercard, Visa, Verve</Text>
                                     </VStack>
                                 </HStack>
                                 {selectedMethod === 'card' && <ShieldCheckIcon size={24} color="hsl(var(--primary))" />}
                             </HStack>
-                        </Box>
+                        </Button>
 
                         {/* USSD Method - Coming Soon */}
                         <Box className="p-6 rounded-[2.5rem] border border-border/20 bg-card/20 opacity-40 grayscale">
@@ -93,7 +120,7 @@ export default function Payment() {
                                     </Box>
                                     <VStack>
                                         <Heading size="sm" className="text-muted-foreground font-black tracking-tight">Direct Ledger Transfer</Heading>
-                                        <Text className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">Node Syncing Required</Text>
+                                        <Text className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">Coming Soon</Text>
                                     </VStack>
                                 </HStack>
                             </HStack>
@@ -107,7 +134,7 @@ export default function Payment() {
                         </Box>
                         <VStack className="flex-1">
                             <Text className="text-foreground font-black text-[10px] uppercase tracking-widest">PCI-DSS Compliant</Text>
-                            <Text className="text-muted-foreground text-[10px] font-medium leading-relaxed">Your financial data is never stored on our local nodes. All transactions are handled by Tier-1 payment processors.</Text>
+                            <Text className="text-muted-foreground text-[10px] font-medium leading-relaxed">All transactions are handled by PayStack</Text>
                         </VStack>
                     </HStack>
                 </VStack>
@@ -119,7 +146,8 @@ export default function Payment() {
                     <Button
                         size="xl"
                         className="w-full rounded-[2.5rem] bg-primary hover:scale-[1.02] shadow-[0_24px_48px_rgba(var(--primary-rgb),0.3)] border-0 h-24 transition-all active:scale-[0.98] group overflow-hidden relative"
-                        onPress={() => alert('Payment initialization simulation.')}
+                        onPress={handleExecutePayment}
+                        disabled={isSubmitting}
                     >
                         <Box className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
                         <HStack space="lg" className="items-center relative z-10">
@@ -127,8 +155,16 @@ export default function Payment() {
                                 <LockIcon size={24} color="black" />
                             </Box>
                             <VStack className="items-start">
-                                <ButtonText className="font-black text-black text-xl uppercase tracking-[0.25em] leading-none">Execute Authorization</ButtonText>
-                                <Text className="text-black/60 text-[10px] font-black uppercase tracking-widest mt-1">Finalize Secure Financial Handshake</Text>
+                                {isSubmitting ? (
+                                    <HStack space="sm" className="items-center">
+                                        <Text className="font-black text-black text-xl uppercase tracking-[0.25em] leading-none">Processing...</Text>
+                                    </HStack>
+                                ) : (
+                                    <>
+                                        <ButtonText className="font-black text-black text-xl uppercase tracking-[0.25em] leading-none">Execute Authorization</ButtonText>
+                                        <Text className="text-black/60 text-[10px] font-black uppercase tracking-widest mt-1">Finalize Secure Financial Handshake</Text>
+                                    </>
+                                )}
                             </VStack>
                         </HStack>
                     </Button>

@@ -4,6 +4,7 @@ import { GluestackUIProvider } from '@/components/ui/gluestack-ui-provider';
 import { Inter } from 'next/font/google';
 import { ThemeProvider } from '@/components/theme-provider';
 import { BottomNav } from '@/components/BottomNav';
+import { CartProvider } from '@/context/CartContext';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -29,8 +30,10 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <GluestackUIProvider mode="dark">
-              {children}
-              <BottomNav />
+              <CartProvider>
+                {children}
+                <BottomNav />
+              </CartProvider>
             </GluestackUIProvider>
           </ThemeProvider>
         </StyledJsxRegistry>

@@ -11,10 +11,18 @@ import { ArrowLeftIcon, CreditCardIcon, MapPinIcon, ShieldCheckIcon, TruckIcon }
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { useCart } from '@/context/CartContext';
 
 export default function Checkout() {
     const router = useRouter();
+    const { total, items, subtotal } = useCart();
+    const [address, setAddress] = useState('');
+    const [city, setCity] = useState('');
+    const [lga, setLga] = useState('FCT');
+    const [phone, setPhone] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const delivery = items.length > 0 ? 2000 : 0;
 
     return (
         <Box className="flex-1 min-h-screen bg-background pb-40">
@@ -29,7 +37,7 @@ export default function Checkout() {
                         <ArrowLeftIcon size={20} color="hsl(var(--foreground))" />
                     </Button>
                     <VStack>
-                        <Text className="text-[10px] text-muted-foreground font-black uppercase tracking-[0.3em] leading-none mb-1">Transaction Node</Text>
+                        <Text className="text-[10px] text-muted-foreground font-black uppercase tracking-[0.3em] leading-none mb-1">Transaction</Text>
                         <Heading size="lg" className="text-foreground font-black tracking-tighter">Finalize Procurement</Heading>
                     </VStack>
                 </HStack>
@@ -50,7 +58,12 @@ export default function Checkout() {
                             <VStack space="xs">
                                 <Text className="text-[10px] text-muted-foreground font-black uppercase tracking-widest ml-1 mb-1">Street Address / Terminal</Text>
                                 <Input size="xl" className="rounded-2xl bg-secondary/20 border-border/30 h-16 px-4">
-                                    <InputField placeholder="e.g. 123 Blockchain Ave" className="text-foreground font-bold" />
+                                    <InputField
+                                        placeholder="e.g. 123 Blockchain Ave"
+                                        value={address}
+                                        onChangeText={setAddress}
+                                        className="text-foreground font-bold"
+                                    />
                                 </Input>
                             </VStack>
 
@@ -58,13 +71,23 @@ export default function Checkout() {
                                 <VStack space="xs">
                                     <Text className="text-[10px] text-muted-foreground font-black uppercase tracking-widest ml-1 mb-1">Zone / City</Text>
                                     <Input size="xl" className="rounded-2xl bg-secondary/20 border-border/30 h-16 px-4">
-                                        <InputField placeholder="City" className="text-foreground font-bold" />
+                                        <InputField
+                                            placeholder="City"
+                                            value={city}
+                                            onChangeText={setCity}
+                                            className="text-foreground font-bold"
+                                        />
                                     </Input>
                                 </VStack>
                                 <VStack space="xs">
                                     <Text className="text-[10px] text-muted-foreground font-black uppercase tracking-widest ml-1 mb-1">Administrative Area (LGA)</Text>
                                     <Input size="xl" className="rounded-2xl bg-secondary/20 border-border/30 h-16 px-4">
-                                        <InputField placeholder="LGA" defaultValue="FCT" className="text-foreground font-bold" />
+                                        <InputField
+                                            placeholder="LGA"
+                                            value={lga}
+                                            onChangeText={setLga}
+                                            className="text-foreground font-bold"
+                                        />
                                     </Input>
                                 </VStack>
                             </Box>
@@ -72,7 +95,13 @@ export default function Checkout() {
                             <VStack space="xs">
                                 <Text className="text-[10px] text-muted-foreground font-black uppercase tracking-widest ml-1 mb-1">Communication Channel (Phone)</Text>
                                 <Input size="xl" className="rounded-2xl bg-secondary/20 border-border/30 h-16 px-4">
-                                    <InputField placeholder="+234 ..." keyboardType="phone-pad" className="text-foreground font-bold" />
+                                    <InputField
+                                        placeholder="+234 ..."
+                                        value={phone}
+                                        onChangeText={setPhone}
+                                        keyboardType="phone-pad"
+                                        className="text-foreground font-bold"
+                                    />
                                 </Input>
                             </VStack>
                         </VStack>
@@ -107,17 +136,17 @@ export default function Checkout() {
                             <VStack space="md">
                                 <HStack className="justify-between items-center">
                                     <Text className="text-muted-foreground font-bold text-xs uppercase tracking-widest">Base Procurement Cost</Text>
-                                    <Text className="font-black text-foreground">₦23,000</Text>
+                                    <Text className="font-black text-foreground">₦{subtotal.toLocaleString()}</Text>
                                 </HStack>
                                 <HStack className="justify-between items-center">
                                     <Text className="text-muted-foreground font-bold text-xs uppercase tracking-widest">Network Logistics Fee</Text>
-                                    <Text className="font-black text-foreground">₦2,000</Text>
+                                    <Text className="font-black text-foreground">₦{delivery.toLocaleString()}</Text>
                                 </HStack>
                                 <Box className="h-[1px] bg-border/40 my-2" />
                                 <HStack className="justify-between items-end">
                                     <VStack>
                                         <Text className="text-muted-foreground font-black text-[10px] uppercase tracking-[0.3em] mb-1">Total Authorized Amount</Text>
-                                        <Heading size="xl" className="text-primary font-black tracking-tighter leading-none">₦25,000</Heading>
+                                        <Heading size="xl" className="text-primary font-black tracking-tighter leading-none">₦{total.toLocaleString()}</Heading>
                                     </VStack>
                                     <Box className="bg-primary/20 px-3 py-1.5 rounded-full border border-primary/30">
                                         <Text className="text-primary font-black text-[10px] uppercase tracking-widest">Final Ledger</Text>
@@ -132,8 +161,19 @@ export default function Checkout() {
             {/* Bottom Interaction Deck */}
             <Box className="fixed bottom-0 left-0 right-0 bg-background/80 backdrop-blur-3xl p-8 border-t border-border/30 pb-12 z-50">
                 <Box className="max-w-4xl mx-auto">
-                    <Link href="/payment" passHref legacyBehavior>
-                        <Button size="xl" className="w-full rounded-[2.5rem] bg-primary hover:scale-[1.02] shadow-[0_24px_48px_rgba(var(--primary),0.3)] border-0 h-24 transition-all active:scale-[0.98] group overflow-hidden relative">
+                    <Link
+                        href={{
+                            pathname: '/payment',
+                            query: { address, city, lga, phone }
+                        }}
+                        passHref
+                        legacyBehavior
+                    >
+                        <Button
+                            size="xl"
+                            disabled={!address || !city || !phone}
+                            className={`w-full rounded-[2.5rem] bg-primary hover:scale-[1.02] shadow-[0_24px_48px_rgba(var(--primary),0.3)] border-0 h-24 transition-all active:scale-[0.98] group overflow-hidden relative ${(!address || !city || !phone) ? 'opacity-50 grayscale' : ''}`}
+                        >
                             <Box className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
                             <HStack space="lg" className="items-center relative z-10">
                                 <Box className="bg-black/10 p-3 rounded-2xl group-hover:scale-110 transition-transform">
@@ -141,7 +181,7 @@ export default function Checkout() {
                                 </Box>
                                 <VStack className="items-start">
                                     <ButtonText className="font-black text-black text-xl uppercase tracking-[0.25em] leading-none">Initialize Ledger Settlement</ButtonText>
-                                    <Text className="text-black/60 text-[10px] font-black uppercase tracking-widest mt-1">Authorize Transaction Through Secure Node</Text>
+                                    <Text className="text-black/60 text-[10px] font-black uppercase tracking-widest mt-1">Authorize Transaction Through Secure Payment Gateway</Text>
                                 </VStack>
                             </HStack>
                         </Button>

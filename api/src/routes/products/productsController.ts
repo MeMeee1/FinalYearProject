@@ -3,7 +3,7 @@ import { db } from '../../db/index.js';
 import { productsTable } from '../../db/productsSchema.js';
 import { vendorsTable } from '../../db/vendorsSchema.js';
 import { usersTable } from '../../db/usersSchema.js';
-import { eq, and, sql, like, or, ilike, desc, asc } from 'drizzle-orm';
+import { SQL, eq, and, sql, like, or, ilike, desc, asc } from 'drizzle-orm';
 import _ from 'lodash';
 
 export async function listProducts(req: Request, res: Response) {
@@ -379,6 +379,7 @@ export async function searchProducts(req: Request, res: Response) {
   try {
     const searchQuery = req.query.q as string;
     const lga = req.query.lga as string;
+    const category = req.query.category as string;
     const sort = req.query.sort as string;
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 10;
@@ -395,18 +396,25 @@ export async function searchProducts(req: Request, res: Response) {
     const offset = (page - 1) * limit;
 
     // Build conditions
-    const conditions = [eq(productsTable.status, 'active')];
+    const conditions: SQL[] = [eq(productsTable.status, 'active')];
 
     if (searchQuery && searchQuery.trim() !== '') {
-      conditions.push(or(
+      const searchCondition = or(
         ilike(productsTable.name, `%${searchQuery}%`),
         ilike(productsTable.description, `%${searchQuery}%`),
         ilike(vendorsTable.storeName, `%${searchQuery}%`),
-      ));
+      );
+      if (searchCondition) {
+        conditions.push(searchCondition);
+      }
     }
 
     if (lga && lga.trim() !== '' && lga !== 'All') {
       conditions.push(eq(vendorsTable.lga, lga as any));
+    }
+
+    if (category && category.trim() !== '' && category !== 'All') {
+      conditions.push(eq(productsTable.productTags, category as any));
     }
 
     // Determine Sort Order
@@ -446,7 +454,7 @@ export async function searchProducts(req: Request, res: Response) {
       })
       .from(productsTable)
       .leftJoin(vendorsTable, eq(productsTable.sellerId, vendorsTable.id))
-      .where(and(...(conditions as any)))
+      .where(and(...conditions))
       .orderBy(orderBy)
       .limit(limit)
       .offset(offset);
@@ -456,7 +464,7 @@ export async function searchProducts(req: Request, res: Response) {
       .select({ count: sql<number>`count(*)` })
       .from(productsTable)
       .leftJoin(vendorsTable, eq(productsTable.sellerId, vendorsTable.id))
-      .where(and(...(conditions as any)));
+      .where(and(...conditions));
 
     const totalPages = Math.ceil(count / limit);
 
@@ -481,6 +489,44 @@ export async function getProductCategories(req: Request, res: Response) {
   try {
     const categories = ['Chicken', 'Fish', 'Eggs'];
     res.json(categories);
+  } catch (e) {
+    console.log(e);
+    res.status(500).send(e);
+  }
+}
+export async function reduceStock(req: Request, res: Response) {
+  try {
+    const id = Number(req.params.id);
+    const { quantity } = req.body;
+
+    const [product] = await db
+      .select()
+      .from(productsTable)
+      .where(eq(productsTable.id, id));
+
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    if (product.stock < quantity) {
+      return res.status(400).json({ message: 'Insufficient stock' });
+    }
+
+    const [updatedProduct] = await db
+      .update(productsTable)
+      .set({ stock: product.stock - quantity })
+      .where(eq(productsTable.id, id))
+      .returning();
+
+    // Broadcast stock update via WebSockets
+    if (req.io) {
+      req.io.emit('stock_updated', {
+        productId: id,
+        newStock: updatedProduct.stock
+      });
+    }
+
+    res.json(updatedProduct);
   } catch (e) {
     console.log(e);
     res.status(500).send(e);

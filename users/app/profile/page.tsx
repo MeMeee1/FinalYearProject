@@ -195,7 +195,7 @@ export default function Profile() {
                             <Box className="grid grid-cols-2 gap-4">
                                 <FormControl>
                                     <FormControlLabel className="mb-2 ml-1">
-                                        <FormControlLabelText className="text-muted-foreground text-[10px] uppercase font-black tracking-[0.2em]">Node City</FormControlLabelText>
+                                        <FormControlLabelText className="text-muted-foreground text-[10px] uppercase font-black tracking-[0.2em]">City</FormControlLabelText>
                                     </FormControlLabel>
                                     <Input size="xl" className="rounded-2xl bg-secondary/20 border-border/30 h-16 px-4">
                                         <InputField value={city} onChangeText={setCity} placeholder="City" className="text-foreground font-bold" />
@@ -255,7 +255,7 @@ export default function Profile() {
                         </Box>
                         <VStack className="flex-1">
                             <Text className="text-foreground font-black text-[10px] uppercase tracking-widest">Trust Protocol</Text>
-                            <Text className="text-muted-foreground text-xs font-medium">Your data is secured using military-grade AES-256 encryption within our localized database node.</Text>
+                            <Text className="text-muted-foreground text-xs font-medium">Data is secured</Text>
                         </VStack>
                     </Box>
 

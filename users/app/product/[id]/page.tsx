@@ -14,6 +14,9 @@ import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { getProduct, Product } from '@/lib/api';
 import { ChevronRightIcon } from '@/components/ui/icon';
+import { useCart } from '@/context/CartContext';
+import { useStockSync } from '@/hooks/useStockSync';
+import { useCallback } from 'react';
 import {
     HeartIcon,
     Share2Icon,
@@ -31,6 +34,15 @@ export default function ProductDetails() {
     const [loading, setLoading] = useState(true);
     const [quantity, setQuantity] = useState(1);
     const [isWishlisted, setIsWishlisted] = useState(false);
+    const { addToCart } = useCart();
+
+    const handleSyncUpdate = useCallback((data: { productId: number, newStock: number }) => {
+        if (product && data.productId === product.id) {
+            setProduct(prev => prev ? { ...prev, stock: data.newStock } : null);
+        }
+    }, [product?.id]);
+
+    useStockSync(handleSyncUpdate);
 
     useEffect(() => {
         if (params.id) {
@@ -122,12 +134,12 @@ export default function ProductDetails() {
                                         <Text className="text-[10px] text-muted-foreground font-black uppercase tracking-[0.4em]">Node ID: {product.sku || 'N/A'}</Text>
                                     </HStack>
                                     <Heading className="text-6xl font-black text-foreground tracking-tighter leading-[0.85] mb-2">{product.name}</Heading>
-                                    <HStack space="xs" className="items-center">
+                                    {/* <HStack space="xs" className="items-center">
                                         {[1, 2, 3, 4, 5].map((s) => (
                                             <StarIcon key={s} size={14} color="hsl(var(--primary))" fill="hsl(var(--primary))" />
                                         ))}
                                         <Text className="text-muted-foreground text-xs font-bold ml-2">5.0 (Vetting Approved)</Text>
-                                    </HStack>
+                                    </HStack> */}
                                 </VStack>
 
                                 <HStack className="justify-between items-end border-t border-border/30 pt-8 mt-4">
@@ -237,15 +249,24 @@ export default function ProductDetails() {
                         <Text className="text-foreground font-black text-2xl tracking-tighter">₦{(product.price * quantity).toLocaleString()}</Text>
                     </VStack>
 
-                    <Button size="xl" className="flex-1 rounded-[2.5rem] bg-primary hover:scale-[1.02] shadow-[0_24px_48px_rgba(var(--primary),0.3)] border-0 h-24 transition-all active:scale-[0.98] group overflow-hidden relative">
+                    <Button
+                        size="xl"
+                        onPress={() => {
+                            if (product) {
+                                addToCart(product, quantity);
+                                router.push('/cart');
+                            }
+                        }}
+                        className="flex-1 rounded-[2.5rem] bg-primary hover:scale-[1.02] shadow-[0_24px_48px_rgba(var(--primary),0.3)] border-0 h-24 transition-all active:scale-[0.98] group overflow-hidden relative"
+                    >
                         <Box className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
                         <HStack space="lg" className="items-center relative z-10">
                             <Box className="bg-black/10 p-3 rounded-2xl group-hover:scale-110 transition-transform">
                                 <ShoppingBagIcon size={24} color="black" />
                             </Box>
                             <VStack className="items-start">
-                                <ButtonText className="font-black text-black text-xl uppercase tracking-[0.25em] leading-none">Initialize Procurement</ButtonText>
-                                <Text className="text-black/60 text-[10px] font-black uppercase tracking-widest mt-1">Transaction Node Secured</Text>
+                                <ButtonText className="font-black text-black text-xl uppercase tracking-[0.25em] leading-none">Add To Cart</ButtonText>
+                                <Text className="text-black/60 text-[10px] font-black uppercase tracking-widest mt-1">Get a product!</Text>
                             </VStack>
                         </HStack>
                     </Button>

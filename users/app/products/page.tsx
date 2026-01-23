@@ -45,7 +45,7 @@ export default function AllProducts() {
     const fetchProducts = async (currentPage = page, query = searchQuery, category = activeCategory, sort = activeSort) => {
         setLoading(true);
         try {
-            const response = await searchProducts(query, category, sort, currentPage, 10);
+            const response = await searchProducts(query, category, undefined, sort, currentPage, 10);
             setProducts(response.data);
             setPagination(response.pagination);
         } catch (err) {
@@ -126,8 +126,8 @@ export default function AllProducts() {
                     <HStack space="sm">
                         {[
                             { id: 'newest', label: 'Recent' },
-                            { id: 'price-low', label: 'Val: Low' },
-                            { id: 'price-high', label: 'Val: High' }
+                            { id: 'price_asc', label: 'Val: Low' },
+                            { id: 'price_desc', label: 'Val: High' }
                         ].map((s) => (
                             <Button
                                 key={s.id}
@@ -152,7 +152,7 @@ export default function AllProducts() {
                             <Box className="w-16 h-16 bg-primary/20 rounded-full items-center justify-center border border-primary/20 animate-pulse">
                                 <SearchIcon size={32} color="hsl(var(--primary))" />
                             </Box>
-                            <Text className="text-muted-foreground font-black uppercase tracking-[0.3em] text-[10px]">Scanning Active Nodes...</Text>
+                            <Text className="text-muted-foreground font-black uppercase tracking-[0.3em] text-[10px]">Loading...</Text>
                         </VStack>
                     </Box>
                 ) : (
@@ -207,7 +207,7 @@ export default function AllProducts() {
                                         setActiveCategory('All');
                                         setPage(1);
                                     }}>
-                                        <ButtonText className="text-black font-black uppercase tracking-widest text-sm">Reset Protocol</ButtonText>
+                                        <ButtonText className="text-black font-black uppercase tracking-widest text-sm">Reset Filter</ButtonText>
                                     </Button>
                                 </VStack>
                             </Box>

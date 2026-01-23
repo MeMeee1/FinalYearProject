@@ -38,6 +38,7 @@ export interface Order {
     id: number;
     status: string;
     total: number;
+    totalAmount?: number;
     createdAt: string;
     items: CartItem[];
     pickupLocation?: string;

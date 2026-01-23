@@ -102,25 +102,25 @@ async function fetchWithAuth(url: string, options: RequestInit = {}) {
 
 // --- Products ---
 
-export async function getRecommendations(lga: string): Promise<Product[]> {
-    // Ideally, passing LGA as a query param if backend supports it
-    // For now, fetching all products
+export async function getRecommendations(lga: string, category: string = 'All'): Promise<Product[]> {
     const res = await fetch(`${API_URL}/products`);
     const data = await res.json();
     if (!res.ok) throw new Error('Failed to fetch products');
 
-    // The API returns { data: Product[] } or just Product[]?
-    // based on ecommerce-mobile/api/products.ts, it returns { data: Product[] }?
-    // Let's verify standard return.
-    // Assuming listProducts returns array or { data: ... }
-    // Mobile app says: const data = await res.json(); return data; (where return type is { data: Product[] })
+    let products = Array.isArray(data) ? data : (data.data || []);
 
-    return Array.isArray(data) ? data : (data.data || []);
+    // Filter by category if specified and not 'All'
+    if (category !== 'All') {
+        products = products.filter((p: Product) => p.productTags === category);
+    }
+
+    return products;
 }
 
-export async function searchProducts(query: string = '', lga?: string, sort?: string, page: number = 1, limit: number = 10): Promise<any> {
+export async function searchProducts(query: string = '', category?: string, lga?: string, sort?: string, page: number = 1, limit: number = 10): Promise<any> {
     const params = new URLSearchParams();
     if (query) params.append('q', query);
+    if (category && category !== 'All') params.append('category', category);
     if (lga && lga !== 'All') params.append('lga', lga);
     if (sort) params.append('sort', sort);
     params.append('page', page.toString());
@@ -143,6 +143,19 @@ export async function getProduct(id: number): Promise<Product | null> {
     const res = await fetch(`${API_URL}/products/${id}`);
     if (!res.ok) return null;
     return await res.json();
+}
+
+export async function reduceStock(id: number, quantity: number) {
+    const res = await fetch(`${API_URL}/products/${id}/reduce`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ quantity }),
+    });
+    if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.message || 'Failed to reduce stock');
+    }
+    return res.json();
 }
 
 export async function getVendor(id: number): Promise<any> {
