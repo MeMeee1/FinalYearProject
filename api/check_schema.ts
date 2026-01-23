@@ -25,7 +25,7 @@ try {
 } catch (e) {
     if (e instanceof z.ZodError) {
         console.log("Validation failed:");
-        console.log(JSON.stringify(e.errors, null, 2));
+        console.log(JSON.stringify(e.issues, null, 2));
     } else {
         console.log("Validation error:", e);
     }

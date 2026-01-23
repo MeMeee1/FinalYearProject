@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { Card } from '@/components/ui/card';
 import { Heading } from '@/components/ui/heading';
 import { Text } from '@/components/ui/text';
-import { Image } from '@/components/ui/image';
 import SearchBar from './SearchBar';
 import Pagination from './Pagination';
 import { Plus, Package, Edit2, Trash2 } from 'lucide-react';
@@ -12,9 +11,12 @@ import { useState, useEffect } from 'react';
 import { useVendorStore } from '@/store/vendorStore';
 import { useVendorProfile } from '@/hooks/useVendorProfile';
 
-import { Button, ButtonText } from '@/components/ui/button';
+import { Button, ButtonText, ButtonIcon } from '@/components/ui/button';
 import { deleteProduct } from './actions';
 import { useRouter } from 'next/navigation';
+import { HStack } from '@/components/ui/hstack';
+import { VStack } from '@/components/ui/vstack';
+import { Box } from '@/components/ui/box';
 
 interface ProductsClientProps {
     initialProducts: any[];
@@ -33,7 +35,6 @@ export default function ProductsClient({
     const { vendorProfile: storeProfile, fetchProfile } = useVendorProfile();
     const setVendorStoreProfile = useVendorStore(state => state.setVendorProfile);
 
-    // Seed the store with server data on mount
     useEffect(() => {
         if (vendorProfile && !storeProfile) {
             setVendorStoreProfile(vendorProfile);
@@ -46,7 +47,6 @@ export default function ProductsClient({
     const displayedProducts = initialProducts;
     const query = searchParams.q?.trim();
 
-    // Delete State
     const [isDeleting, setIsDeleting] = useState(false);
 
     const handleDelete = async (productId: number) => {
@@ -67,142 +67,130 @@ export default function ProductsClient({
     };
 
     return (
-        <div className="w-full max-w-[1400px] mx-auto px-2 sm:px-4 lg:px-6 py-4 sm:py-6">
-            <div className="mb-4 sm:mb-6 lg:mb-8">
-                <div className="flex items-center justify-between gap-4 mb-3 sm:mb-4">
-                    <Heading size="xl" className="text-lg sm:text-xl">Your Products</Heading>
+        <div className="w-full max-w-[1600px] mx-auto p-6">
+            <VStack space="xl">
+                <HStack className="justify-between items-center mb-2">
+                    <Heading size="xl" className="text-2xl font-bold text-slate-800">Your Products</Heading>
                     {isActive && (
-                        <Link
-                            href="/dashboard/products/create"
-                            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 font-medium"
-                        >
-                            <Plus size={20} />
-                            <span className="hidden sm:inline">Add Product</span>
-                            <span className="sm:hidden">Add</span>
+                        <Link href="/dashboard/products/create">
+                            <Button className="bg-blue-600 hover:bg-blue-700 rounded-lg px-6 h-11 border-0 shadow-sm">
+                                <ButtonIcon as={Plus} className="mr-2 text-white" />
+                                <ButtonText className="text-white font-bold">Add Product</ButtonText>
+                            </Button>
                         </Link>
                     )}
-                </div>
+                </HStack>
+
+                <Box className="bg-white p-2 rounded-xl border border-slate-100 shadow-sm mb-4">
+                    <SearchBar />
+                </Box>
+
                 {!isActive && (
-                    <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-md mb-4 flex items-center gap-2">
-                        <Package className="w-5 h-5" />
-                        <Text className="text-sm">Account pending approval. You can manage products once approved.</Text>
-                    </div>
+                    <Box className="bg-amber-50 border border-amber-100 p-4 rounded-xl flex-row items-center gap-3">
+                        <Package className="text-amber-600 w-5 h-5" />
+                        <Text className="text-amber-800 font-medium">Account pending approval. You can manage products once approved.</Text>
+                    </Box>
                 )}
-                <SearchBar />
-            </div>
 
-            <div>
-                {displayedProducts.length === 0 ? (
-                    <div className="text-center py-16">
-                        <Package className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-                        <p className="text-slate-500 text-lg mb-4">
-                            {query ? 'No matching products found' : 'No products yet'}
-                        </p>
-                        {isActive && (
-                            <Link
-                                href="/dashboard/products/create"
-                                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 font-medium"
-                            >
-                                <Plus size={20} />
-                                Create Your First Product
-                            </Link>
-                        )}
-                    </div>
-                ) : (
-                    <>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-5 mb-8">
-                            {displayedProducts.map((product: any) => {
-                                // Parse image if it's a string, or handle string directly
-                                let previewImage = product.image;
-                                if (product.image && typeof product.image === 'string') {
-                                    try {
-                                        const parsed = JSON.parse(product.image);
-                                        if (Array.isArray(parsed) && parsed.length > 0) {
-                                            previewImage = parsed[0];
-                                        } else if (Array.isArray(parsed)) {
-                                            previewImage = null; // empty array
-                                        } else {
-                                            // Is just a JSON string of a single URL or not JSON?
-                                            // Actually our controller code stores JSON string array or falls back.
+                <div>
+                    {displayedProducts.length === 0 ? (
+                        <VStack className="items-center justify-center py-24 bg-white rounded-2xl border border-dashed border-slate-200">
+                            <Box className="w-20 h-20 bg-slate-50 rounded-full items-center justify-center mb-4">
+                                <Package className="w-10 h-10 text-slate-300" />
+                            </Box>
+                            <Text className="text-slate-500 text-lg font-semibold mb-6">
+                                {query ? 'No matching products found' : 'No products in your catalog yet'}
+                            </Text>
+                            {isActive && (
+                                <Link href="/dashboard/products/create">
+                                    <Button className="bg-blue-600 hover:bg-blue-700 rounded-lg px-8">
+                                        <ButtonText className="text-white font-bold">Add Your First Product</ButtonText>
+                                    </Button>
+                                </Link>
+                            )}
+                        </VStack>
+                    ) : (
+                        <>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
+                                {displayedProducts.map((product: any) => {
+                                    let previewImage = product.image;
+                                    if (product.image && typeof product.image === 'string') {
+                                        try {
+                                            const parsed = JSON.parse(product.image);
+                                            if (Array.isArray(parsed) && parsed.length > 0) {
+                                                previewImage = parsed[0];
+                                            }
+                                        } catch (e) {
+                                            previewImage = product.image;
                                         }
-                                    } catch (e) {
-                                        // Not JSON, so it's a raw URL string
-                                        previewImage = product.image;
                                     }
-                                }
 
-                                return (
-                                    <Card key={product.id} className="w-full h-full p-4 rounded-lg hover:shadow-lg transition-shadow duration-300 flex flex-col border border-gray-200 overflow-hidden">
-                                        <div className="relative pt-[75%] mb-4 overflow-hidden rounded-md bg-gradient-to-br from-gray-50 to-gray-100">
-                                            {previewImage ? (
-                                                <img
-                                                    src={previewImage}
-                                                    className="absolute top-0 left-0 w-full h-full object-cover"
-                                                    alt={product.name}
-                                                />
-                                            ) : (
-                                                <div className="absolute inset-0 flex items-center justify-center">
-                                                    <Package className="w-12 h-12 text-gray-300" />
-                                                </div>
-                                            )}
-                                        </div>
+                                    return (
+                                        <Card key={product.id} className="p-0 border border-slate-100 bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all group flex flex-col h-full">
+                                            <Box className="relative aspect-video bg-slate-50 overflow-hidden">
+                                                {previewImage ? (
+                                                    <img
+                                                        src={previewImage}
+                                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                                        alt={product.name}
+                                                    />
+                                                ) : (
+                                                    <div className="flex items-center justify-center w-full h-full">
+                                                        <Package className="w-12 h-12 text-slate-200" />
+                                                    </div>
+                                                )}
+                                            </Box>
 
-                                        <div className="flex-grow mb-4">
-                                            <Heading size="sm" className="mb-2 line-clamp-2">{product.name}</Heading>
-                                            {product.description && (
-                                                <Text className="text-sm text-slate-600 line-clamp-2 mb-3">
-                                                    {product.description}
-                                                </Text>
-                                            )}
+                                            <VStack className="p-5 flex-1 justify-between" space="md">
+                                                <VStack>
+                                                    <Heading size="sm" className="text-slate-900 font-bold line-clamp-1 mb-1">{product.name}</Heading>
+                                                    <Text className="text-xs text-slate-500 font-medium mb-3">{product.category || 'Product'}</Text>
 
-                                            <div className="mt-auto pt-3 border-t border-gray-100">
-                                                <div className="flex justify-between items-center mb-2">
-                                                    <Text className="text-lg font-bold text-green-600">
-                                                        ${product.price?.toFixed(2) || '0.00'}
-                                                    </Text>
-                                                    <Text className={`text-sm font-medium ${product.stock > 0 ? 'text-blue-600' : 'text-red-600'}`}>
-                                                        {product.stock} in stock
-                                                    </Text>
-                                                </div>
-                                            </div>
-                                        </div>
+                                                    <HStack className="justify-between items-center mt-2">
+                                                        <Text className="text-xl font-bold text-green-600">
+                                                            ${product.price?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00'}
+                                                        </Text>
+                                                        <Text className={`text-[10px] font-bold px-2 py-1 rounded-full ${product.stock > 0 ? 'bg-blue-50 text-blue-600' : 'bg-red-50 text-red-600'}`}>
+                                                            {product.stock} In stock
+                                                        </Text>
+                                                    </HStack>
+                                                </VStack>
 
-                                        {isActive && (
-                                            <div className="flex gap-2 pt-3 border-t border-gray-100">
-                                                <Link
-                                                    href={`/dashboard/products/${product.id}/edit`}
-                                                    className="flex-1 inline-flex items-center justify-center gap-1 px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-md transition-colors duration-200 font-medium text-sm"
-                                                >
-                                                    <Edit2 size={16} />
-                                                    <span className="hidden sm:inline">Edit</span>
-                                                </Link>
-                                                <button
-                                                    onClick={() => handleDelete(product.id)}
-                                                    disabled={isDeleting}
-                                                    className="flex-1 inline-flex items-center justify-center gap-1 px-3 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-md transition-colors duration-200 font-medium text-sm disabled:opacity-50"
-                                                >
-                                                    <Trash2 size={16} />
-                                                    <span className="hidden sm:inline">Delete</span>
-                                                </button>
-                                            </div>
-                                        )}
-                                    </Card>
-                                )
-                            })}
-                        </div>
+                                                {isActive && (
+                                                    <HStack space="md" className="mt-4 pt-4 border-t border-slate-50">
+                                                        <Link href={`/dashboard/products/${product.id}/edit`} className="flex-1">
+                                                            <Button className="w-full bg-blue-50 hover:bg-blue-100 h-10 border-0 rounded-lg shadow-none group/edit">
+                                                                <ButtonIcon as={Edit2} className="text-blue-600 w-4 h-4 mr-2" />
+                                                                <ButtonText className="text-blue-600 font-bold text-xs uppercase tracking-wider">Edit</ButtonText>
+                                                            </Button>
+                                                        </Link>
+                                                        <Button
+                                                            className="flex-1 bg-red-50 hover:bg-red-100 h-10 border-0 rounded-lg shadow-none group/delete"
+                                                            onPress={() => handleDelete(product.id)}
+                                                            disabled={isDeleting}
+                                                        >
+                                                            <ButtonIcon as={Trash2} className="text-red-600 w-4 h-4 mr-2" />
+                                                            <ButtonText className="text-red-600 font-bold text-xs uppercase tracking-wider">Delete</ButtonText>
+                                                        </Button>
+                                                    </HStack>
+                                                )}
+                                            </VStack>
+                                        </Card>
+                                    )
+                                })}
+                            </div>
 
-                        {initialPagination && initialPagination.totalPages > 1 && (
-                            <div className="mt-6 sm:mt-8 pt-4 border-t border-gray-200">
+                            {initialPagination && initialPagination.totalPages > 1 && (
                                 <Pagination
                                     currentPage={initialPagination.page || 1}
                                     totalPages={initialPagination.totalPages || 1}
                                     searchQuery={query}
                                 />
-                            </div>
-                        )}
-                    </>
-                )}
-            </div>
+                            )}
+                        </>
+                    )}
+                </div>
+            </VStack>
         </div>
     );
 }

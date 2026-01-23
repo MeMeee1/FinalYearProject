@@ -1,19 +1,18 @@
 'use client';
+
 import { Box } from '@/components/ui/box';
 import { FormControl, FormControlLabel, FormControlLabelText } from '@/components/ui/form-control';
 import { Heading } from '@/components/ui/heading';
 import { VStack } from '@/components/ui/vstack';
 import { HStack } from '@/components/ui/hstack';
 import { Text } from '@/components/ui/text';
-
 import { Button, ButtonText, ButtonSpinner } from '@/components/ui/button';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { createProduct, uploadProductImage, uploadProductVideo } from '@/app/dashboard/products/actions';
-import { Image as ImageIcon, Upload, X, Plus, Video } from 'lucide-react';
-
+import { Image as ImageIcon, Upload, X, Plus, Video, ArrowLeft, Save, Package, DollarSign, Tag, Info, Activity } from 'lucide-react';
 import { z } from 'zod';
-
+import { ChevronDown } from 'lucide-react';
 const productSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   description: z.string().optional(),
@@ -24,6 +23,7 @@ const productSchema = z.object({
 });
 
 export default function CreateProductPage() {
+  const router = useRouter();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
@@ -52,14 +52,11 @@ export default function CreateProductPage() {
   const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-
-      // Check for file size (50MB = 50 * 1024 * 1024 bytes)
       if (file.size > 50 * 1024 * 1024) {
         alert('Video size must be less than 50MB');
-        e.target.value = ''; // Clear file input
+        e.target.value = '';
         return;
       }
-
       setVideo({
         file,
         preview: URL.createObjectURL(file)
@@ -76,7 +73,6 @@ export default function CreateProductPage() {
       setErrors({});
       setIsSubmitting(true);
 
-      // Validate inputs
       try {
         productSchema.parse({
           name,
@@ -89,10 +85,9 @@ export default function CreateProductPage() {
       } catch (err) {
         if (err instanceof z.ZodError) {
           const fieldErrors: Record<string, string> = {};
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (err as any).errors.forEach((error: any) => {
-            if (error.path[0]) {
-              fieldErrors[error.path[0].toString()] = error.message;
+          err.issues.forEach((issue) => {
+            if (issue.path[0]) {
+              fieldErrors[issue.path[0].toString()] = issue.message;
             }
           });
           setErrors(fieldErrors);
@@ -102,7 +97,6 @@ export default function CreateProductPage() {
       }
 
       const uploadedUrls: string[] = [];
-
       for (const img of images) {
         if (img.file) {
           const formData = new FormData();
@@ -132,6 +126,10 @@ export default function CreateProductPage() {
         videoUrl,
         tag
       );
+
+      router.push('/dashboard/products');
+      router.refresh();
+
     } catch (e) {
       console.error(e);
       setIsSubmitting(false);
@@ -139,182 +137,245 @@ export default function CreateProductPage() {
   };
 
   return (
-    <div className="flex-1 min-h-screen bg-gray-50 p-4 md:p-8 pb-40">
-      <Box className="max-w-6xl mx-auto">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-          <VStack>
-            <Heading className="text-2xl font-bold text-gray-900">Create Product</Heading>
-            <Text className="text-gray-500">Add a new product to your store</Text>
-          </VStack>
-          <Button
-            onPress={handleSave}
-            isDisabled={isSubmitting}
-            className="bg-blue-600 hover:bg-blue-700 w-full md:w-auto"
-          >
-            {isSubmitting ? <ButtonSpinner color="white" /> : <ButtonText className="text-white">Save Product</ButtonText>}
-          </Button>
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 pb-20">
+      <div className="max-w-6xl mx-auto space-y-10">
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 mb-2">
+              <button
+                onClick={() => router.back()}
+                className="w-10 h-10 rounded-2xl bg-secondary/80 hover:bg-secondary transition-all flex items-center justify-center border border-border group"
+              >
+                <ArrowLeft className="w-4 h-4 text-muted-foreground group-hover:text-foreground group-hover:-translate-x-1 transition-all" />
+              </button>
+              <div className="h-4 w-px bg-border mx-2" />
+              <div className="flex items-center gap-2">
+                <Box className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <Package className="w-4 h-4 text-primary" />
+                </Box>
+                <Text className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Inventory Hub</Text>
+              </div>
+            </div>
+            <Heading className="text-3xl font-black tracking-tight text-foreground">Launch New Listing</Heading>
+            <Text className="text-muted-foreground font-medium">Introduce a new product to your marketplace audience.</Text>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleSave}
+              disabled={isSubmitting}
+              className="px-8 py-3 bg-primary text-primary-foreground font-black rounded-2xl shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center gap-3 disabled:opacity-50 text-xs uppercase tracking-widest"
+            >
+              {isSubmitting ? <Activity className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              {isSubmitting ? 'Processing...' : 'Deploy Product'}
+            </button>
+          </div>
         </div>
 
         {errorMessage && (
-          <Box className="bg-red-50 border border-red-200 p-4 rounded-lg mb-6 flex flex-row items-center gap-2">
-            <Text className="text-red-700 font-medium">Error:</Text>
-            <Text className="text-red-600">{errorMessage}</Text>
-          </Box>
+          <div className="p-4 rounded-2xl bg-destructive/10 border border-destructive/20 flex items-start gap-3 text-destructive animate-in bounce-in">
+            <Info className="w-5 h-5 shrink-0" />
+            <Text className="text-xs font-bold leading-relaxed">{errorMessage}</Text>
+          </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8" style={{ paddingBottom: '150px' }}>
-          <div className="lg:col-span-2 space-y-6">
-            <Box className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-              <VStack space="xl">
-                <Heading className="text-lg font-semibold text-gray-900 border-b border-gray-100 pb-3">Product Details</Heading>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+          <div className="lg:col-span-2 space-y-8">
+            {/* Core Details */}
+            <div className="bg-card rounded-[2.5rem] border border-border p-8 md:p-10 space-y-8">
+              <div className="flex items-center gap-4 border-b border-border/50 pb-6">
+                <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
+                  <Info className="w-6 h-6 text-primary" />
+                </div>
+                <div>
+                  <Heading className="text-xl font-black text-foreground">Item Specification</Heading>
+                  <Text className="text-xs text-muted-foreground font-medium">Standard marketplace identification details.</Text>
+                </div>
+              </div>
 
-                <FormControl>
-                  <FormControlLabel className="mb-1"><FormControlLabelText className="text-gray-700 font-medium">Name</FormControlLabelText></FormControlLabel>
-                  <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="e.g. Premium Cotton T-Shirt"
-                    className={`w-full border ${errors.name ? 'border-red-500' : 'border-gray-300'} rounded-md px-3 h-10 focus:border-blue-500 hover:border-gray-400 outline-none text-gray-900 placeholder:text-gray-400`}
-                  />
-                  {errors.name && <Text className="text-red-500 text-xs mt-1">{errors.name}</Text>}
-                </FormControl>
-
-                <FormControl>
-                  <FormControlLabel className="mb-1"><FormControlLabelText className="text-gray-700 font-medium">Description</FormControlLabelText></FormControlLabel>
-                  <Box className="h-32 w-full border border-gray-300 rounded-md overflow-hidden focus-within:border-blue-500 hover:border-gray-400">
-                    <textarea
-                      className="w-full h-full p-3 outline-none resize-none text-gray-900 placeholder:text-gray-400 text-sm font-sans"
-                      placeholder="Describe your product features, materials, etc..."
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-2">Product Name</label>
+                  <div className="relative group">
+                    <Tag className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                    <input
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="e.g. Organic Free-Range Chicken"
+                      className={`w-full pl-14 pr-6 py-4 bg-secondary/30 border rounded-3xl text-sm font-bold focus:bg-card focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none ${errors.name ? 'border-destructive/50' : 'border-border'}`}
                     />
-                  </Box>
-                </FormControl>
+                  </div>
+                  {errors.name && <Text className="text-[10px] text-destructive font-bold ml-2">{errors.name}</Text>}
+                </div>
 
-                <FormControl>
-                  <FormControlLabel className="mb-1"><FormControlLabelText className="text-gray-700 font-medium">Tag</FormControlLabelText></FormControlLabel>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-2">Description</label>
+                  <textarea
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="Describe product weight, origin, quality standards..."
+                    className="w-full px-6 py-6 bg-secondary/30 border border-border rounded-[2rem] text-sm font-medium focus:bg-card focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none h-40 resize-none"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-2">Classification</label>
                   <div className="relative">
                     <select
                       value={tag}
                       onChange={(e) => setTag(e.target.value)}
-                      className="w-full border border-gray-300 rounded-md px-3 h-10 focus:border-blue-500 hover:border-gray-400 outline-none text-gray-900 appearance-none bg-white"
+                      className="w-full px-6 py-4 bg-secondary/30 border border-border rounded-2xl text-sm font-bold focus:bg-card focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none appearance-none cursor-pointer"
                     >
-                      <option value="Chicken">Chicken</option>
-                      <option value="Fish">Fish</option>
-                      <option value="Eggs">Eggs</option>
+                      <option value="Chicken">Poultry / Chicken</option>
+                      <option value="Fish">Aquatic / Fish</option>
+                      <option value="Eggs">Dairy / Eggs</option>
                     </select>
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                      <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
-                    </div>
+                    <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                   </div>
-                </FormControl>
-              </VStack>
-            </Box>
-
-            <Box className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-              <VStack space="xl">
-                <Heading className="text-lg font-semibold text-gray-900 border-b border-gray-100 pb-3">Media</Heading>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {images.map((img, index) => (
-                    <div key={index} className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden border border-gray-200 group">
-                      <img src={img.preview} alt={`Product ${index + 1}`} className="w-full h-full object-cover" />
-                      <button
-                        onClick={() => removeImage(index)}
-                        className="absolute top-1 right-1 bg-white/90 text-red-600 p-1 rounded-full shadow-sm hover:bg-white transition-all opacity-0 group-hover:opacity-100"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ))}
-                  {images.length < 5 && (
-                    <label className="flex flex-col items-center justify-center aspect-square border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 hover:border-gray-400 transition-all duration-200">
-                      <Plus className="w-6 h-6 text-gray-400 mb-2" />
-                      <span className="text-xs text-gray-500 font-medium">Add Image</span>
-                      <input type="file" className="hidden" accept="image/*" onChange={handleFileChange} multiple />
-                    </label>
-                  )}
                 </div>
-                <Text className="text-xs text-gray-500 mt-2">Add up to 5 images.</Text>
+              </div>
+            </div>
 
-                <Box className="mt-6 border-t border-gray-100 pt-4">
-                  <Heading className="text-sm font-semibold text-gray-900 mb-2">Product Video</Heading>
+            {/* Visuals & Media */}
+            <div className="bg-card rounded-[2.5rem] border border-border p-8 md:p-10 space-y-8">
+              <div className="flex items-center gap-4 border-b border-border/50 pb-6">
+                <div className="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center">
+                  <ImageIcon className="w-6 h-6 text-blue-500" />
+                </div>
+                <div>
+                  <Heading className="text-xl font-black text-foreground">Content Gallery</Heading>
+                  <Text className="text-xs text-muted-foreground font-medium">High fidelity images and demonstration videos.</Text>
+                </div>
+              </div>
+
+              <div className="space-y-8">
+                <div className="space-y-4">
+                  <Text className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Images (Max 5)</Text>
+                  <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
+                    {images.map((img, index) => (
+                      <div key={index} className="relative group aspect-square rounded-2xl border border-border overflow-hidden bg-secondary shadow-sm transition-all hover:border-primary/50">
+                        <img src={img.preview} alt={`Product ${index + 1}`} className="w-full h-full object-cover" />
+                        <button
+                          onClick={() => removeImage(index)}
+                          className="absolute top-2 right-2 w-8 h-8 bg-card border border-border rounded-full flex items-center justify-center text-destructive opacity-0 group-hover:opacity-100 transition-all hover:scale-110 active:scale-90 shadow-lg"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                    {images.length < 5 && (
+                      <label className="flex flex-col items-center justify-center aspect-square border-2 border-dashed border-border rounded-2xl cursor-pointer bg-secondary/30 hover:bg-primary/5 hover:border-primary transition-all group active:scale-95">
+                        <div className="w-10 h-10 rounded-xl bg-card border border-border flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground transition-all">
+                          <Plus className="w-5 h-5 text-muted-foreground group-hover:text-primary-foreground" />
+                        </div>
+                        <input type="file" className="hidden" accept="image/*" onChange={handleFileChange} multiple />
+                      </label>
+                    )}
+                  </div>
+                </div>
+
+                <div className="space-y-4 pt-4 border-t border-border/50">
+                  <div className="flex items-center justify-between">
+                    <Text className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Demo Video (Optional)</Text>
+                    <Text className="text-[10px] text-muted-foreground/60 font-bold">MAX 50 MB</Text>
+                  </div>
                   {video ? (
-                    <div className="relative w-full aspect-video bg-black rounded-lg overflow-hidden border border-gray-200 group">
+                    <div className="relative group aspect-video bg-black rounded-[2rem] overflow-hidden border border-border">
                       <video src={video.preview} controls className="w-full h-full" />
                       <button
                         onClick={() => setVideo(null)}
-                        className="absolute top-2 right-2 bg-white/90 text-red-600 p-2 rounded-full shadow-sm hover:bg-white transition-all opacity-0 group-hover:opacity-100"
+                        className="absolute top-4 right-4 w-10 h-10 bg-card/80 backdrop-blur-md text-destructive rounded-full flex items-center justify-center shadow-xl hover:scale-110 active:scale-90 transition-all"
                       >
-                        <X className="w-4 h-4" />
+                        <X className="w-5 h-5" />
                       </button>
                     </div>
                   ) : (
-                    <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 hover:border-gray-400 transition-all duration-200">
-                      <Upload className="w-8 h-8 text-gray-400 mb-2" />
-                      <span className="text-sm text-gray-500 font-medium">Upload Video</span>
-                      <span className="text-xs text-gray-400 mt-1">Max 50MB</span>
+                    <label className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-border rounded-[2rem] cursor-pointer bg-secondary/30 hover:bg-primary/5 hover:border-primary transition-all group">
+                      <div className="w-12 h-12 rounded-2xl bg-card border border-border flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground transition-all mb-3 shadow-sm">
+                        <Video className="w-6 h-6 text-muted-foreground group-hover:text-primary-foreground" />
+                      </div>
+                      <span className="text-xs font-black text-muted-foreground uppercase tracking-widest opacity-60">Upload Product Reel</span>
                       <input type="file" className="hidden" accept="video/*" onChange={handleVideoChange} />
                     </label>
                   )}
-                </Box>
-              </VStack>
-            </Box>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div className="space-y-6">
-            <Box className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-              <VStack space="xl">
-                <Heading className="text-lg font-semibold text-gray-900 border-b border-gray-100 pb-3">Pricing</Heading>
-                <FormControl>
-                  <FormControlLabel className="mb-1"><FormControlLabelText className="text-gray-700 font-medium">Price</FormControlLabelText></FormControlLabel>
-                  <div className={`flex items-center w-full border ${errors.price ? 'border-red-500' : 'border-gray-300'} rounded-md px-3 h-10 focus-within:border-blue-500 hover:border-gray-400`}>
-                    <span className="text-gray-500 mr-2">$</span>
+          <div className="space-y-8">
+            {/* Commercials */}
+            <div className="bg-card rounded-[2.5rem] border border-border p-8 space-y-8">
+              <div className="flex items-center gap-4 border-b border-border/50 pb-6">
+                <div className="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center">
+                  <DollarSign className="w-5 h-5 text-green-500" />
+                </div>
+                <Heading className="text-lg font-black text-foreground">Economics</Heading>
+              </div>
+
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-2">Market Price (₦)</label>
+                  <div className="relative group">
+                    <div className="absolute left-5 top-1/2 -translate-y-1/2 font-black text-primary text-sm group-focus-within:scale-110 transition-transform">₦</div>
                     <input
                       type="number"
                       value={price}
                       onChange={(e) => setPrice(e.target.value)}
                       placeholder="0.00"
-                      className="flex-1 outline-none text-gray-900 font-medium h-full bg-transparent"
+                      className={`w-full pl-12 pr-6 py-4 bg-secondary/30 border rounded-2xl text-sm font-black focus:bg-card focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none ${errors.price ? 'border-destructive/50' : 'border-border'}`}
                     />
                   </div>
-                  {errors.price && <Text className="text-red-500 text-xs mt-1">{errors.price}</Text>}
-                </FormControl>
-              </VStack>
-            </Box>
+                  {errors.price && <Text className="text-[10px] text-destructive font-bold ml-2">{errors.price}</Text>}
+                </div>
+              </div>
+            </div>
 
-            <Box className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-              <VStack space="xl">
-                <Heading className="text-lg font-semibold text-gray-900 border-b border-gray-100 pb-3">Inventory</Heading>
+            {/* Logistics */}
+            <div className="bg-card rounded-[2.5rem] border border-border p-8 space-y-8">
+              <div className="flex items-center gap-4 border-b border-border/50 pb-6">
+                <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center">
+                  <Package className="w-5 h-5 text-purple-500" />
+                </div>
+                <Heading className="text-lg font-black text-foreground">Logistics</Heading>
+              </div>
 
-                <FormControl>
-                  <FormControlLabel className="mb-1"><FormControlLabelText className="text-gray-700 font-medium">SKU (Optional)</FormControlLabelText></FormControlLabel>
-                  <input
-                    type="text"
-                    value={sku}
-                    onChange={(e) => setSku(e.target.value)}
-                    placeholder="Auto-generated if empty"
-                    className="w-full border border-gray-300 rounded-md px-3 h-10 focus:border-blue-500 hover:border-gray-400 outline-none text-gray-900 bg-gray-50"
-                  />
-                  <Text className="text-xs text-gray-500 mt-1">Leave empty to auto-generate.</Text>
-                </FormControl>
-
-                <FormControl>
-                  <FormControlLabel className="mb-1"><FormControlLabelText className="text-gray-700 font-medium">Quantity</FormControlLabelText></FormControlLabel>
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-2">Initial Stock</label>
                   <input
                     type="number"
                     value={stock}
                     onChange={(e) => setStock(e.target.value)}
-                    placeholder="1"
-                    className={`w-full border ${errors.stock ? 'border-red-500' : 'border-gray-300'} rounded-md px-3 h-10 focus:border-blue-500 hover:border-gray-400 outline-none text-gray-900`}
+                    placeholder="0"
+                    className={`w-full px-6 py-4 bg-secondary/30 border rounded-2xl text-sm font-black focus:bg-card focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none ${errors.stock ? 'border-destructive/50' : 'border-border'}`}
                   />
-                  {errors.stock && <Text className="text-red-500 text-xs mt-1">{errors.stock}</Text>}
-                </FormControl>
-              </VStack>
-            </Box>
+                  {errors.stock && <Text className="text-[10px] text-destructive font-bold ml-2">{errors.stock}</Text>}
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-2">Reference SKU</label>
+                  <input
+                    type="text"
+                    value={sku}
+                    onChange={(e) => setSku(e.target.value)}
+                    placeholder="Optional SKU..."
+                    className="w-full px-6 py-4 bg-secondary/30 border border-border rounded-2xl text-sm font-bold focus:bg-card focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-4 text-center">
+              <Text className="text-[10px] text-muted-foreground/40 font-black uppercase tracking-[0.2em] px-10 leading-relaxed italic">
+                Deployment of this product will make it instantly visible to verified consumers.
+              </Text>
+            </div>
           </div>
         </div>
-      </Box>
+      </div>
     </div>
   );
 }

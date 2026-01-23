@@ -1,9 +1,8 @@
 import { fetchVendorOrders } from '@/api/orders';
-import { Card } from '@/components/ui/card';
 import { Heading } from '@/components/ui/heading';
 import { Text } from '@/components/ui/text';
 import Link from 'next/link';
-import { Package, Calendar, DollarSign, TrendingUp } from 'lucide-react';
+import { Package, Calendar, DollarSign, TrendingUp, Search, Filter, ArrowRight } from 'lucide-react';
 
 export default async function OrdersPage({
   searchParams,
@@ -14,12 +13,10 @@ export default async function OrdersPage({
   const orders = ordersData?.data || [];
   const statusFilter = searchParams.status || 'all';
 
-  // Filter orders by status
-  const filteredOrders = statusFilter === 'all' 
-    ? orders 
+  const filteredOrders = statusFilter === 'all'
+    ? orders
     : orders.filter((o: any) => o.status === statusFilter);
 
-  // Calculate stats
   const stats = {
     total: orders.length,
     pending: orders.filter((o: any) => o.status === 'pending').length,
@@ -29,127 +26,139 @@ export default async function OrdersPage({
   };
 
   return (
-    <div className="w-full max-w-[1400px] mx-auto px-2 sm:px-4 lg:px-6 py-4 sm:py-6">
+    <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
       {/* Header */}
-      <div className="mb-4 sm:mb-6">
-        <Heading size="xl" className="mb-2 text-lg sm:text-xl">Orders Management</Heading>
-        <Text className="text-slate-600 text-sm sm:text-base">Track and manage all platform orders</Text>
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Package className="w-4 h-4 text-primary" />
+            </div>
+            <Text className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Operations</Text>
+          </div>
+          <Heading className="text-3xl font-black tracking-tight text-foreground">Order Hub</Heading>
+          <Text className="text-muted-foreground font-medium">Manage and fulfill your customer orders.</Text>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <div className="relative group">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+            <input
+              type="text"
+              placeholder="Find an order ID..."
+              className="pl-11 pr-4 py-3 bg-secondary/50 border border-border/50 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:bg-card transition-all w-full md:w-64"
+            />
+          </div>
+        </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6">
-        <Card className="p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <Package className="w-4 h-4 text-blue-600" />
-            <Text className="text-xs text-slate-500">Total Orders</Text>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        {[
+          { label: 'Total Volume', value: stats.total, icon: Package, color: 'text-blue-500', bg: 'bg-blue-500/10' },
+          { label: 'Pending', value: stats.pending, icon: Calendar, color: 'text-yellow-500', bg: 'bg-yellow-500/10' },
+          { label: 'Fulfilling', value: stats.processing, icon: TrendingUp, color: 'text-purple-500', bg: 'bg-purple-500/10' },
+          { label: 'Net Sales', value: `₦${stats.totalRevenue.toLocaleString()}`, icon: DollarSign, color: 'text-primary', bg: 'bg-primary/10' },
+        ].map((item, i) => (
+          <div key={i} className="bg-card p-6 rounded-[2rem] border border-border hover:shadow-lg transition-all group">
+            <div className="flex items-center gap-3 mb-3">
+              <div className={`p-2.5 ${item.bg} rounded-xl group-hover:scale-110 transition-transform`}>
+                <item.icon className={`w-4 h-4 ${item.color}`} />
+              </div>
+              <Text className="text-[10px] font-black text-muted-foreground uppercase tracking-widest opacity-60">{item.label}</Text>
+            </div>
+            <Heading className="text-2xl font-black text-foreground tracking-tight">{item.value}</Heading>
           </div>
-          <Heading size="xl" className="text-lg sm:text-xl">{stats.total}</Heading>
-        </Card>
-        <Card className="p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <Calendar className="w-4 h-4 text-yellow-600" />
-            <Text className="text-xs text-slate-500">Pending</Text>
-          </div>
-          <Heading size="xl" className="text-lg sm:text-xl">{stats.pending}</Heading>
-        </Card>
-        <Card className="p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <TrendingUp className="w-4 h-4 text-purple-600" />
-            <Text className="text-xs text-slate-500">Processing</Text>
-          </div>
-          <Heading size="xl" className="text-lg sm:text-xl">{stats.processing}</Heading>
-        </Card>
-        <Card className="p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <DollarSign className="w-4 h-4 text-green-600" />
-            <Text className="text-xs text-slate-500">Revenue</Text>
-          </div>
-          <Heading size="xl" className="text-sm sm:text-lg">${stats.totalRevenue.toFixed(2)}</Heading>
-        </Card>
+        ))}
       </div>
 
-      {/* Filter Tabs */}
-      <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
-        <Link href="/dashboard/orders">
-          <span className={`px-3 py-2 rounded-md text-sm whitespace-nowrap ${
-            statusFilter === 'all' ? 'bg-blue-600 text-white' : 'bg-white border text-slate-700'
-          }`}>All ({stats.total})</span>
-        </Link>
-        <Link href="/dashboard/orders?status=pending">
-          <span className={`px-3 py-2 rounded-md text-sm whitespace-nowrap ${
-            statusFilter === 'pending' ? 'bg-blue-600 text-white' : 'bg-white border text-slate-700'
-          }`}>Pending ({stats.pending})</span>
-        </Link>
-        <Link href="/dashboard/orders?status=processing">
-          <span className={`px-3 py-2 rounded-md text-sm whitespace-nowrap ${
-            statusFilter === 'processing' ? 'bg-blue-600 text-white' : 'bg-white border text-slate-700'
-          }`}>Processing ({stats.processing})</span>
-        </Link>
-        <Link href="/dashboard/orders?status=delivered">
-          <span className={`px-3 py-2 rounded-md text-sm whitespace-nowrap ${
-            statusFilter === 'delivered' ? 'bg-blue-600 text-white' : 'bg-white border text-slate-700'
-          }`}>Delivered ({stats.delivered})</span>
-        </Link>
-      </div>
-
-      {/* Orders List */}
-      <Card className="overflow-hidden">
-        {filteredOrders.length === 0 ? (
-          <div className="text-center py-10">
-            <Package className="w-12 h-12 mx-auto mb-2 text-slate-300" />
-            <Text className="text-slate-500">No orders found</Text>
+      {/* Filter Tabs & Content */}
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-secondary/30 p-2 rounded-[2rem] border border-border/50">
+          <div className="flex items-center gap-1 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0 hide-scrollbar">
+            {[
+              { id: 'all', label: 'All Orders', count: stats.total },
+              { id: 'pending', label: 'Pending', count: stats.pending },
+              { id: 'processing', label: 'Processing', count: stats.processing },
+              { id: 'delivered', label: 'Delivered', count: stats.delivered },
+            ].map((tab) => (
+              <Link key={tab.id} href={tab.id === 'all' ? '/dashboard/orders' : `/dashboard/orders?status=${tab.id}`} className="flex-shrink-0">
+                <div className={`px-6 py-2.5 rounded-full text-xs font-black uppercase tracking-widest transition-all ${statusFilter === tab.id
+                    ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-105'
+                    : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
+                  }`}>
+                  {tab.label} <span className="ml-1 opacity-50">[{tab.count}]</span>
+                </div>
+              </Link>
+            ))}
           </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-slate-50 border-b">
-                <tr>
-                  <th className="text-left p-3 sm:p-4 text-xs sm:text-sm font-medium text-slate-600">Order ID</th>
-                  <th className="text-left p-3 sm:p-4 text-xs sm:text-sm font-medium text-slate-600">Date</th>
-                  <th className="text-left p-3 sm:p-4 text-xs sm:text-sm font-medium text-slate-600 hidden sm:table-cell">Customer</th>
-                  <th className="text-left p-3 sm:p-4 text-xs sm:text-sm font-medium text-slate-600">Amount</th>
-                  <th className="text-left p-3 sm:p-4 text-xs sm:text-sm font-medium text-slate-600">Status</th>
-                  <th className="text-left p-3 sm:p-4 text-xs sm:text-sm font-medium text-slate-600">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredOrders.map((order: any) => (
-                  <tr key={order.id} className="border-b hover:bg-slate-50">
-                    <td className="p-3 sm:p-4 text-xs sm:text-sm font-medium">#{order.id}</td>
-                    <td className="p-3 sm:p-4 text-xs sm:text-sm text-slate-600">
-                      {new Date(order.createdAt).toLocaleDateString()}
-                    </td>
-                    <td className="p-3 sm:p-4 text-xs sm:text-sm text-slate-600 hidden sm:table-cell">
-                      User #{order.userId}
-                    </td>
-                    <td className="p-3 sm:p-4 text-xs sm:text-sm font-medium">
-                      ${Number(order.totalAmount || 0).toFixed(2)}
-                    </td>
-                    <td className="p-3 sm:p-4">
-                      <span className={`px-2 py-1 rounded text-xs ${
-                        order.status === 'delivered' ? 'bg-green-100 text-green-700' :
-                        order.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                        order.status === 'processing' ? 'bg-blue-100 text-blue-700' :
-                        'bg-gray-100 text-gray-700'
-                      }`}>
-                        {order.status}
-                      </span>
-                    </td>
-                    <td className="p-3 sm:p-4">
-                      <Link 
-                        href={`/dashboard/orders/${order.id}`}
-                        className="text-blue-600 hover:text-blue-700 text-xs sm:text-sm"
-                      >
-                        View
-                      </Link>
-                    </td>
+          <button className="flex items-center gap-2 px-6 py-2.5 bg-card border border-border rounded-full text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-foreground transition-all">
+            <Filter className="w-3.5 h-3.5" /> More Filters
+          </button>
+        </div>
+
+        <div className="bg-card rounded-[2.5rem] border border-border overflow-hidden shadow-sm">
+          {filteredOrders.length === 0 ? (
+            <div className="py-24 flex flex-col items-center text-center px-6">
+              <div className="w-20 h-20 bg-secondary rounded-[2.5rem] flex items-center justify-center mb-6">
+                <Package className="w-10 h-10 text-muted-foreground opacity-20" />
+              </div>
+              <Text className="text-lg font-black text-foreground mb-1">No Orders Found</Text>
+              <Text className="text-sm text-muted-foreground font-medium max-w-xs">We couldn't find any orders matching your current criteria.</Text>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-border/50">
+                    <th className="px-8 py-6 text-[10px] font-black text-muted-foreground uppercase tracking-widest">Order Identifier</th>
+                    <th className="px-8 py-6 text-[10px] font-black text-muted-foreground uppercase tracking-widest">Received On</th>
+                    <th className="px-8 py-6 text-[10px] font-black text-muted-foreground uppercase tracking-widest">Fulfillment</th>
+                    <th className="px-8 py-6 text-[10px] font-black text-muted-foreground uppercase tracking-widest text-right">Order Value</th>
+                    <th className="px-8 py-6 text-[10px] font-black text-muted-foreground uppercase tracking-widest text-right">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </Card>
+                </thead>
+                <tbody className="divide-y divide-border/30">
+                  {filteredOrders.map((order: any) => (
+                    <tr key={order.id} className="hover:bg-secondary/20 transition-all group">
+                      <td className="px-8 py-6">
+                        <div className="flex flex-col">
+                          <Text className="font-black text-foreground text-sm group-hover:text-primary transition-colors">#{order.id}</Text>
+                          <Text className="text-[10px] text-muted-foreground uppercase font-medium tracking-tighter">Customer ID: {order.userId}</Text>
+                        </div>
+                      </td>
+                      <td className="px-8 py-6">
+                        <Text className="text-xs font-bold text-muted-foreground">{new Date(order.createdAt).toLocaleDateString(undefined, {
+                          month: 'short', day: 'numeric', year: 'numeric'
+                        })}</Text>
+                      </td>
+                      <td className="px-8 py-6">
+                        <div className={`inline-flex items-center px-3 py-1 rounded-full border ${order.status === 'delivered' ? 'bg-green-500/10 text-green-500 border-green-500/20' :
+                            order.status === 'pending' ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20' :
+                              'bg-blue-500/10 text-blue-500 border-blue-500/20'
+                          }`}>
+                          <Text className="text-[10px] font-black uppercase tracking-tighter">{order.status}</Text>
+                        </div>
+                      </td>
+                      <td className="px-8 py-6 text-right">
+                        <Text className="font-black text-foreground text-sm">₦{Number(order.totalAmount || 0).toLocaleString()}</Text>
+                      </td>
+                      <td className="px-8 py-6 text-right">
+                        <Link
+                          href={`/dashboard/orders/${order.id}`}
+                          className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-secondary text-foreground hover:bg-primary hover:text-primary-foreground transition-all active:scale-95 shadow-sm"
+                        >
+                          <ArrowRight className="w-4 h-4" />
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

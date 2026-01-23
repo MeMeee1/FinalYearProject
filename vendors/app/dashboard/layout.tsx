@@ -8,8 +8,9 @@ import { redirect } from 'next/navigation';
 import { Text } from '@/components/ui/text';
 import Link from 'next/link';
 import { Icon } from '@/components/ui/icon';
-import { LayoutGrid, ShoppingBag, TrendingUp, Settings as SettingsIcon, Star } from 'lucide-react';
+import { LayoutGrid, ShoppingBag, TrendingUp, Settings as SettingsIcon, Star, Bell } from 'lucide-react';
 import { VendorProfileSync } from '@/components/VendorProfileSync';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 type DashboardLayoutProps = {
   children: React.ReactNode;
@@ -18,12 +19,9 @@ type DashboardLayoutProps = {
 async function getVendorProfileServer() {
   try {
     const token = cookies().get('token')?.value;
-    console.log('[LAYOUT] Token exists:', !!token);
     if (!token) return null;
 
     const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-    console.log('[LAYOUT] Fetching vendor profile from:', `${API_URL}/vendors/profile/me`);
-
     const res = await fetch(`${API_URL}/vendors/profile/me`, {
       cache: 'no-store',
       next: { revalidate: 0 },
@@ -34,18 +32,8 @@ async function getVendorProfileServer() {
       },
     });
 
-    console.log('[LAYOUT] Response status:', res.status);
-
-    if (!res.ok) {
-      console.log('[LAYOUT] Response not OK, returning null');
-      return null;
-    }
-
-    const profile = await res.json();
-    console.log('[LAYOUT] Vendor profile FULL:', JSON.stringify(profile, null, 2));
-    console.log('[LAYOUT] Vendor STATUS:', profile.status, 'Type:', typeof profile.status);
-
-    return profile;
+    if (!res.ok) return null;
+    return await res.json();
   } catch (error) {
     console.error('[LAYOUT] Error fetching vendor profile:', error);
     return null;
@@ -62,19 +50,16 @@ export default async function DashboardLayout({ children }: DashboardLayoutProps
   const vendorProfile = await getVendorProfileServer();
   const isActive = vendorProfile?.status === 'active';
 
-  console.log('[LAYOUT] Vendor profile result:', vendorProfile);
-  console.log('[LAYOUT] Is Active:', isActive, '(status:', vendorProfile?.status, ')');
-
   return (
     <>
       <VendorProfileSync initialProfile={vendorProfile} />
-      <div className="h-screen flex flex-col overflow-hidden">
+      <div className="h-screen flex flex-col overflow-hidden bg-background text-foreground">
         {/* Header */}
-        <Header />
+        <Header vendorProfile={vendorProfile} />
 
         <div className="flex flex-1 overflow-hidden">
           <Sidebar isActive={isActive} />
-          <Box className="flex-1 overflow-y-auto bg-gray-50 p-2 sm:p-4 pb-20 md:pb-4">{children}</Box>
+          <Box className="flex-1 overflow-y-auto bg-background/50 p-2 sm:p-6 pb-20 md:pb-6">{children}</Box>
         </div>
 
         <MobileNavbar isActive={isActive} />
@@ -83,92 +68,127 @@ export default async function DashboardLayout({ children }: DashboardLayoutProps
   );
 }
 
-function Header() {
+function Header({ vendorProfile }: { vendorProfile: any }) {
   return (
-    <HStack className="p-4 sm:p-5 border-b border-gray-200 justify-between items-center flex-shrink-0 bg-white shadow-sm">
-      <div className="flex items-center gap-2">
-        <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-          <span className="text-white font-bold text-sm">V</span>
+    <header className="h-20 px-4 sm:px-8 border-b border-border bg-card/80 backdrop-blur-md flex items-center justify-between sticky top-0 z-30">
+      <div className="flex items-center gap-4">
+        <div className="w-11 h-11 bg-primary rounded-2xl flex items-center justify-center shadow-lg shadow-primary/20 rotate-3">
+          <Icon as={ShoppingBag} className="text-primary-foreground w-6 h-6 -rotate-3" />
         </div>
-        <Heading className="text-lg sm:text-xl font-bold text-gray-900">Vendor Hub</Heading>
+        <div className="flex flex-col">
+          <Heading className="text-xl font-bold tracking-tight text-foreground leading-none mb-1">Vendor Hub</Heading>
+          <Text className="text-[10px] font-bold text-primary uppercase tracking-[0.2em]">Premium Dashboard</Text>
+        </div>
       </div>
 
-      <div className="flex items-center gap-3">
-        <div className="hidden sm:flex flex-col items-end">
-          <Text className="text-sm font-medium text-gray-900">Vendor Store</Text>
-          <Text className="text-xs text-gray-500">Manage your business</Text>
+      <div className="flex items-center gap-3 sm:gap-6">
+        <div className="hidden sm:flex items-center gap-3 px-4 py-2 bg-secondary/50 rounded-2xl border border-border/50">
+          <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+          <Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Live System</Text>
         </div>
-        <Link href="/dashboard/settings" className="hover:opacity-80 transition-opacity">
-          <Avatar className="w-10 h-10 bg-blue-100 border-2 border-blue-200">
-            <AvatarFallbackText className="text-blue-700 font-semibold">VH</AvatarFallbackText>
-          </Avatar>
-        </Link>
+
+        <div className="flex items-center gap-2 px-1 border-x border-border/50 hidden sm:flex">
+          <button className="p-2 rounded-xl hover:bg-secondary text-muted-foreground transition-all">
+            <Bell className="w-5 h-5" />
+          </button>
+          <ThemeToggle />
+        </div>
+
+        <div className="flex items-center gap-3 pl-2">
+          <div className="hidden md:flex flex-col items-end">
+            <Text className="text-sm font-bold text-foreground leading-none mb-1">{vendorProfile?.storeName || 'Vendor'}</Text>
+            <Text className="text-[10px] text-muted-foreground font-medium uppercase tracking-tighter">Verified Merchant</Text>
+          </div>
+          <Link href="/dashboard/settings" className="transition-all hover:scale-105 active:scale-95">
+            <Avatar className="w-11 h-11 bg-primary/10 border-2 border-primary/20 p-0.5 rounded-2xl">
+              <AvatarFallbackText className="text-primary font-bold">{vendorProfile?.storeName?.[0] || 'V'}</AvatarFallbackText>
+            </Avatar>
+          </Link>
+        </div>
       </div>
-    </HStack>
+    </header>
   );
 }
 
 function Sidebar({ isActive }: { isActive: boolean }) {
   const allMenuItems = [
-    { href: '/dashboard', label: 'Dashboard', icon: LayoutGrid, alwaysShow: true },
+    { href: '/dashboard', label: 'Overview', icon: LayoutGrid, alwaysShow: true },
     { href: '/dashboard/products', label: 'Products', icon: ShoppingBag, alwaysShow: false },
-    { href: '/dashboard/orders', label: 'Orders', icon: ShoppingBag, alwaysShow: false },
-    { href: '/dashboard/reviews', label: 'Reviews', icon: Star, alwaysShow: false },
+    { href: '/dashboard/orders', label: 'Order Hub', icon: ShoppingBag, alwaysShow: false },
+    { href: '/dashboard/reviews', label: 'Feedbacks', icon: Star, alwaysShow: false },
     { href: '/dashboard/analytics', label: 'Analytics', icon: TrendingUp, alwaysShow: false },
+    { href: '/dashboard/settings', label: 'Account', icon: SettingsIcon, alwaysShow: true },
   ];
 
   const menuItems = allMenuItems.filter(item => item.alwaysShow || isActive);
 
   return (
-    <VStack className="w-56 p-5 border-r border-gray-200 gap-1 bg-white hidden md:flex flex-shrink-0">
-      <div className="mb-4">
-        <Text className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 mb-2">Menu</Text>
+    <aside className="w-72 p-6 border-r border-border bg-card hidden md:flex flex-col flex-shrink-0">
+      <div className="space-y-8">
+        <div>
+          <Text className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] px-4 mb-6 opacity-50">Main Navigation</Text>
+          <nav className="space-y-1.5">
+            {menuItems.map((item) => (
+              <Link key={item.href} href={item.href} className="block group">
+                <HStack className="hover:bg-primary/10 hover:translate-x-1 transition-all py-3.5 px-4 rounded-2xl items-center gap-4 relative overflow-hidden group-active:scale-95">
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary absolute -left-0.5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <Icon
+                    as={item.icon}
+                    className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors"
+                  />
+                  <Text className="text-sm font-bold text-muted-foreground group-hover:text-foreground transition-colors tracking-tight">
+                    {item.label}
+                  </Text>
+                </HStack>
+              </Link>
+            ))}
+          </nav>
+        </div>
+
+        <div className="pt-8 border-t border-border/30">
+          <div className="bg-gradient-to-br from-primary/20 to-primary/5 p-5 rounded-3xl border border-primary/20">
+            <Text className="block text-xs font-black text-primary uppercase tracking-wider mb-2">
+              Vendor Support
+            </Text>
+
+            <Text className="block text-[11px] text-muted-foreground font-medium mb-4 leading-relaxed">
+              Need help managing your store or products?
+            </Text>
+
+            <button className="w-full py-2.5 bg-primary text-primary-foreground rounded-xl text-xs font-bold shadow-lg shadow-primary/20 hover:scale-105 transition-transform active:scale-95">
+              Contact Center
+            </button>
+          </div>
+        </div>
       </div>
 
-      {menuItems.map((item) => (
-        <Link key={item.href} href={item.href} className="w-full">
-          <Text className="hover:text-blue-600 hover:bg-blue-50 transition-colors py-3 px-3 rounded-lg font-medium text-gray-700">
-            {item.label}
-          </Text>
-        </Link>
-      ))}
-
-
-    </VStack>
+      <div className="mt-auto pt-6">
+        <Text className="text-[10px] text-muted-foreground/50 font-medium text-center tracking-tight">
+          Final Year Project v1.0
+        </Text>
+      </div>
+    </aside>
   );
 }
 
 function MobileNavbar({ isActive }: { isActive: boolean }) {
+  const mobileItems = [
+    { href: '/dashboard', label: 'Home', icon: LayoutGrid, alwaysShow: true },
+    { href: '/dashboard/products', label: 'Items', icon: ShoppingBag, alwaysShow: false },
+    { href: '/dashboard/orders', label: 'Orders', icon: ShoppingBag, alwaysShow: false },
+    { href: '/dashboard/settings', label: 'More', icon: SettingsIcon, alwaysShow: true },
+  ];
+
+  const menuItems = mobileItems.filter(item => item.alwaysShow || isActive);
+
   return (
-    <HStack className="fixed bottom-0 left-0 right-0 p-3 border-t border-gray-200 gap-2 bg-white justify-around md:hidden shadow-xl z-50">
-      <Link href="/dashboard" className="flex flex-col items-center gap-1 flex-1">
-        <Icon as={LayoutGrid} className="w-5 h-5 text-gray-600" />
-        <span className="text-xs text-gray-600 font-medium">Home</span>
-      </Link>
-
-      {isActive && (
-        <>
-          <Link href="/dashboard/products" className="flex flex-col items-center gap-1 flex-1">
-            <Icon as={ShoppingBag} className="w-5 h-5 text-gray-600" />
-            <span className="text-xs text-gray-600 font-medium">Products</span>
-          </Link>
-
-          <Link href="/dashboard/orders" className="flex flex-col items-center gap-1 flex-1">
-            <Icon as={ShoppingBag} className="w-5 h-5 text-gray-600" />
-            <span className="text-xs text-gray-600 font-medium">Orders</span>
-          </Link>
-
-          <Link href="/dashboard/reviews" className="flex flex-col items-center gap-1 flex-1">
-            <Icon as={Star} className="w-5 h-5 text-gray-600" />
-            <span className="text-xs text-gray-600 font-medium">Reviews</span>
-          </Link>
-
-          <Link href="/dashboard/analytics" className="flex flex-col items-center gap-1 flex-1">
-            <Icon as={TrendingUp} className="w-5 h-5 text-gray-600" />
-            <span className="text-xs text-gray-600 font-medium">Analytics</span>
-          </Link>
-        </>
-      )}
-    </HStack>
+    <nav className="fixed bottom-0 left-0 right-0 p-4 border-t border-border bg-card/90 backdrop-blur-xl flex justify-around md:hidden shadow-[0_-10px_30px_rgba(0,0,0,0.05)] z-50 rounded-t-[2.5rem]">
+      {menuItems.map((item) => (
+        <Link key={item.href} href={item.href} className="flex flex-col items-center gap-1.5 py-1 px-4 rounded-2xl active:bg-secondary transition-all">
+          <Icon as={item.icon} className="w-5 h-5 text-muted-foreground" />
+          <span className="text-[10px] text-muted-foreground font-black uppercase tracking-tighter">{item.label}</span>
+        </Link>
+      ))}
+    </nav>
   );
 }

@@ -4,8 +4,30 @@ import { useState, useRef } from 'react';
 import { z } from 'zod';
 import { handleVendorSignup } from './actions';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { ArrowLeft, ArrowRight, Eye, EyeOff, X, UploadCloud, ChevronDown, AlertCircle } from 'lucide-react-native';
+import {
+  ArrowLeft,
+  ArrowRight,
+  Eye,
+  EyeOff,
+  X,
+  UploadCloud,
+  ChevronDown,
+  AlertCircle,
+  CheckCircle2,
+  Lock,
+  Mail,
+  User,
+  Building2,
+  Store,
+  Phone,
+  MapPin,
+  Camera,
+  Image as ImageIcon,
+  Activity
+} from 'lucide-react';
 import { API_URL } from '@/config';
+import { Heading } from '@/components/ui/heading';
+import { Text } from '@/components/ui/text';
 
 type FormData = {
   email: string;
@@ -56,178 +78,12 @@ const step4Schema = z.object({
   storeBanner: z.string().url().optional().or(z.literal('')),
 });
 
-const ImageUploadField = ({
-  label,
-  value,
-  onChange,
-  error,
-}: {
-  label: string;
-  value: string;
-  onChange: (url: string) => void;
-  error?: string;
-}) => {
-  const [loading, setLoading] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setLoading(true);
-    try {
-      const formData = new FormData();
-      formData.append('image', file);
-
-      const res = await fetch(`${API_URL}/upload/image`, {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!res.ok) throw new Error('Upload failed');
-
-      const data = await res.json();
-      onChange(data.url);
-    } catch (err) {
-      console.error(err);
-      alert('Failed to upload image. Please try again.');
-    } finally {
-      setLoading(false);
-      if (inputRef.current) inputRef.current.value = '';
-    }
-  };
-
-  return (
-    <div className="mb-4">
-      <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
-      <div
-        className={`relative border-2 border-dashed rounded-xl p-4 h-32 flex flex-col items-center justify-center transition-all cursor-pointer bg-gray-50 hover:bg-gray-100 hover:border-gray-400 ${error ? 'border-red-500 bg-red-50' : 'border-gray-200'}`}
-        onClick={() => !value && inputRef.current?.click()}
-      >
-        {value ? (
-          <div className="relative w-full h-full flex justify-center items-center group">
-            <img
-              src={value}
-              alt="Preview"
-              className="w-full h-full object-contain rounded"
-            />
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onChange('');
-              }}
-              className="absolute -top-3 -right-3 bg-white text-red-500 rounded-full p-1.5 shadow-md border border-gray-100 hover:scale-110 transition-transform"
-            >
-              <X size={16} />
-            </button>
-          </div>
-        ) : (
-          <div className="flex flex-col items-center text-center">
-            <div className="p-2 bg-blue-50 rounded-full mb-2 text-blue-600">
-              <UploadCloud size={20} />
-            </div>
-            <span className="text-sm font-medium text-gray-600">
-              {loading ? 'Uploading...' : 'Click to Upload'}
-            </span>
-          </div>
-        )}
-        <input
-          type="file"
-          ref={inputRef}
-          className="hidden"
-          accept="image/*"
-          onChange={handleUpload}
-          disabled={loading}
-        />
-      </div>
-      {error && <p className="text-red-500 text-xs mt-1 font-medium flex items-center gap-1">
-        <AlertCircle size={12} /> {error}
-      </p>}
-    </div>
-  );
-};
-
-const FormInput = ({
-  label,
-  value,
-  onChange,
-  placeholder,
-  type = 'text',
-  error,
-  rightElement
-}: {
-  label: string,
-  value: string,
-  onChange: (val: string) => void,
-  placeholder?: string,
-  type?: string,
-  error?: string,
-  rightElement?: React.ReactNode
-}) => (
-  <div className="mb-4">
-    <label className="block text-sm font-medium text-gray-700 mb-1.5">{label}</label>
-    <div className="relative">
-      <input
-        type={type}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        className={`w-full px-4 py-2.5 rounded-lg border bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all 
-          ${error ? 'border-red-300 focus:border-red-500' : 'border-gray-300 focus:border-blue-500 text-gray-900'}
-          placeholder:text-gray-400 text-sm`}
-      />
-      {rightElement && (
-        <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center">
-          {rightElement}
-        </div>
-      )}
-    </div>
-    {error && <p className="text-red-500 text-xs mt-1.5 font-medium flex items-center gap-1">
-      {error}
-    </p>}
-  </div>
-);
-
-const FormSelect = ({
-  label,
-  value,
-  options,
-  onChange,
-  error
-}: {
-  label: string,
-  value: string,
-  options: { label: string, value: string }[],
-  onChange: (val: string) => void,
-  error?: string
-}) => (
-  <div className="mb-4">
-    <label className="block text-sm font-medium text-gray-700 mb-1.5">{label}</label>
-    <div className="relative">
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className={`w-full appearance-none px-4 py-2.5 rounded-lg border bg-white focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all cursor-pointer
-                    ${error ? 'border-red-300 focus:border-red-500' : 'border-gray-300 focus:border-blue-500 text-gray-900'}
-                    text-sm`}
-      >
-        {options.map(opt => (
-          <option key={opt.value} value={opt.value}>{opt.label}</option>
-        ))}
-      </select>
-      <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
-        <ChevronDown size={16} />
-      </div>
-    </div>
-    {error && <p className="text-red-500 text-xs mt-1.5 font-medium">{error}</p>}
-  </div>
-);
-
 export default function SignUpPage() {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const searchParams = useSearchParams();
   const serverError = searchParams.get('errorMessage');
 
@@ -277,6 +133,7 @@ export default function SignUpPage() {
   };
 
   const handleSubmit = async () => {
+    setIsSubmitting(true);
     const vendorData = {
       name: `${formData.firstName} ${formData.lastName}`,
       phone: formData.phone,
@@ -294,164 +151,294 @@ export default function SignUpPage() {
       storeBanner: formData.storeBanner,
     };
 
-    const result = await handleVendorSignup(formData.email, formData.password, vendorData);
-
-    if (result?.error) {
-      setErrors((prev) => ({ ...prev, email: result.error }));
-      alert(result.error);
+    try {
+      const result = await handleVendorSignup(formData.email, formData.password, vendorData);
+      if (result?.error) {
+        setErrors((prev) => ({ ...prev, email: result.error }));
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  const lgaOptions = [
-    { label: 'Abaji', value: 'Abaji' },
-    { label: 'Abuja Municipal (AMAC)', value: 'Abuja Municipal' },
-    { label: 'Bwari', value: 'Bwari' },
-    { label: 'Gwagwalada', value: 'Gwagwalada' },
-    { label: 'Kuje', value: 'Kuje' },
-    { label: 'Kwali', value: 'Kwali' },
-  ];
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50/50 p-4 font-sans">
-      <div className="w-full max-w-lg bg-white p-8 rounded-2xl border border-gray-100 shadow-xl shadow-gray-200/50">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4 relative overflow-hidden">
+      {/* Background Decor */}
+      <div className="absolute top-0 -left-20 w-96 h-96 bg-primary/10 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-0 -right-20 w-[30rem] h-[30rem] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
 
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Vendor Application</h1>
-          <p className="text-sm text-gray-500 mt-2">Join our marketplace and start selling today.</p>
-        </div>
+      <div className="w-full max-w-2xl animate-in fade-in slide-in-from-bottom-8 duration-1000">
+        <div className="bg-card rounded-[3rem] shadow-2xl shadow-primary/5 border border-border overflow-hidden relative backdrop-blur-sm">
 
-        {/* Progress Steps */}
-        <div className="flex gap-2 mb-8">
-          {[1, 2, 3, 4].map((s) => (
-            <div key={s} className="flex-1 h-1.5 rounded-full overflow-hidden bg-gray-100">
-              <div
-                className={`h-full transition-all duration-500 ease-out ${s <= step ? 'bg-blue-600 w-full' : 'w-0'}`}
-              />
+          {/* Header */}
+          <div className="p-10 pb-4 flex flex-col items-center text-center space-y-4">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center">
+                <Store className="text-primary w-6 h-6" />
+              </div>
+              <div className="h-6 w-px bg-border" />
+              <div className="flex flex-col items-start">
+                <Text className="text-[10px] font-black text-primary uppercase tracking-[0.2em] leading-none mb-1">Onboarding</Text>
+                <Heading className="text-xl font-black text-foreground leading-none">Step {step} of 4</Heading>
+              </div>
             </div>
-          ))}
-        </div>
+            <div className="space-y-1">
+              <Heading className="text-3xl font-black tracking-tighter text-foreground">Join the Hub</Heading>
+              <Text className="text-muted-foreground font-medium text-sm">Scale your business with our enterprise infrastructure.</Text>
+            </div>
+          </div>
 
-        {step === 1 && (
-          <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Account Credentials</h2>
+          {/* Progress Bar */}
+          <div className="px-10 flex gap-2 mb-8">
+            {[1, 2, 3, 4].map((s) => (
+              <div key={s} className="flex-1 h-1.5 rounded-full bg-secondary overflow-hidden relative">
+                <div
+                  className={`absolute inset-0 bg-primary transition-all duration-700 ease-out ${s <= step ? 'translate-x-0' : '-translate-x-full'}`}
+                />
+              </div>
+            ))}
+          </div>
 
-            <FormInput
-              label="Email Address"
-              placeholder="name@company.com"
-              value={formData.email}
-              onChange={(v) => updateField('email', v)}
-              error={errors.email}
-            />
+          {/* Form Content */}
+          <div className="p-10 pt-4 space-y-8">
+            <div className="min-h-[400px]">
+              {step === 1 && (
+                <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
+                  <div className="flex items-center gap-3 border-b border-border/50 pb-4">
+                    <Lock className="w-5 h-5 text-primary" />
+                    <Text className="text-sm font-black text-foreground uppercase tracking-widest">Authentication</Text>
+                  </div>
+                  <div className="space-y-6">
+                    <FormInput
+                      label="Institutional Email"
+                      icon={Mail}
+                      placeholder="you@enterprise.com"
+                      value={formData.email}
+                      onChange={(v) => updateField('email', v)}
+                      error={errors.email}
+                    />
+                    <FormInput
+                      label="Access Password"
+                      icon={Lock}
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder="Min. 6 high-security chars"
+                      value={formData.password}
+                      onChange={(v) => updateField('password', v)}
+                      error={errors.password}
+                      rightElement={
+                        <button onClick={() => setShowPassword(!showPassword)} className="text-muted-foreground hover:text-foreground">
+                          {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </button>
+                      }
+                    />
+                  </div>
+                </div>
+              )}
 
-            <FormInput
-              label="Password"
-              type={showPassword ? 'text' : 'password'}
-              placeholder="••••••••"
-              value={formData.password}
-              onChange={(v) => updateField('password', v)}
-              error={errors.password}
-              rightElement={
+              {step === 2 && (
+                <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
+                  <div className="flex items-center gap-3 border-b border-border/50 pb-4">
+                    <User className="w-5 h-5 text-primary" />
+                    <Text className="text-sm font-black text-foreground uppercase tracking-widest">Representative Profile</Text>
+                  </div>
+                  <div className="grid grid-cols-2 gap-6">
+                    <FormInput label="First Name" icon={User} placeholder="James" value={formData.firstName} onChange={v => updateField('firstName', v)} error={errors.firstName} />
+                    <FormInput label="Surname" icon={User} placeholder="Bond" value={formData.lastName} onChange={v => updateField('lastName', v)} error={errors.lastName} />
+                  </div>
+                  <FormInput label="Direct Line" icon={Phone} placeholder="+234..." value={formData.phone} onChange={v => updateField('phone', v)} error={errors.phone} />
+                  <FormInput label="Home Residence" icon={MapPin} placeholder="Primary address" value={formData.address} onChange={v => updateField('address', v)} error={errors.address} />
+                  <div className="grid grid-cols-2 gap-6">
+                    <FormSelect label="City Hub" icon={MapPin} value={formData.city} options={[{ label: 'Abuja', value: 'Abuja' }]} onChange={v => updateField('city', v)} error={errors.city} />
+                    <FormSelect label="Jurisdiction (LGA)" icon={MapPin} value={formData.lga} options={[
+                      { label: 'Abaji', value: 'Abaji' },
+                      { label: 'AMAC', value: 'Abuja Municipal' },
+                      { label: 'Bwari', value: 'Bwari' },
+                      { label: 'Gwagwalada', value: 'Gwagwalada' },
+                      { label: 'Kuje', value: 'Kuje' },
+                      { label: 'Kwali', value: 'Kwali' },
+                    ]} onChange={v => updateField('lga', v)} error={errors.lga} />
+                  </div>
+                </div>
+              )}
+
+              {step === 3 && (
+                <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
+                  <div className="flex items-center gap-3 border-b border-border/50 pb-4">
+                    <Building2 className="w-5 h-5 text-primary" />
+                    <Text className="text-sm font-black text-foreground uppercase tracking-widest">Corporate Identity</Text>
+                  </div>
+                  <FormInput label="Registered Entity Name" icon={Building2} placeholder="Legal Enterprise Ltd." value={formData.businessName} onChange={v => updateField('businessName', v)} error={errors.businessName} />
+                  <FormInput label="Headquarters Address" icon={MapPin} placeholder="Commercial address" value={formData.businessAddress} onChange={v => updateField('businessAddress', v)} error={errors.businessAddress} />
+                  <div className="grid grid-cols-2 gap-6">
+                    <FormInput label="Corporate Email" icon={Mail} placeholder="ops@enterprise.com" value={formData.businessEmail} onChange={v => updateField('businessEmail', v)} error={errors.businessEmail} />
+                    <FormInput label="Corporate Phone" icon={Phone} placeholder="+234..." value={formData.businessPhone} onChange={v => updateField('businessPhone', v)} error={errors.businessPhone} />
+                  </div>
+                </div>
+              )}
+
+              {step === 4 && (
+                <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
+                  <div className="flex items-center gap-3 border-b border-border/50 pb-4">
+                    <Store className="w-5 h-5 text-primary" />
+                    <Text className="text-sm font-black text-foreground uppercase tracking-widest">Retail Config</Text>
+                  </div>
+                  <FormInput label="Marketplace Store Name" icon={Store} placeholder="Premium Retail Store" value={formData.storeName} onChange={v => updateField('storeName', v)} error={errors.storeName} />
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-2">Brand Story</label>
+                    <textarea
+                      value={formData.storeDescription}
+                      onChange={(e) => updateField('storeDescription', e.target.value)}
+                      placeholder="What makes your store unique?"
+                      className="w-full px-6 py-4 bg-secondary/30 border border-border rounded-2xl text-sm font-medium focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all resize-none h-32"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-6">
+                    <ImageUploadField label="Store Logo" value={formData.storeLogo} onChange={v => updateField('storeLogo', v)} error={errors.storeLogo} />
+                    <ImageUploadField label="Brand Banner" value={formData.storeBanner} onChange={v => updateField('storeBanner', v)} error={errors.storeBanner} />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Pagination Controls */}
+            <div className="flex gap-4 pt-10 border-t border-border/50">
+              {step > 1 && (
                 <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="text-gray-400 hover:text-gray-600"
+                  onClick={() => setStep(step - 1)}
+                  className="flex-1 px-8 py-4 bg-secondary/50 hover:bg-secondary text-foreground rounded-2xl font-black text-xs uppercase tracking-widest transition-all active:scale-[0.98] border border-border flex items-center justify-center gap-2"
                 >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  <ArrowLeft size={16} /> Previous Cycle
                 </button>
-              }
-            />
-
-            <button
-              onClick={() => validateStep(1) && setStep(2)}
-              className="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg shadow-sm shadow-blue-200 transition-all flex items-center justify-center gap-2 group"
-            >
-              Next Step
-              <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-            </button>
-          </div>
-        )}
-
-        {step === 2 && (
-          <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Personal Details</h2>
-
-            <div className="grid grid-cols-2 gap-4">
-              <FormInput label="First Name" placeholder="John" value={formData.firstName} onChange={v => updateField('firstName', v)} error={errors.firstName} />
-              <FormInput label="Last Name" placeholder="Doe" value={formData.lastName} onChange={v => updateField('lastName', v)} error={errors.lastName} />
-            </div>
-
-            <FormInput label="Phone Number" placeholder="+234..." value={formData.phone} onChange={v => updateField('phone', v)} error={errors.phone} />
-            <FormInput label="Personal Address" placeholder="123 Home St" value={formData.address} onChange={v => updateField('address', v)} error={errors.address} />
-
-            <div className="grid grid-cols-2 gap-4">
-              <FormSelect label="City" value={formData.city} options={[{ label: 'Abuja', value: 'Abuja' }]} onChange={v => updateField('city', v)} error={errors.city} />
-              <FormSelect label="Area Council (LGA)" value={formData.lga} options={lgaOptions} onChange={v => updateField('lga', v)} error={errors.lga} />
-            </div>
-
-            <FormSelect label="Country" value={formData.country} options={[{ label: 'Nigeria', value: 'Nigeria' }]} onChange={v => updateField('country', v)} error={errors.country} />
-
-            <div className="flex gap-3 mt-6">
-              <button onClick={() => setStep(1)} className="flex-1 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 font-medium py-3 rounded-lg flex items-center justify-center gap-2"><ArrowLeft size={18} /> Back</button>
-              <button onClick={() => validateStep(2) && setStep(3)} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg shadow-sm shadow-blue-200 flex items-center justify-center gap-2 group">Next Step <ArrowRight size={18} className="group-hover:translate-x-1" /></button>
+              )}
+              {step < 4 ? (
+                <button
+                  onClick={() => validateStep(step) && setStep(step + 1)}
+                  className="flex-[2] px-8 py-4 bg-primary text-primary-foreground rounded-2xl font-black text-xs uppercase tracking-widest transition-all hover:scale-[1.02] active:scale-[0.98] shadow-xl shadow-primary/20 flex items-center justify-center gap-2"
+                >
+                  Initialize Step {step + 1} <ArrowRight size={16} />
+                </button>
+              ) : (
+                <button
+                  onClick={() => validateStep(4) && !isSubmitting && handleSubmit()}
+                  disabled={isSubmitting}
+                  className="flex-[2] px-8 py-4 bg-primary text-primary-foreground rounded-2xl font-black text-xs uppercase tracking-widest transition-all hover:scale-[1.02] active:scale-[0.98] shadow-xl shadow-primary/20 flex items-center justify-center gap-2"
+                >
+                  {isSubmitting ? <Activity className="w-4 h-4 animate-spin" /> : 'Finalize Onboarding'}
+                  {!isSubmitting && <CheckCircle2 size={16} />}
+                </button>
+              )}
             </div>
           </div>
-        )}
 
-        {step === 3 && (
-          <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Business Details</h2>
-
-            <FormInput label="Business Name" placeholder="Legal Business Name" value={formData.businessName} onChange={v => updateField('businessName', v)} error={errors.businessName} />
-            <FormInput label="Business Address" placeholder="123 Market St" value={formData.businessAddress} onChange={v => updateField('businessAddress', v)} error={errors.businessAddress} />
-            <div className="grid grid-cols-2 gap-4">
-              <FormInput label="Business Email" placeholder="contact@biz.com" value={formData.businessEmail} onChange={v => updateField('businessEmail', v)} error={errors.businessEmail} />
-              <FormInput label="Business Phone" placeholder="+234..." value={formData.businessPhone} onChange={v => updateField('businessPhone', v)} error={errors.businessPhone} />
+          {serverError && (
+            <div className="mx-10 mb-10 p-4 bg-destructive/10 border border-destructive/20 rounded-2xl flex items-start gap-3 text-destructive animate-in bounce-in">
+              <AlertCircle size={18} className="shrink-0 mt-0.5" />
+              <Text className="text-xs font-bold">{serverError}</Text>
             </div>
+          )}
 
-            <div className="flex gap-3 mt-6">
-              <button onClick={() => setStep(2)} className="flex-1 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 font-medium py-3 rounded-lg flex items-center justify-center gap-2"><ArrowLeft size={18} /> Back</button>
-              <button onClick={() => validateStep(3) && setStep(4)} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg shadow-sm shadow-blue-200 flex items-center justify-center gap-2 group">Next Step <ArrowRight size={18} className="group-hover:translate-x-1" /></button>
-            </div>
+          <div className="p-8 bg-secondary/20 text-center border-t border-border/50">
+            <Text className="text-[10px] text-muted-foreground font-medium uppercase tracking-tighter">
+              Institutional Onboarding Protocol &bull; Step {step}/4
+            </Text>
           </div>
-        )}
-
-        {step === 4 && (
-          <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Store Setup</h2>
-
-            <FormInput label="Store Name" placeholder="My Awesome Store" value={formData.storeName} onChange={v => updateField('storeName', v)} error={errors.storeName} />
-            <FormInput label="Description" placeholder="What do you sell?" value={formData.storeDescription} onChange={v => updateField('storeDescription', v)} error={errors.storeDescription} />
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <ImageUploadField label="Store Logo" value={formData.storeLogo} onChange={v => updateField('storeLogo', v)} error={errors.storeLogo} />
-              <ImageUploadField label="Store Banner" value={formData.storeBanner} onChange={v => updateField('storeBanner', v)} error={errors.storeBanner} />
-            </div>
-
-            <div className="flex gap-3 mt-6">
-              <button
-                onClick={() => setStep(3)}
-                className="flex-1 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 font-medium py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
-              >
-                <ArrowLeft size={18} /> Back
-              </button>
-              <button
-                onClick={() => validateStep(4) && handleSubmit()}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg shadow-sm shadow-blue-200 transition-all flex items-center justify-center gap-2"
-              >
-                Complete Signup <ArrowRight size={18} />
-              </button>
-            </div>
-          </div>
-        )}
-
-        {serverError && (
-          <div className="mt-6 p-4 bg-red-50 rounded-lg border border-red-100 flex items-start gap-3">
-            <AlertCircle className="text-red-500 mt-0.5" size={20} />
-            <p className="text-sm text-red-700 font-medium">{serverError}</p>
-          </div>
-        )}
+        </div>
       </div>
     </div>
   );
 }
+
+/* HELPER COMPONENTS */
+
+const FormInput = ({ label, icon: IconComponent, value, onChange, placeholder, type = 'text', error, rightElement }: any) => (
+  <div className="space-y-2">
+    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] ml-2">{label}</label>
+    <div className="relative group">
+      {IconComponent && <IconComponent className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />}
+      <input
+        type={type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className={`w-full ${IconComponent ? 'pl-14' : 'px-6'} pr-6 py-4 rounded-2xl border bg-secondary/30 focus:bg-card focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none text-foreground font-bold placeholder:text-muted-foreground/40 text-sm ${error ? 'border-destructive/50 ring-destructive/10' : 'border-border'}`}
+      />
+      {rightElement && (
+        <div className="absolute right-5 top-1/2 -translate-y-1/2">
+          {rightElement}
+        </div>
+      )}
+    </div>
+    {error && <Text className="text-[10px] font-bold text-destructive ml-2 tracking-tight">{error}</Text>}
+  </div>
+);
+
+const FormSelect = ({ label, icon: IconComponent, value, options, onChange, error }: any) => (
+  <div className="space-y-2">
+    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] ml-2">{label}</label>
+    <div className="relative group">
+      {IconComponent && <IconComponent className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />}
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className={`w-full ${IconComponent ? 'pl-14' : 'px-6'} pr-12 py-4 rounded-2xl border bg-secondary/30 focus:bg-card focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none text-foreground font-bold appearance-none cursor-pointer text-sm ${error ? 'border-destructive/50' : 'border-border'}`}
+      >
+        {options.map((opt: any) => (
+          <option key={opt.value} value={opt.value}>{opt.label}</option>
+        ))}
+      </select>
+      <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+    </div>
+    {error && <Text className="text-[10px] font-bold text-destructive ml-2 tracking-tight">{error}</Text>}
+  </div>
+);
+
+const ImageUploadField = ({ label, value, onChange, error }: any) => {
+  const [loading, setLoading] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleUpload = async (e: any) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setLoading(true);
+    try {
+      const fd = new FormData();
+      fd.append('image', file);
+      const res = await fetch(`${API_URL}/upload/image`, { method: 'POST', body: fd });
+      const data = await res.json();
+      onChange(data.url);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      <label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] ml-2">{label}</label>
+      <div
+        className={`relative h-32 rounded-2xl border-2 border-dashed flex flex-col items-center justify-center transition-all cursor-pointer group hover:bg-primary/5 hover:border-primary ${value ? 'border-primary/20 bg-primary/5' : 'border-border bg-secondary/30'} ${error ? 'border-destructive/50' : ''}`}
+        onClick={() => !value && !loading && inputRef.current?.click()}
+      >
+        {value ? (
+          <div className="relative w-full h-full p-2">
+            <img src={value} className="w-full h-full object-contain rounded-xl" alt="Preview" />
+            <button
+              onClick={(e) => { e.stopPropagation(); onChange(''); }}
+              className="absolute -top-2 -right-2 w-8 h-8 bg-card border border-border rounded-full flex items-center justify-center text-destructive shadow-lg hover:scale-110 active:scale-90 transition-all"
+            >
+              <X size={14} />
+            </button>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-2">
+            <div className={`p-3 rounded-xl ${loading ? 'bg-primary/10' : 'bg-card'} border border-border group-hover:bg-primary group-hover:text-primary-foreground transition-all`}>
+              {loading ? <Activity className="w-5 h-5 animate-spin text-primary" /> : <Camera className="w-5 h-5 text-muted-foreground group-hover:text-primary-foreground" />}
+            </div>
+            <Text className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{loading ? 'Processing...' : 'Upload'}</Text>
+          </div>
+        )}
+        <input type="file" ref={inputRef} className="hidden" accept="image/*" onChange={handleUpload} disabled={loading} />
+      </div>
+      {error && <Text className="text-[10px] font-bold text-destructive ml-2 tracking-tight">{error}</Text>}
+    </div>
+  );
+};

@@ -8,14 +8,14 @@ import { Text } from '@/components/ui/text';
 import { Heading } from '@/components/ui/heading';
 import { Input, InputField, InputSlot, InputIcon } from '@/components/ui/input';
 import { Button, ButtonText, ButtonIcon } from '@/components/ui/button';
-import { SearchIcon, ShoppingCartIcon, UserIcon, MapPinIcon } from 'lucide-react-native';
+import { SearchIcon, ShoppingCartIcon, UserIcon, MapPinIcon, ChevronRightIcon } from 'lucide-react-native';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { getRecommendations, getUserProfile, getProductCategories } from '@/lib/api';
 import { Product } from '@/lib/types';
 import { ProductCard } from '@/components/ProductCard';
 import { ThemeToggle } from '@/components/ThemeToggle';
-
+import { ArrowLeftIcon } from '@/components/ui/icon';
 export default function Home() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
@@ -51,73 +51,81 @@ export default function Home() {
     }
   };
 
+  const navigateToCategory = (cat: string) => {
+    setActiveCategory(cat);
+    router.push(`/products?category=${encodeURIComponent(cat)}`);
+  };
+
   return (
     <Box className="flex-1 min-h-screen bg-background pb-24">
       {/* Header */}
-      <Box className="bg-background/95 backdrop-blur-md px-6 pt-12 pb-6 border-b border-border sticky top-0 z-50">
+      <Box className="bg-background/95 backdrop-blur-md px-6 pt-12 pb-6 border-b border-border sticky top-0 z-50 shadow-sm">
         <HStack className="justify-between items-center mb-6">
           <VStack>
-            <Text className="text-muted-foreground text-xs font-bold uppercase tracking-wider mb-1">Delivering to</Text>
-            <HStack className="items-center space-x-1">
+            <Text className="text-muted-foreground text-[10px] font-black uppercase tracking-[0.2em] mb-1">Logistics Hub</Text>
+            <HStack className="items-center space-x-2">
               <MapPinIcon size={16} color="hsl(var(--primary))" />
-              <Text className="text-foreground font-bold text-lg">{userLga}, Abuja</Text>
+              <Text className="text-foreground font-black text-lg tracking-tight">{userLga}, Abuja</Text>
             </HStack>
           </VStack>
           <HStack space="md" className="items-center">
             <ThemeToggle />
             <Link href="/cart">
-              <Box className="bg-secondary p-3 rounded-full hover:bg-muted transition-colors relative">
+              <Box className="bg-secondary p-3 rounded-2xl hover:bg-muted transition-all active:scale-95 relative border border-border/50">
                 <ShoppingCartIcon size={20} className="text-foreground" />
               </Box>
             </Link>
             <Link href="/profile">
-              <Box className="bg-secondary p-3 rounded-full hover:bg-muted transition-colors">
+              <Box className="bg-secondary p-3 rounded-2xl hover:bg-muted transition-all active:scale-95 border border-border/50">
                 <UserIcon size={20} className="text-foreground" />
               </Box>
             </Link>
           </HStack>
         </HStack>
 
-        <VStack space="md">
+        <VStack space="xl">
           <Box>
-            <Heading className="text-3xl font-extrabold text-foreground">
-              Hello, <Text className="text-primary">{userName || 'Shopper'}</Text>
+            <Heading className="text-4xl font-black text-foreground tracking-tighter leading-none mb-2">
+              Welcome, <Text className="text-primary">{userName || 'Shopper'}</Text>
             </Heading>
-            <Text className="text-muted-foreground mt-1 text-lg">What are you looking for today?</Text>
+            <Text className="text-muted-foreground font-medium text-lg tracking-tight">Discover local production today.</Text>
           </Box>
 
-          <Input size="xl" className="bg-secondary border-0 rounded-full h-14 focus:bg-muted">
-            <InputSlot className="pl-4">
+          <Input size="xl" className="bg-secondary/50 border-0 rounded-3xl h-16 focus:bg-card shadow-inner border-border/10">
+            <InputSlot className="pl-6">
               <InputIcon as={SearchIcon} className="text-muted-foreground" />
             </InputSlot>
             <InputField
-              placeholder="Search fresh products..."
+              placeholder="Search local catalog..."
               value={searchQuery}
               onChangeText={setSearchQuery}
               onSubmitEditing={handleSearch}
-              className="text-foreground placeholder:text-muted-foreground font-medium"
+              className="text-foreground placeholder:text-muted-foreground/50 font-bold"
             />
           </Input>
         </VStack>
       </Box>
 
       {/* Categories */}
-      <Box className="pt-8">
-        <Box className="px-6 mb-4">
-          <Heading size="sm" className="font-bold text-foreground uppercase tracking-widest text-xs">Categories</Heading>
-        </Box>
-        <HStack space="sm" className="overflow-x-auto pb-4 px-6 scrollbar-hide">
+      <Box className="pt-10">
+        <HStack className="px-7 justify-between items-center mb-5">
+          <Heading size="sm" className="font-black text-foreground uppercase tracking-[0.2em] text-[10px] opacity-60">Global Categories</Heading>
+          <Link href="/products">
+            <Text className="text-primary font-black text-[10px] uppercase tracking-widest">Browse All</Text>
+          </Link>
+        </HStack>
+        <HStack space="md" className="overflow-x-auto pb-4 px-6 scrollbar-hide">
           {categories.map((cat, index) => (
             <Button
               key={`${cat}-${index}`}
               size="sm"
-              onPress={() => setActiveCategory(cat)}
-              className={`rounded-full px-6 py-2 border h-10 ${activeCategory === cat
-                  ? 'bg-primary border-primary'
-                  : 'bg-secondary border-transparent hover:bg-muted'
+              onPress={() => navigateToCategory(cat)}
+              className={`rounded-2xl px-8 h-12 border transition-all active:scale-95 ${activeCategory === cat
+                ? 'bg-primary border-primary shadow-lg shadow-primary/20 scale-105'
+                : 'bg-secondary/50 border-border/30 hover:bg-secondary'
                 }`}
             >
-              <ButtonText className={`font-semibold ${activeCategory === cat ? 'text-primary-foreground' : 'text-foreground'}`}>
+              <ButtonText className={`font-black uppercase tracking-widest text-[10px] ${activeCategory === cat ? 'text-primary-foreground' : 'text-foreground'}`}>
                 {cat}
               </ButtonText>
             </Button>
@@ -126,24 +134,33 @@ export default function Home() {
       </Box>
 
       {/* Recommendations */}
-      <Box className="p-6">
-        <HStack className="justify-between items-end mb-6">
-          <Heading size="xl" className="text-foreground font-bold">Recommended</Heading>
+      <Box className="p-6 mt-6">
+        <HStack className="justify-between items-end mb-8 px-1">
+          <VStack>
+            <Heading size="2xl" className="text-foreground font-black tracking-tighter">Locally Sourced</Heading>
+            <Text className="text-muted-foreground font-medium text-sm">Top picks in your area council</Text>
+          </VStack>
           <Link href="/products">
-            <Text className="text-primary font-bold text-sm mb-1 hover:text-primary/80">View All</Text>
+            <HStack className="items-center space-x-1 hover:translate-x-1 transition-transform">
+              <Text className="text-primary font-bold text-xs uppercase tracking-widest">Marketplace</Text>
+              <ChevronRightIcon size={14} color="hsl(var(--primary))" />
+            </HStack>
           </Link>
         </HStack>
 
-        <Box className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6">
+        <Box className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 sm:gap-8">
           {products.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </Box>
 
-        <Box className="mt-12">
+        <Box className="mt-16 px-4">
           <Link href="/products" passHref legacyBehavior>
-            <Button size="xl" className="w-full rounded-full bg-primary hover:bg-primary/90 h-14 border-0" variant="solid">
-              <ButtonText className="text-primary-foreground font-bold text-lg">Explore All Products</ButtonText>
+            <Button size="xl" className="w-full rounded-[2rem] bg-foreground hover:bg-foreground/90 h-16 border-0 shadow-2xl transition-all active:scale-[0.98] group" variant="solid">
+              <ButtonText className="text-background font-black text-base uppercase tracking-[0.2em]">Explore Full Network</ButtonText>
+              <Box className="ml-2 group-hover:translate-x-1 transition-transform">
+                <ArrowLeftIcon  className="text-background rotate-180" />
+              </Box>
             </Button>
           </Link>
         </Box>

@@ -1,12 +1,10 @@
-
 'use client';
 
 import { useState } from 'react';
-import { Card } from '@/components/ui/card';
 import { Heading } from '@/components/ui/heading';
 import { Text } from '@/components/ui/text';
 import { replyToReview } from '@/api/reviews';
-import { Star, MessageCircle, Reply } from 'lucide-react';
+import { Star, MessageCircle, Reply, ChevronRight, Send, X } from 'lucide-react';
 
 export default function ReviewsList({ reviews }: { reviews: any[] }) {
     const [replyingId, setReplyingId] = useState<number | null>(null);
@@ -20,7 +18,7 @@ export default function ReviewsList({ reviews }: { reviews: any[] }) {
             await replyToReview(reviewId, replyText);
             setReplyingId(null);
             setReplyText('');
-            // Ideally update the local state or let revalidatePath handle it
+            window.location.reload(); // Simple sync
         } catch (e) {
             alert('Failed to send reply');
         } finally {
@@ -30,96 +28,121 @@ export default function ReviewsList({ reviews }: { reviews: any[] }) {
 
     if (!reviews || reviews.length === 0) {
         return (
-            <div className="text-center py-10">
-                <MessageCircle className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <Heading className="text-gray-500">No reviews yet</Heading>
-                <Text className="text-gray-400">Reviews for your products will appear here.</Text>
+            <div className="bg-card rounded-[2.5rem] border border-border py-24 flex flex-col items-center justify-center text-center px-6">
+                <div className="w-24 h-24 bg-secondary rounded-[2.5rem] flex items-center justify-center mb-6">
+                    <MessageCircle className="w-10 h-10 text-muted-foreground opacity-20" />
+                </div>
+                <Text className="text-xl font-black text-foreground mb-1">Silence is Golden</Text>
+                <Text className="text-sm text-muted-foreground font-medium max-w-xs">You haven't received any reviews yet. Great listings naturally attract feedback!</Text>
             </div>
         );
     }
 
     return (
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 gap-6 pb-12">
             {reviews.map((review) => (
-                <Card key={review.id} className="p-6">
-                    <div className="flex flex-col sm:flex-row justify-between gap-4">
-                        <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                                <div className="flex items-center">
+                <div key={review.id} className="bg-card rounded-[2.5rem] border border-border overflow-hidden transition-all hover:shadow-xl hover:shadow-primary/5 group">
+                    <div className="p-8 md:p-10 space-y-6">
+                        <div className="flex flex-col md:flex-row justify-between gap-6 md:items-center">
+                            <div className="flex items-center gap-4">
+                                <div className="flex items-center gap-0.5 bg-secondary/50 px-3 py-1.5 rounded-full border border-border/50">
                                     {[...Array(5)].map((_, i) => (
                                         <Star
                                             key={i}
-                                            className={`w-4 h-4 ${i < review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-200'}`}
+                                            className={`w-3 h-3 ${i < review.rating ? 'text-primary fill-primary' : 'text-muted-foreground opacity-20'}`}
                                         />
                                     ))}
+                                    <Text className="text-[10px] font-black text-primary ml-1.5">{review.rating.toFixed(1)}</Text>
                                 </div>
-                                <Text className="text-sm text-gray-500">• {new Date(review.createdAt).toLocaleDateString()}</Text>
+                                <Text className="text-xs font-black text-muted-foreground uppercase tracking-widest opacity-60">
+                                    {new Date(review.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                                </Text>
                             </div>
 
-                            <Text className="font-semibold mb-1">{review.productName}</Text>
-                            <Text className="text-gray-700 mb-4">{review.comment}</Text>
-
-                            {/* Product Info (small) */}
-                            <div className="flex items-center gap-2 mb-4">
+                            <div className="flex items-center gap-3 bg-secondary/30 px-4 py-2 rounded-2xl border border-border/50 max-w-fit">
                                 {review.productImage && (
-                                    <img src={JSON.parse(review.productImage)[0]} alt={review.productName} className="w-8 h-8 rounded object-cover" />
+                                    <img
+                                        src={review.productImage.startsWith('[') ? JSON.parse(review.productImage)[0] : review.productImage}
+                                        alt={review.productName}
+                                        className="w-8 h-8 rounded-lg object-cover ring-2 ring-background shadow-sm"
+                                    />
                                 )}
-                                <span className="text-xs text-gray-500">Product ID: {review.productId}</span>
+                                <div>
+                                    <Text className="text-[10px] font-black text-foreground truncate max-w-[120px] uppercase tracking-tighter">{review.productName}</Text>
+                                    <Text className="text-[8px] text-muted-foreground font-bold uppercase tracking-widest opacity-50">Ref: #{review.productId}</Text>
+                                </div>
                             </div>
-
-                            {/* Vendor Reply Section */}
-                            {review.vendorReply ? (
-                                <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 mt-2">
-                                    <div className="flex items-center gap-2 mb-1">
-                                        <Reply className="w-4 h-4 text-blue-600" />
-                                        <Text className="font-semibold text-blue-900 text-sm">Response from Store</Text>
-                                    </div>
-                                    <Text className="text-blue-800 text-sm">{review.vendorReply}</Text>
-                                    <Text className="text-xs text-blue-500 mt-2">
-                                        Replied on {new Date(review.replyDate).toLocaleDateString()}
-                                    </Text>
-                                </div>
-                            ) : (
-                                <div className="mt-2">
-                                    {replyingId === review.id ? (
-                                        <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                                            <Text className="font-medium text-sm mb-2">Reply to Customer</Text>
-                                            <textarea
-                                                className="w-full p-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
-                                                rows={3}
-                                                placeholder="Thank the customer for their review..."
-                                                value={replyText}
-                                                onChange={(e) => setReplyText(e.target.value)}
-                                            />
-                                            <div className="flex gap-2 justify-end">
-                                                <button
-                                                    onClick={() => setReplyingId(null)}
-                                                    className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800"
-                                                >
-                                                    Cancel
-                                                </button>
-                                                <button
-                                                    onClick={() => handleReply(review.id)}
-                                                    disabled={loading}
-                                                    className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
-                                                >
-                                                    {loading ? 'Sending...' : 'Post Reply'}
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        <button
-                                            onClick={() => setReplyingId(review.id)}
-                                            className="text-blue-600 text-sm font-medium hover:underline flex items-center gap-1"
-                                        >
-                                            <Reply className="w-4 h-4" /> Reply to Review
-                                        </button>
-                                    )}
-                                </div>
-                            )}
                         </div>
+
+                        <div className="space-y-4">
+                            <Text className="text-lg font-bold text-foreground leading-relaxed italic">
+                                "{review.comment}"
+                            </Text>
+                            <Text className="text-xs font-black text-muted-foreground uppercase tracking-tighter">— Buyer ID: {review.userId}</Text>
+                        </div>
+
+                        {/* Reply Section */}
+                        {review.vendorReply ? (
+                            <div className="bg-primary/5 p-6 rounded-[2rem] border border-primary/10 relative overflow-hidden group/reply animate-in slide-in-from-left-2 transition-all">
+                                <div className="absolute top-0 right-0 p-8 opacity-5">
+                                    <Reply className="w-16 h-16 text-primary" />
+                                </div>
+                                <div className="flex items-center gap-3 mb-3">
+                                    <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center">
+                                        <Reply className="w-4 h-4 text-primary-foreground" />
+                                    </div>
+                                    <Text className="text-xs font-black text-primary uppercase tracking-widest">Store Official Response</Text>
+                                </div>
+                                <Text className="text-sm font-medium text-foreground/80 leading-relaxed mb-3">{review.vendorReply}</Text>
+                                <Text className="text-[10px] text-primary/60 font-black uppercase">
+                                    Replied on {new Date(review.replyDate).toLocaleDateString()}
+                                </Text>
+                            </div>
+                        ) : (
+                            <div className="pt-2">
+                                {replyingId === review.id ? (
+                                    <div className="bg-secondary/30 p-8 rounded-[2rem] border border-border animate-in zoom-in-95 duration-200">
+                                        <div className="flex items-center justify-between mb-6">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center">
+                                                    <Send className="w-5 h-5 text-primary" />
+                                                </div>
+                                                <Text className="text-sm font-black text-foreground uppercase tracking-widest">Craft a Response</Text>
+                                            </div>
+                                            <button onClick={() => setReplyingId(null)} className="p-2 hover:bg-secondary rounded-full transition-colors text-muted-foreground">
+                                                <X className="w-5 h-5" />
+                                            </button>
+                                        </div>
+                                        <textarea
+                                            className="w-full p-6 bg-card border border-border rounded-3xl text-sm font-medium focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all resize-none mb-6 outline-none"
+                                            rows={3}
+                                            placeholder="Example: Thank you for the positive feedback! We hope to serve you again soon..."
+                                            value={replyText}
+                                            onChange={(e) => setReplyText(e.target.value)}
+                                        />
+                                        <div className="flex justify-end pr-2">
+                                            <button
+                                                onClick={() => handleReply(review.id)}
+                                                disabled={loading || !replyText.trim()}
+                                                className="px-10 py-3.5 bg-primary text-primary-foreground rounded-2xl font-black text-sm shadow-xl shadow-primary/20 hover:scale-105 active:scale-95 disabled:opacity-50 transition-all flex items-center gap-2"
+                                            >
+                                                {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                                                {loading ? 'Transmitting...' : 'Post Response'}
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <button
+                                        onClick={() => setReplyingId(review.id)}
+                                        className="inline-flex items-center gap-2 px-6 py-3 bg-card border border-border rounded-2xl text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary hover:border-primary transition-all group-hover:bg-secondary/50 shadow-sm"
+                                    >
+                                        <Reply className="w-3.5 h-3.5" /> Acknowledge Review
+                                    </button>
+                                )}
+                            </div>
+                        )}
                     </div>
-                </Card>
+                </div>
             ))}
         </div>
     );
