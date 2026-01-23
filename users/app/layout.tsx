@@ -19,7 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} antialiased`}>
+      <body className={`${inter.className} antialiased bg-background text-foreground`}>
         <StyledJsxRegistry>
           <ThemeProvider
             attribute="class"
@@ -27,7 +27,7 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <GluestackUIProvider mode="light">{children}</GluestackUIProvider>
+            <GluestackUIProvider mode="dark">{children}</GluestackUIProvider>
           </ThemeProvider>
         </StyledJsxRegistry>
       </body>
