@@ -142,7 +142,7 @@ const createIconUI = ({ ...props }: ParameterTypes) => {
     (
       {
         className,
-        size,
+        size = 'md',
         ...props
       }: VariantProps<typeof iconStyle> &
         React.ComponentPropsWithoutRef<typeof UIIconCreateIcon>,

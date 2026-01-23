@@ -4,9 +4,10 @@ import { tva } from '@gluestack-ui/nativewind-utils/tva';
 import { VariantProps } from '@gluestack-ui/nativewind-utils';
 
 const accessClassName = (style: any) => {
+  if (!style || !style[0]) return '';
   const obj = style[0];
   const keys = Object.keys(obj); //will return an array of keys
-  return obj[keys[1]];
+  return obj[keys[1]] || '';
 };
 
 const Svg = React.forwardRef<
@@ -99,10 +100,10 @@ const iconStyle = tva({
 export const Icon = React.forwardRef<
   React.ElementRef<typeof UIIcon>,
   React.ComponentPropsWithoutRef<typeof UIIcon> &
-    VariantProps<typeof iconStyle> & {
-      height?: number | string;
-      width?: number | string;
-    }
+  VariantProps<typeof iconStyle> & {
+    height?: number | string;
+    width?: number | string;
+  }
 >(({ size = 'md', className, ...props }, ref) => {
   if (typeof size === 'number') {
     return (
@@ -142,11 +143,11 @@ const createIconUI = ({ ...props }: ParameterTypes) => {
   return React.forwardRef<
     React.ElementRef<typeof UIIcon>,
     React.ComponentPropsWithoutRef<typeof UIIcon> &
-      VariantProps<typeof iconStyle> & {
-        height?: number | string;
-        width?: number | string;
-      }
-  >(({ className, size, ...props }, ref) => {
+    VariantProps<typeof iconStyle> & {
+      height?: number | string;
+      width?: number | string;
+    }
+  >(({ className, size = 'md', ...props }, ref) => {
     return (
       <UIIcon
         ref={ref}

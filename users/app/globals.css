@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    /* LIGHT MODE SPOTIFY-INSPIRED */
+    /* LIGHT MODE */
     --background: 0 0% 100%;
     --foreground: 0 0% 9%;
 
@@ -17,53 +17,55 @@
     --primary: 141 73% 42%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 0 0% 96.1%;
+    --secondary: 0 0% 96%;
     --secondary-foreground: 0 0% 9%;
 
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
 
-    --accent: 0 0% 96.1%;
+    --accent: 0 0% 96%;
     --accent-foreground: 0 0% 9%;
 
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
+    --border: 0 0% 88%;
+    --input: 0 0% 88%;
     --ring: 141 73% 42%;
 
     --radius: 0.75rem;
   }
 
   .dark {
-    /* DARK MODE SPOTIFY-INSPIRED */
-    --background: 0 0% 7%;
-    --foreground: 0 0% 98%;
+    /* DARK MODE — LIFTED SURFACES */
+    --background: 0 0% 9%;
+    --foreground: 0 0% 96%;
 
-    --card: 0 0% 9%;
-    --card-foreground: 0 0% 98%;
+    /* Key fix: brighter than background for glass */
+    --card: 0 0% 13%;
+    --card-foreground: 0 0% 96%;
 
-    --popover: 0 0% 7%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 0 0% 11%;
+    --popover-foreground: 0 0% 96%;
 
     --primary: 141 73% 42%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 0 0% 18%;
+    --secondary-foreground: 0 0% 96%;
 
-    --muted: 0 0% 15.7%;
-    --muted-foreground: 0 0% 63.9%;
+    --muted: 0 0% 18%;
+    --muted-foreground: 0 0% 65%;
 
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
+    --accent: 0 0% 18%;
+    --accent-foreground: 0 0% 96%;
 
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 63% 35%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
+    /* Border must be visible through blur */
+    --border: 0 0% 22%;
+    --input: 0 0% 22%;
     --ring: 141 73% 42%;
   }
 }

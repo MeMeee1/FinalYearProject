@@ -145,7 +145,7 @@ export default function Home() {
           </VStack>
           <Link href="/products">
             <HStack className="items-center space-x-2 group-hover:translate-x-1 transition-transform bg-secondary/30 px-4 py-2 rounded-full border border-border/50">
-              <Text className="text-foreground font-bold text-[10px] uppercase tracking-widest">Network View</Text>
+              <Text className="text-foreground font-bold text-[10px] uppercase tracking-widest">View All Products</Text>
               <ChevronRightIcon size={12} className="text-primary" />
             </HStack>
           </Link>
@@ -158,12 +158,12 @@ export default function Home() {
         </Box>
 
         {/* Global Action CTA */}
-        <Box className="mt-20">
-          <Link href="/products" passHref legacyBehavior>
-            <Button size="xl" className="w-full rounded-[2.5rem] bg-foreground hover:bg-foreground/90 h-20 border-0 shadow-2xl transition-all active:scale-[0.98] group overflow-hidden relative" variant="solid">
+        <Box className="mt-24 mb-50">
+          <Link href="/products">
+            <Button size="sm" className="w-[50%] mx-auto rounded-[2.5rem] bg-foreground hover:bg-foreground/90 h-20 border-0 shadow-2xl transition-all active:scale-[0.98] group overflow-hidden relative" variant="solid">
               <Box className="absolute inset-0 bg-primary/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
               <HStack space="md" className="items-center relative z-10">
-                <ButtonText className="text-background font-black text-lg uppercase tracking-[0.25em]">Explore Full Network</ButtonText>
+                <ButtonText className="text-background font-black text-md uppercase tracking-[0.25em]">See more Products</ButtonText>
                 <Box className="group-hover:translate-x-2 transition-transform duration-500">
                   <ChevronRightIcon size={24} className="text-background" />
                 </Box>
