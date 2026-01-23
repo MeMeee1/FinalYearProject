@@ -61,7 +61,7 @@ io.on('connection', (socket) => {
   });
 });
 
-if (process.env.NODE_ENV === 'dev') {
+if (!process.env.NODE_ENV || process.env.NODE_ENV.trim() === 'dev') {
   httpServer.listen(port, () => {
     console.log(`Example app listening on port ${port} with WebSockets`);
   });

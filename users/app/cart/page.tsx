@@ -150,8 +150,8 @@ export default function Cart() {
                                             <ShoppingBagIcon size={28} color="black" />
                                         </Box>
                                         <VStack className="items-start">
-                                            <ButtonText className="font-black text-black text-2xl uppercase tracking-[0.2em] leading-none">Authorize Checkout</ButtonText>
-                                            <Text className="text-black/60 text-[10px] font-black uppercase tracking-[0.3em] mt-2">Proceed to Secure Payment Gateway</Text>
+                                            <ButtonText className="font-black text-black text-2xl uppercase tracking-[0.2em] leading-none">Checkout</ButtonText>
+                                            <Text className="text-black/60 text-[10px] font-black uppercase tracking-[0.3em] mt-2">Pay Up</Text>
                                         </VStack>
                                     </HStack>
                                 </Button>
