@@ -141,7 +141,7 @@ export default function Home() {
         <HStack className="justify-between items-end mb-10">
           <VStack space="xs">
             <Text className="text-primary font-black text-[10px] uppercase tracking-[0.3em]">Curated Feed</Text>
-            <Heading size="3xl" className="text-foreground font-black tracking-tighter">Locally Sourced</Heading>
+            <Heading size="3xl" className="text-foreground font-black tracking-tighter">Recommended For You</Heading>
           </VStack>
           <Link href="/products">
             <HStack className="items-center space-x-2 group-hover:translate-x-1 transition-transform bg-secondary/30 px-4 py-2 rounded-full border border-border/50">
