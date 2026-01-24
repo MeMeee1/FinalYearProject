@@ -77,10 +77,6 @@ function Sidebar() {
         <Text className="hover:text-blue-600 transition-colors py-2 px-3 rounded hover:bg-blue-50">Vendors</Text>
       </Link>
 
-      <Link href="/dashboard/reviews" className="w-full">
-        <Text className="hover:text-blue-600 transition-colors py-2 px-3 rounded hover:bg-blue-50">Reviews</Text>
-      </Link>
-
       <Link href="/dashboard/fulfillment-points" className="w-full">
         <Text className="hover:text-blue-600 transition-colors py-2 px-3 rounded hover:bg-blue-50">Fulfillment Points</Text>
       </Link>

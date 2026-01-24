@@ -1,5 +1,5 @@
 
-import { pgTable, text, boolean, integer, timestamp, pgEnum } from 'drizzle-orm/pg-core';
+import { pgTable, text, boolean, integer, timestamp, pgEnum, doublePrecision } from 'drizzle-orm/pg-core';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 
 // Define the LGA Enum
@@ -23,6 +23,8 @@ export const fulfillmentPointsTable = pgTable('fulfillment_points', {
 
     isActive: boolean().default(true),
     canVerifyVendors: boolean().default(false), // TRUE for Vets
+
+    platformCommissionRate: doublePrecision().default(5.0), // Platform cut for processing orders at this point
 
     createdAt: timestamp().notNull().defaultNow(),
     updatedAt: timestamp().notNull().defaultNow(),

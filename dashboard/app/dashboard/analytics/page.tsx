@@ -3,24 +3,25 @@ import { fetchOrders } from '@/api/orders';
 import { Card } from '@/components/ui/card';
 import { Heading } from '@/components/ui/heading';
 import { Text } from '@/components/ui/text';
-import { 
-  TrendingUp, 
+import {
+  TrendingUp,
   TrendingDown,
-  DollarSign, 
-  ShoppingBag, 
-  Users, 
+  DollarSign,
+  ShoppingBag,
+  Users,
   Package,
   Calendar,
   BarChart3
 } from 'lucide-react';
 
 export default async function AnalyticsPage() {
-  const [stats, orders, vendorsResponse] = await Promise.all([
+  const [stats, ordersResponse, vendorsResponse] = await Promise.all([
     getPlatformStats().catch(() => null),
     fetchOrders().catch(() => []),
     listActiveVendors(1, 100).catch(() => ({ data: [] })),
   ]);
 
+  const orders = Array.isArray(ordersResponse) ? ordersResponse : (ordersResponse as any)?.data || [];
   const vendors = vendorsResponse?.data || [];
 
   // Calculate order trends
@@ -29,14 +30,14 @@ export default async function AnalyticsPage() {
     const orderDate = new Date(o.createdAt);
     return orderDate.getMonth() === now.getMonth() && orderDate.getFullYear() === now.getFullYear();
   });
-  
+
   const lastMonth = orders.filter((o: any) => {
     const orderDate = new Date(o.createdAt);
     const lastMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
     return orderDate.getMonth() === lastMonthDate.getMonth() && orderDate.getFullYear() === lastMonthDate.getFullYear();
   });
 
-  const monthGrowth = lastMonth.length > 0 
+  const monthGrowth = lastMonth.length > 0
     ? ((thisMonth.length - lastMonth.length) / lastMonth.length * 100).toFixed(1)
     : '0';
 
@@ -48,8 +49,8 @@ export default async function AnalyticsPage() {
   };
 
   // Top vendors by order count (mock - would need real vendor data)
-  const avgOrderValue = orders.length > 0 
-    ? orders.reduce((sum: number, o: any) => sum + Number(o.totalAmount || 0), 0) / orders.length 
+  const avgOrderValue = orders.length > 0
+    ? orders.reduce((sum: number, o: any) => sum + Number(o.totalAmount || 0), 0) / orders.length
     : 0;
 
   return (
@@ -83,9 +84,8 @@ export default async function AnalyticsPage() {
             <div className="p-2 bg-green-100 rounded-lg">
               <ShoppingBag className="w-5 h-5 text-green-600" />
             </div>
-            <div className={`flex items-center gap-1 text-xs px-2 py-1 rounded ${
-              Number(monthGrowth) >= 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-            }`}>
+            <div className={`flex items-center gap-1 text-xs px-2 py-1 rounded ${Number(monthGrowth) >= 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+              }`}>
               {Number(monthGrowth) >= 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
               <span>{Math.abs(Number(monthGrowth))}%</span>
             </div>
@@ -124,59 +124,7 @@ export default async function AnalyticsPage() {
 
       {/* Two Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
-        {/* Revenue Breakdown */}
-        <Card className="p-4 sm:p-5">
-          <div className="flex items-center gap-2 mb-4">
-            <BarChart3 className="w-5 h-5 text-blue-600" />
-            <Heading size="md" className="text-base sm:text-lg">Revenue by Status</Heading>
-          </div>
-          <div className="space-y-3">
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <Text className="text-xs sm:text-sm text-slate-600">Delivered</Text>
-                <Text className="text-xs sm:text-sm font-medium">${revenueByStatus.delivered.toFixed(2)}</Text>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div 
-                  className="bg-green-600 h-2 rounded-full transition-all"
-                  style={{ 
-                    width: `${(revenueByStatus.delivered / (revenueByStatus.delivered + revenueByStatus.processing + revenueByStatus.pending)) * 100}%` 
-                  }}
-                ></div>
-              </div>
-            </div>
 
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <Text className="text-xs sm:text-sm text-slate-600">Processing</Text>
-                <Text className="text-xs sm:text-sm font-medium">${revenueByStatus.processing.toFixed(2)}</Text>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div 
-                  className="bg-blue-600 h-2 rounded-full transition-all"
-                  style={{ 
-                    width: `${(revenueByStatus.processing / (revenueByStatus.delivered + revenueByStatus.processing + revenueByStatus.pending)) * 100}%` 
-                  }}
-                ></div>
-              </div>
-            </div>
-
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <Text className="text-xs sm:text-sm text-slate-600">Pending</Text>
-                <Text className="text-xs sm:text-sm font-medium">${revenueByStatus.pending.toFixed(2)}</Text>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div 
-                  className="bg-yellow-600 h-2 rounded-full transition-all"
-                  style={{ 
-                    width: `${(revenueByStatus.pending / (revenueByStatus.delivered + revenueByStatus.processing + revenueByStatus.pending)) * 100}%` 
-                  }}
-                ></div>
-              </div>
-            </div>
-          </div>
-        </Card>
 
         {/* Monthly Comparison */}
         <Card className="p-4 sm:p-5">
@@ -201,17 +149,16 @@ export default async function AnalyticsPage() {
               <Text className="text-xs text-slate-500">Orders received last month</Text>
             </div>
 
-            <div className="border-t pt-4">
+            {/* <div className="border-t pt-4">
               <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
                 <Text className="text-xs sm:text-sm font-medium">Growth</Text>
-                <div className={`flex items-center gap-1 font-bold ${
-                  Number(monthGrowth) >= 0 ? 'text-green-600' : 'text-red-600'
-                }`}>
+                <div className={`flex items-center gap-1 font-bold ${Number(monthGrowth) >= 0 ? 'text-green-600' : 'text-red-600'
+                  }`}>
                   {Number(monthGrowth) >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
                   <span className="text-base sm:text-lg">{Math.abs(Number(monthGrowth))}%</span>
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
         </Card>
       </div>

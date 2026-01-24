@@ -4,11 +4,17 @@ import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Heading } from '@/components/ui/heading';
 import { Text } from '@/components/ui/text';
-import { Button } from '@/components/ui/button';
+import { Button, ButtonText } from '@/components/ui/button';
 import { Plus, MapPin, Edit, Trash, Store, X } from 'lucide-react';
 import { API_URL } from '@/config';
 import { useForm } from 'react-hook-form';
 import { useToast } from '@/components/ui/use-toast';
+import {
+    fetchFulfillmentPoints,
+    createFulfillmentPoint,
+    updateFulfillmentPoint,
+    deleteFulfillmentPoint
+} from '@/api/fulfillment-points';
 
 type FulfillmentPoint = {
     id: number;
@@ -19,6 +25,7 @@ type FulfillmentPoint = {
     instructions: string;
     isActive: boolean;
     canVerifyVendors: boolean;
+    platformCommissionRate: number;
 };
 
 const lgaOptions = [
@@ -32,11 +39,10 @@ export default function FulfillmentPointsPage() {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingPoint, setEditingPoint] = useState<FulfillmentPoint | null>(null);
 
-    const fetchPoints = async () => {
+    const loadPoints = async () => {
         try {
             setIsLoading(true);
-            const res = await fetch(`${API_URL}/fulfillment-points`);
-            const data = await res.json();
+            const data = await fetchFulfillmentPoints();
             setPoints(data);
         } catch (error) {
             console.error(error);
@@ -47,26 +53,17 @@ export default function FulfillmentPointsPage() {
     };
 
     useEffect(() => {
-        fetchPoints();
+        loadPoints();
     }, []);
 
     const handleDelete = async (id: number) => {
         if (!confirm('Are you sure? This will deactivate the fulfillment point.')) return;
         try {
-            const res = await fetch(`${API_URL}/fulfillment-points/${id}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}` // Admin token
-                }
-            });
-            if (res.ok) {
-                toast({ title: 'Success', description: 'Fulfillment point deactivated' });
-                fetchPoints();
-            } else {
-                throw new Error('Failed to delete');
-            }
-        } catch (error) {
-            toast({ title: 'Error', description: 'Failed to delete fulfillment point', variant: 'destructive' });
+            await deleteFulfillmentPoint(id);
+            toast({ title: 'Success', description: 'Fulfillment point deactivated' });
+            loadPoints();
+        } catch (error: any) {
+            toast({ title: 'Error', description: error.message || 'Failed to delete fulfillment point', variant: 'destructive' });
         }
     };
 
@@ -78,8 +75,8 @@ export default function FulfillmentPointsPage() {
                     <Text className="text-gray-500 mt-2">Manage pickup locations and verification centers (Vet Offices).</Text>
                 </div>
 
-                <Button className="gap-2" onPress={() => { setIsDialogOpen(true); setEditingPoint(null); }}>
-                    <Plus size={16} /> Add New Point
+                <Button className="gap-2 bg-blue-600 hover:bg-blue-700 font-bold" onPress={() => { setIsDialogOpen(true); setEditingPoint(null); }}>
+                    <Plus size={16} /> <ButtonText className="text-white">Add New Point</ButtonText>
                 </Button>
 
                 {isDialogOpen && (
@@ -101,7 +98,7 @@ export default function FulfillmentPointsPage() {
                                     initialData={editingPoint}
                                     onSuccess={() => {
                                         setIsDialogOpen(false);
-                                        fetchPoints();
+                                        loadPoints();
                                     }}
                                 />
                             </div>
@@ -133,12 +130,15 @@ export default function FulfillmentPointsPage() {
                             {point.address}
                         </div>
 
-                        <div className="flex gap-2">
+                        <div className="flex flex-wrap gap-2">
                             {point.canVerifyVendors && (
                                 <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-purple-50 text-purple-700 border border-purple-100">
                                     Verifies Vendors
                                 </span>
                             )}
+                            <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-orange-50 text-orange-700 border border-orange-100">
+                                {point.platformCommissionRate}% Fee
+                            </span>
                         </div>
 
                         <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
@@ -174,7 +174,8 @@ function FulfillmentPointForm({ initialData, onSuccess }: { initialData?: Fulfil
             lga: 'Abuja Municipal',
             instructions: '',
             isActive: true,
-            canVerifyVendors: true
+            canVerifyVendors: true,
+            platformCommissionRate: 5.0
         }
     });
 
@@ -182,24 +183,16 @@ function FulfillmentPointForm({ initialData, onSuccess }: { initialData?: Fulfil
 
     const onSubmit = async (data: any) => {
         try {
-            const url = initialData ? `${API_URL}/fulfillment-points/${initialData.id}` : `${API_URL}/fulfillment-points`;
-            const method = initialData ? 'PUT' : 'POST';
-
-            const res = await fetch(url, {
-                method,
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                },
-                body: JSON.stringify(data)
-            });
-
-            if (!res.ok) throw new Error('Failed to save');
+            if (initialData) {
+                await updateFulfillmentPoint(initialData.id, data);
+            } else {
+                await createFulfillmentPoint(data);
+            }
 
             toast({ title: 'Success', description: 'Saved successfully' });
             onSuccess();
-        } catch (e) {
-            toast({ title: 'Error', description: 'Something went wrong', variant: 'destructive' });
+        } catch (e: any) {
+            toast({ title: 'Error', description: e.message || 'Something went wrong', variant: 'destructive' });
         }
     };
 
@@ -250,19 +243,40 @@ function FulfillmentPointForm({ initialData, onSuccess }: { initialData?: Fulfil
                 />
             </div>
 
+            <div className="space-y-2">
+                <label className="text-sm font-medium">Platform Commission (%)</label>
+                <input
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    max="100"
+                    {...register('platformCommissionRate', { valueAsNumber: true, required: 'Commission rate is required' })}
+                    className="w-full p-2 border rounded-md"
+                    placeholder="e.g. 5.0"
+                />
+                {errors.platformCommissionRate && <p className="text-red-500 text-xs">{errors.platformCommissionRate.message}</p>}
+            </div>
+
             <div className="flex items-center gap-4">
                 <label className="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" {...register('canVerifyVendors')} />
+                    <input type="checkbox" {...register('canVerifyVendors', { valueAsNumber: false })} />
                     <span className="text-sm">Can verify vendors?</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" {...register('isActive')} />
+                    <input type="checkbox" {...register('isActive', { valueAsNumber: false })} />
                     <span className="text-sm">Is Active?</span>
                 </label>
             </div>
 
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
-                {isSubmitting ? 'Saving...' : 'Save Fulfillment Point'}
+            <Button
+                type="submit"
+                className="w-full bg-blue-600 hover:bg-blue-700 py-6"
+                disabled={isSubmitting}
+                onPress={handleSubmit(onSubmit)}
+            >
+                <ButtonText className="text-white font-bold">
+                    {isSubmitting ? 'Saving...' : 'Save Fulfillment Point'}
+                </ButtonText>
             </Button>
         </form>
     );

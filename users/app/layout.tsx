@@ -5,6 +5,7 @@ import { Inter } from 'next/font/google';
 import { ThemeProvider } from '@/components/theme-provider';
 import { BottomNav } from '@/components/BottomNav';
 import { CartProvider } from '@/context/CartContext';
+import { UserRealTimeSync } from '@/components/UserRealTimeSync';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -31,6 +32,7 @@ export default function RootLayout({
           >
             <GluestackUIProvider mode="dark">
               <CartProvider>
+                <UserRealTimeSync />
                 {children}
                 <BottomNav />
               </CartProvider>

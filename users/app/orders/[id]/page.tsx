@@ -9,9 +9,10 @@ import { Button, ButtonIcon, ButtonText } from '@/components/ui/button';
 import { Input, InputField } from '@/components/ui/input';
 import { ArrowLeftIcon, MapPinIcon, CheckCircle2Icon, PackageIcon, ClockIcon, ShieldCheckIcon, CopyIcon, KeyIcon } from 'lucide-react-native';
 import { useRouter, useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { getOrder, verifyPickup } from '@/lib/api';
 import { Order } from '@/lib/types';
+import { useRealTimeNotifications } from '@/hooks/useRealTimeNotifications';
 
 export default function OrderDetails() {
     const router = useRouter();
@@ -21,31 +22,40 @@ export default function OrderDetails() {
     const [pickupCode, setPickupCode] = useState('');
     const [isVerifying, setIsVerifying] = useState(false);
 
-    useEffect(() => {
-        const fetchOrderDetails = async () => {
-            try {
-                const data = await getOrder(params.id as string);
-                setOrder(data);
-            } catch (error) {
-                console.error('Failed to fetch order:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
+    const fetchOrderDetails = useCallback(async () => {
+        try {
+            const data = await getOrder(params.id as string);
+            setOrder(data);
+        } catch (error) {
+            console.error('Failed to fetch order:', error);
+        } finally {
+            setLoading(false);
+        }
+    }, [params.id]);
 
+    useEffect(() => {
         if (params.id) {
             fetchOrderDetails();
         }
-    }, [params.id]);
+    }, [params.id, fetchOrderDetails]);
+
+    // Setup real-time notifications
+    const handleOrderNotification = useCallback((data: any) => {
+        if (data.orderId === Number(params.id)) {
+            console.log('Refreshing order details due to socket update');
+            fetchOrderDetails();
+        }
+    }, [params.id, fetchOrderDetails]);
+
+    useRealTimeNotifications(handleOrderNotification);
 
     const handleVerifyPickup = async () => {
         if (!order || !pickupCode) return;
         setIsVerifying(true);
         try {
             await verifyPickup(order.id, pickupCode);
-            // Re-fetch order to show updated status
-            const updated = await getOrder(order.id);
-            setOrder(updated);
+            // Local update of order is handled by fetchOrderDetails which is called by the hook
+            await fetchOrderDetails();
             alert('Order successfully collected! Simulation complete.');
         } catch (error: any) {
             alert(error.message || 'Verification failed. Please check the code.');

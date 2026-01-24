@@ -27,6 +27,15 @@ export function useRealTimeSync() {
             }
         });
 
+        // Listen for order status updates
+        socket.on('order_status_update', (data) => {
+            console.log('[Socket] Order status update received:', data);
+            if (typeof window !== 'undefined') {
+                const event = new CustomEvent('order_updated_received', { detail: data });
+                window.dispatchEvent(event);
+            }
+        });
+
         // Listen for stock updates (if vendor wants to see their own stock changing)
         socket.on('stock_updated', (data) => {
             console.log('[Socket] Stock update received:', data);

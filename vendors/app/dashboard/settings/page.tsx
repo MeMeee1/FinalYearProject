@@ -358,6 +358,30 @@ export default function SettingsPage() {
                         </div>
                     </div>
 
+                    {/* Commercial Terms */}
+                    <div className="bg-card rounded-[2.5rem] border border-border p-8 md:p-10 space-y-8">
+                        <div className="flex items-center gap-4 border-b border-border/50 pb-6">
+                            <div className="w-12 h-12 rounded-2xl bg-orange-500/10 flex items-center justify-center">
+                                <TrendingUp className="w-6 h-6 text-orange-500" />
+                            </div>
+                            <div>
+                                <Heading className="text-xl font-black text-foreground">Commercial Terms</Heading>
+                                <Text className="text-xs text-muted-foreground font-medium">Your partnership agreement with the platform.</Text>
+                            </div>
+                        </div>
+
+                        <div className="p-6 bg-secondary/30 rounded-3xl border border-border/50 flex items-center justify-between">
+                            <div className="space-y-1">
+                                <Text className="text-xs font-black text-foreground uppercase tracking-widest">Platform Service Fee</Text>
+                                <Text className="text-[10px] text-muted-foreground font-medium">Commission deducted from each successful transaction.</Text>
+                            </div>
+                            <div className="text-right">
+                                <Text className="text-2xl font-black text-primary">{vendorProfile?.platformCommissionRate || 10.0}%</Text>
+                                <Text className="text-[10px] text-muted-foreground font-black uppercase">Active Rate</Text>
+                            </div>
+                        </div>
+                    </div>
+
                     {/* Account Security */}
                     <div className="bg-card rounded-[2.5rem] border border-border p-8 md:p-10 space-y-8">
                         <div className="flex items-center gap-4">

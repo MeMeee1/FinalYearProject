@@ -1,12 +1,17 @@
 
 import { Router } from 'express';
 import { db } from '../db/index.js';
-import { fulfillmentPointsTable, insertFulfillmentPointSchema, updateFulfillmentPointSchema } from '../db/fulfillmentPointsSchema.js';
+import { fulfillmentPointsTable, insertFulfillmentPointSchema, updateFulfillmentPointSchema, lgaEnum } from '../db/fulfillmentPointsSchema.js';
 import { eq, sql } from 'drizzle-orm';
 import { verifyToken, verifyAdmin, verifySeller } from '../middlewares/authMiddleware.js';
 import { validateData } from '../middlewares/validationMiddleware.js';
 
 const router = Router();
+
+// 0. Get all LGAs from enum
+router.get('/lgas', (req, res) => {
+    res.json(lgaEnum.enumValues);
+});
 
 // 1. List all Fulfillment Points (Public - for Signup/Checkout)
 router.get('/', async (req, res) => {

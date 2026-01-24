@@ -16,8 +16,8 @@ export async function fetchOrders() {
       throw new Error('Failed to fetch orders');
     }
 
-    const data = await response.json();
-    return data;
+    const responseData = await response.json();
+    return responseData.data || [];
   } catch (error) {
     console.error(error);
     return [];

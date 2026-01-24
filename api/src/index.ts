@@ -10,7 +10,6 @@ import ordersRoutes from './routes/orders/index.js';
 import vendorsRoutes from './routes/vendors/index.js';
 import adminRoutes from './routes/admin/index.js';
 import uploadRoutes from './routes/upload/index.js';
-import reviewsRoutes from './routes/reviews.js';
 import fulfillmentPointsRoutes from './routes/fulfillmentPoints.js';
 import serverless from 'serverless-http';
 
@@ -51,7 +50,6 @@ app.use('/orders', ordersRoutes);
 app.use('/vendors', vendorsRoutes);
 app.use('/admin', adminRoutes);
 app.use('/upload', uploadRoutes);
-app.use('/reviews', reviewsRoutes);
 app.use('/fulfillment-points', fulfillmentPointsRoutes);
 
 io.on('connection', (socket) => {

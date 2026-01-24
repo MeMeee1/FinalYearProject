@@ -131,25 +131,3 @@ router.delete('/admin/:id', verifyToken, verifyAdmin, async (req, res) => {
 });
 
 export default router;
-
-
-// Create a review (Authenticated User)
-router.post('/', verifyToken, validateData(insertReviewSchema), async (req, res) => {
-    try {
-        const reviewData = req.cleanBody;
-        // Force userId from token
-        reviewData.userId = (req as any).userId;
-
-        // Optional: Check if user purchased the product logic here (skipped for MVP)
-
-        const [newReview] = await db
-            .insert(reviewsTable)
-            .values(reviewData)
-            .returning();
-
-        res.status(201).json(newReview);
-    } catch (e) {
-        console.error(e);
-        res.status(500).json({ message: 'Error creating review' });
-    }
-});

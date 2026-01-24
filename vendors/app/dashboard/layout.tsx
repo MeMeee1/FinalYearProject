@@ -117,7 +117,6 @@ function Sidebar({ isActive }: { isActive: boolean }) {
     { href: '/dashboard', label: 'Overview', icon: LayoutGrid, alwaysShow: true },
     { href: '/dashboard/products', label: 'Products', icon: ShoppingBag, alwaysShow: false },
     { href: '/dashboard/orders', label: 'Order Hub', icon: ShoppingBag, alwaysShow: false },
-    { href: '/dashboard/reviews', label: 'Feedbacks', icon: Star, alwaysShow: false },
     { href: '/dashboard/analytics', label: 'Analytics', icon: TrendingUp, alwaysShow: false },
     { href: '/dashboard/settings', label: 'Account', icon: SettingsIcon, alwaysShow: true },
   ];

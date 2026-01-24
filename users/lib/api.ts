@@ -108,7 +108,11 @@ async function fetchWithAuth(url: string, options: RequestInit = {}) {
 // --- Products ---
 
 export async function getRecommendations(lga: string, category: string = 'All'): Promise<Product[]> {
-    const res = await fetch(`${API_URL}/products`);
+    const params = new URLSearchParams();
+    if (lga && lga !== 'All') params.append('lga', lga);
+    if (category && category !== 'All') params.append('category', category);
+
+    const res = await fetch(`${API_URL}/products?${params.toString()}`);
     const data = await res.json();
     if (!res.ok) throw new Error('Failed to fetch products');
 
@@ -149,6 +153,13 @@ export async function getFulfillmentPoints(): Promise<any[]> {
     const data = await res.json();
     if (!res.ok) throw new Error('Failed to fetch fulfillment points');
     return Array.isArray(data) ? data : (data.data || []);
+}
+
+export async function getLgas(): Promise<string[]> {
+    const res = await fetch(`${API_URL}/fulfillment-points/lgas`);
+    const data = await res.json();
+    if (!res.ok) throw new Error('Failed to fetch LGAs');
+    return data;
 }
 
 export async function getProduct(id: number): Promise<Product | null> {

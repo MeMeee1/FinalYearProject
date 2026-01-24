@@ -11,7 +11,7 @@ import { Button, ButtonText, ButtonIcon } from '@/components/ui/button';
 import { SearchIcon, ShoppingCartIcon, UserIcon, MapPinIcon, ChevronRightIcon } from 'lucide-react-native';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { getRecommendations, getUserProfile, getProductCategories } from '@/lib/api';
+import { getRecommendations, getUserProfile, getProductCategories, getLgas } from '@/lib/api';
 import { Product } from '@/lib/types';
 import { ProductCard } from '@/components/ProductCard';
 import { ThemeToggle } from '@/components/ThemeToggle';
@@ -22,7 +22,8 @@ export default function Home() {
   const [activeCategory, setActiveCategory] = useState('All');
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<string[]>(['All']);
-  const [userLga, setUserLga] = useState('Ikeja');
+  const [availableLgas, setAvailableLgas] = useState<string[]>(['Abuja Municipal']);
+  const [userLga, setUserLga] = useState('Abuja Municipal');
   const [userName, setUserName] = useState('');
 
   useEffect(() => {
@@ -39,6 +40,8 @@ export default function Home() {
     getProductCategories().then(cats => {
       setCategories(['All', ...cats]);
     }).catch(err => console.error(err));
+
+    getLgas().then(setAvailableLgas).catch(err => console.error('Failed to fetch LGAs:', err));
   }, []);
 
   useEffect(() => {
@@ -70,6 +73,19 @@ export default function Home() {
               <HStack className="items-center space-x-2 bg-secondary/50 backdrop-blur-md px-3 py-1.5 rounded-full border border-border/50 self-start mb-2">
                 <MapPinIcon size={12} color="hsl(var(--primary))" />
                 <Text className="text-foreground font-black text-[10px] uppercase tracking-widest">{userLga}, Abuja</Text>
+                <Button
+                  variant="link"
+                  size="xs"
+                  className="p-0 ml-2"
+                  onPress={() => {
+                    const next = availableLgas[(availableLgas.indexOf(userLga) + 1) % availableLgas.length];
+                    setUserLga(next);
+                    // Optionally update profile in background
+                    import('@/lib/api').then(api => api.updateUserProfile({ lga: next }));
+                  }}
+                >
+                  <Text className="text-primary text-[8px] font-bold uppercase">(Switch)</Text>
+                </Button>
               </HStack>
               <Heading className="text-5xl font-black text-foreground tracking-tighter leading-[0.9] mb-1">
                 Welcome, <Text className="text-primary italic">{userName || 'Shopper'}</Text>
@@ -151,11 +167,32 @@ export default function Home() {
           </Link>
         </HStack>
 
-        <Box className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </Box>
+        {products.length > 0 ? (
+          <Box className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+            {products.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </Box>
+        ) : (
+          <Box className="py-20 items-center justify-center bg-secondary/10 rounded-[3rem] border-2 border-dashed border-border/30">
+            <VStack space="md" className="items-center">
+              <Box className="p-6 bg-secondary/50 rounded-full">
+                <MapPinIcon size={40} color="hsl(var(--muted-foreground))" />
+              </Box>
+              <VStack className="items-center" space="xs">
+                <Heading size="md" className="text-foreground font-black tracking-tight">No products in your {userLga}</Heading>
+                <Text className="text-muted-foreground text-sm font-medium text-center px-10">We couldn't find any active listings in this region. Try switching LGAs or checking the marketplace.</Text>
+              </VStack>
+              <Button
+                variant="outline"
+                className="rounded-2xl border-primary mt-4"
+                onPress={() => router.push('/products')}
+              >
+                <ButtonText className="text-primary font-black uppercase tracking-widest text-[10px]">Explore Global Market</ButtonText>
+              </Button>
+            </VStack>
+          </Box>
+        )}
 
         {/* Global Action CTA */}
         <Box className="mt-24 mb-50">

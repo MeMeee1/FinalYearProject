@@ -44,7 +44,8 @@ export async function createOrder(req: Request, res: Response) {
           sellerId: productsTable.sellerId,
           supportsOutsideLgaDelivery: productsTable.supportsOutsideLgaDelivery,
           vendor: {
-            assignedVerificationPointId: vendorsTable.assignedVerificationPointId
+            assignedVerificationPointId: vendorsTable.assignedVerificationPointId,
+            platformCommissionRate: vendorsTable.platformCommissionRate
           }
         })
         .from(productsTable)
@@ -88,7 +89,10 @@ export async function createOrder(req: Request, res: Response) {
 
       // Calculate amounts
       const subtotal = items.reduce((acc: number, item: any) => acc + (item.price * item.quantity), 0);
-      const platformFee = subtotal * 0.1; // 10% platform fee
+
+      // Use the commission rate from the vendor profile (default to 10% if not found)
+      const commissionRate = dbProducts[0]?.vendor?.platformCommissionRate || 10.0;
+      const platformFee = subtotal * (commissionRate / 100);
       const shippingCost = 0;
       const totalAmount = subtotal;
       const sellerAmount = subtotal - platformFee;
@@ -228,11 +232,26 @@ export async function verifyPickupCode(req: Request, res: Response) {
       .returning();
 
     if (req.io) {
+      // Notify the user
       req.io.to(`user_${order.userId}`).emit('order_status_update', {
         orderId: id,
         deliveryStatus: 'collected',
         message: 'Order successfully collected!'
       });
+
+      // Notify the vendor/seller
+      const [orderWithSeller] = await db
+        .select({ sellerId: ordersTable.sellerId })
+        .from(ordersTable)
+        .where(eq(ordersTable.id, id));
+
+      if (orderWithSeller) {
+        req.io.to(`vendor_${orderWithSeller.sellerId}`).emit('order_status_update', {
+          orderId: id,
+          deliveryStatus: 'collected',
+          message: `Order #${id} has been collected by the customer.`
+        });
+      }
     }
 
     res.json(updatedOrder);

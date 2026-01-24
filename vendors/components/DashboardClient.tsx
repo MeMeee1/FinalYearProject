@@ -74,8 +74,6 @@ export function DashboardClient({ vendorStats, ordersData, vendorProfile }: Dash
   }
 
   const recentOrders = ordersData?.data ? ordersData.data.slice(0, 5) : [];
-  const totalRevenue = vendorStats?.totalRevenue || 0;
-  const avgOrderValue = vendorStats?.totalOrders ? totalRevenue / vendorStats.totalOrders : 0;
   const isPending = activeProfile?.status === 'pending';
   const isSuspended = activeProfile?.status === 'suspended';
 
@@ -147,28 +145,28 @@ export function DashboardClient({ vendorStats, ordersData, vendorProfile }: Dash
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
         {[
           {
-            label: 'Net Revenue',
-            value: `₦${totalRevenue.toLocaleString()}`,
+            label: 'Estimated Net',
+            value: `₦${Number(vendorStats?.totalRevenue || 0).toLocaleString()}`,
             icon: Coins,
             color: 'text-primary',
             trend: '+12.5%',
             bg: 'bg-primary/10'
           },
           {
-            label: 'Total Orders',
-            value: vendorStats?.totalOrders || 0,
-            icon: ShoppingBag,
-            color: 'text-blue-500',
-            trend: '+5.2%',
-            bg: 'bg-blue-500/10'
+            label: 'Gross Sales',
+            value: `₦${Number(vendorStats?.totalGrossRevenue || 0).toLocaleString()}`,
+            icon: DollarSign,
+            color: 'text-orange-500',
+            trend: 'Total',
+            bg: 'bg-orange-500/10'
           },
           {
-            label: 'Avg. Order',
-            value: `₦${avgOrderValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}`,
+            label: 'Platform Cut',
+            value: `₦${Number(vendorStats?.totalCommission || 0).toLocaleString()}`,
             icon: TrendingUp,
-            color: 'text-purple-500',
-            trend: '+2.1%',
-            bg: 'bg-purple-500/10'
+            color: 'text-red-500',
+            trend: 'Admin',
+            bg: 'bg-red-500/10'
           }
         ].map((stat, i) => (
           <div key={i} className="bg-card p-8 rounded-[2rem] border border-border transition-all hover:shadow-xl hover:shadow-primary/5 group relative overflow-hidden">

@@ -10,12 +10,8 @@ import {
   DollarSign,
   ShoppingBag,
   Package,
-  Calendar,
   BarChart3,
-  RefreshCw,
-  Activity,
-  ArrowUpRight,
-  PieChart as PieChartIcon
+  RefreshCw
 } from 'lucide-react';
 import { useVendorStore } from '@/store/vendorStore';
 
@@ -94,16 +90,6 @@ export function AnalyticsClient({ vendorStats, ordersData, vendorProfile }: Anal
     ? ((thisMonth.length - lastMonth.length) / lastMonth.length * 100).toFixed(1)
     : '0';
 
-  const revenueByStatus = {
-    delivered: orders.filter((o: any) => o.status === 'delivered').reduce((sum: number, o: any) => sum + Number(o.totalAmount || 0), 0),
-    processing: orders.filter((o: any) => o.status === 'processing').reduce((sum: number, o: any) => sum + Number(o.totalAmount || 0), 0),
-    pending: orders.filter((o: any) => o.status === 'pending').reduce((sum: number, o: any) => sum + Number(o.totalAmount || 0), 0),
-  };
-
-  const totalPossibleRevenue = revenueByStatus.delivered + revenueByStatus.processing + revenueByStatus.pending || 1;
-  const avgOrderValue = orders.length > 0
-    ? orders.reduce((sum: number, o: any) => sum + Number(o.totalAmount || 0), 0) / orders.length
-    : 0;
 
   return (
     <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -127,12 +113,11 @@ export function AnalyticsClient({ vendorStats, ordersData, vendorProfile }: Anal
       </div>
 
       {/* Primary Metrics */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {[
-          { label: 'Total Revenue', value: `₦${(vendorStats?.totalRevenue || 0).toLocaleString()}`, icon: DollarSign, color: 'text-primary', bg: 'bg-primary/10' },
+          { label: 'Gross Sales', value: `₦${Number(vendorStats?.totalGrossRevenue || 0).toLocaleString()}`, icon: DollarSign, color: 'text-primary', bg: 'bg-primary/10' },
+          { label: 'Net Earnings', value: `₦${Number(vendorStats?.totalRevenue || 0).toLocaleString()}`, icon: TrendingUp, color: 'text-orange-500', bg: 'bg-orange-500/10' },
           { label: 'Order Volume', value: orders.length, icon: ShoppingBag, color: 'text-blue-500', bg: 'bg-blue-500/10', trend: monthGrowth },
-          { label: 'Store Inventory', value: vendorStats?.totalProducts || 0, icon: Package, color: 'text-purple-500', bg: 'bg-purple-500/10' },
-          { label: 'AOV Index', value: `₦${avgOrderValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}`, icon: Activity, color: 'text-orange-500', bg: 'bg-orange-500/10' },
         ].map((item, i) => (
           <div key={i} className="bg-card p-8 rounded-[2rem] border border-border group hover:shadow-xl transition-all">
             <div className="flex justify-between items-start mb-4">
@@ -152,97 +137,6 @@ export function AnalyticsClient({ vendorStats, ordersData, vendorProfile }: Anal
         ))}
       </div>
 
-      {/* Detailed Analysis */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-        {/* Revenue Breakdown */}
-        <div className="bg-card p-8 rounded-[2.5rem] border border-border space-y-8">
-          <div className="flex items-center justify-between border-b border-border/50 pb-6">
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                <PieChartIcon className="w-5 h-5 text-primary" />
-              </div>
-              <Heading className="text-xl font-black text-foreground">Revenue Funnel</Heading>
-            </div>
-            <div className="text-right">
-              <Text className="text-xs font-black text-foreground">₦{totalPossibleRevenue.toLocaleString()}</Text>
-              <Text className="text-[10px] text-muted-foreground font-black uppercase opacity-60 tracking-tighter">Gross Potential</Text>
-            </div>
-          </div>
-
-          <div className="space-y-8">
-            {[
-              { label: 'Cleared (Delivered)', value: revenueByStatus.delivered, color: 'bg-primary' },
-              { label: 'In Pipeline (Processing)', value: revenueByStatus.processing, color: 'bg-blue-500' },
-              { label: 'Committed (Pending)', value: revenueByStatus.pending, color: 'bg-yellow-500' },
-            ].map((row, i) => (
-              <div key={i} className="space-y-3">
-                <div className="flex justify-between items-end">
-                  <div className="flex items-center gap-2">
-                    <div className={`w-1.5 h-1.5 rounded-full ${row.color}`} />
-                    <Text className="text-xs font-black text-foreground uppercase tracking-widest">{row.label}</Text>
-                  </div>
-                  <Text className="text-sm font-black text-foreground">₦{row.value.toLocaleString()}</Text>
-                </div>
-                <div className="w-full bg-secondary rounded-full h-1.5 overflow-hidden">
-                  <div
-                    className={`${row.color} h-full rounded-full transition-all duration-1000`}
-                    style={{ width: `${(row.value / totalPossibleRevenue) * 100}%` }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Temporal Comparison */}
-        <div className="bg-card p-8 rounded-[2.5rem] border border-border space-y-8">
-          <div className="flex items-center gap-4 border-b border-border/50 pb-6">
-            <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center">
-              <Calendar className="w-5 h-5 text-purple-500" />
-            </div>
-            <Heading className="text-xl font-black text-foreground">Temporal Velocity</Heading>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-            <div className="p-6 bg-secondary/30 rounded-3xl border border-border/50 group hover:bg-card transition-colors">
-              <Text className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-4">Current Cycle</Text>
-              <div className="flex items-end gap-3">
-                <Heading className="text-4xl font-black text-foreground">{thisMonth.length}</Heading>
-                <Text className="text-xs font-bold text-muted-foreground mb-1">Orders</Text>
-              </div>
-              <Text className="text-[11px] text-muted-foreground mt-4 font-medium leading-relaxed">Activity recorded in the active calendar month.</Text>
-            </div>
-
-            <div className="p-6 bg-secondary/30 rounded-3xl border border-border/50 group hover:bg-card transition-colors">
-              <Text className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-4">Previous Cycle</Text>
-              <div className="flex items-end gap-3">
-                <Heading className="text-4xl font-black text-muted-foreground/50">{lastMonth.length}</Heading>
-                <Text className="text-xs font-bold text-muted-foreground mb-1">Orders</Text>
-              </div>
-              <Text className="text-[11px] text-muted-foreground mt-4 font-medium leading-relaxed">Closed activity from the last full cycle.</Text>
-            </div>
-          </div>
-
-          <div className="pt-4">
-            <div className="flex items-center justify-between p-6 bg-gradient-to-br from-primary/20 via-primary/10 to-transparent rounded-[2rem] border border-primary/20">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
-                  <TrendingUp className="w-6 h-6 text-primary-foreground" />
-                </div>
-                <div>
-                  <Text className="text-xs font-black text-foreground uppercase tracking-widest">Growth Velocity</Text>
-                  <Text className="text-[10px] text-primary font-black uppercase">Month-over-Month</Text>
-                </div>
-              </div>
-              <div className="text-right">
-                <Heading className={`text-3xl font-black ${Number(monthGrowth) >= 0 ? 'text-primary' : 'text-destructive'}`}>
-                  {Number(monthGrowth) >= 0 ? '+' : ''}{monthGrowth}%
-                </Heading>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

@@ -1,0 +1,1 @@
+ALTER TABLE "fulfillment_points" ADD COLUMN "platformCommissionRate" double precision DEFAULT 5;

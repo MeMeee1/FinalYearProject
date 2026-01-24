@@ -312,9 +312,13 @@ export async function getVendorStats(req: Request, res: Response) {
       // If ordersTable has sellerId (which it seems to based on schema):
       .where(eq(ordersTable.sellerId, vendorId));
 
-    // Total Revenue
-    const [{ totalRevenue }] = await db
-      .select({ totalRevenue: sql<number>`sum(${ordersTable.sellerAmount})` }) // Use sellerAmount
+    // Total Revenue breakdown
+    const [revenueStats] = await db
+      .select({
+        totalGross: sql<number>`sum(${ordersTable.totalAmount})`,
+        totalCommission: sql<number>`sum(${ordersTable.platformFee})`,
+        totalNet: sql<number>`sum(${ordersTable.sellerAmount})`
+      })
       .from(ordersTable)
       .where(eq(ordersTable.sellerId, vendorId));
 
@@ -325,7 +329,9 @@ export async function getVendorStats(req: Request, res: Response) {
       activeProducts,
       outOfStockProducts,
       totalOrders: Number(totalOrders || 0),
-      totalRevenue: Number(totalRevenue || 0),
+      totalRevenue: Number(revenueStats?.totalNet || 0),
+      totalGrossRevenue: Number(revenueStats?.totalGross || 0),
+      totalCommission: Number(revenueStats?.totalCommission || 0),
       status: vendor[0].status,
     });
   } catch (e) {

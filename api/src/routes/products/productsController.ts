@@ -17,6 +17,19 @@ export async function listProducts(req: Request, res: Response) {
 
     const offset = (page - 1) * limit;
 
+    const lga = req.query.lga as string;
+    const category = req.query.category as string;
+
+    const conditions = [eq(productsTable.status, 'active')];
+
+    if (lga && lga !== 'All') {
+      conditions.push(eq(vendorsTable.lga, lga as any));
+    }
+
+    if (category && category !== 'All') {
+      conditions.push(eq(productsTable.productTags, category as any));
+    }
+
     // Get all products with vendor info
     const products = await db
       .select({
@@ -28,6 +41,7 @@ export async function listProducts(req: Request, res: Response) {
         stock: productsTable.stock,
         sku: productsTable.sku,
         status: productsTable.status,
+        productTags: productsTable.productTags,
         createdAt: productsTable.createdAt,
         updatedAt: productsTable.updatedAt,
         sellerId: productsTable.sellerId,
@@ -38,12 +52,13 @@ export async function listProducts(req: Request, res: Response) {
           storeName: vendorsTable.storeName,
           storeDescription: vendorsTable.storeDescription,
           businessAddress: vendorsTable.businessAddress,
+          lga: vendorsTable.lga,
           assignedVerificationPointId: vendorsTable.assignedVerificationPointId,
         },
       })
       .from(productsTable)
       .leftJoin(vendorsTable, eq(productsTable.sellerId, vendorsTable.id))
-      .where(eq(productsTable.status, 'active'))
+      .where(and(...conditions))
       .limit(limit)
       .offset(offset);
     console.log('Fetched products:', products);

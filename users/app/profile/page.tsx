@@ -253,10 +253,10 @@ export default function Profile() {
                         <Box className="w-12 h-12 bg-blue-500/10 rounded-2xl items-center justify-center">
                             <ShieldCheckIcon size={24} color="rgb(59 130 246)" />
                         </Box>
-                        <VStack className="flex-1">
+                        {/* <VStack className="flex-1">
                             <Text className="text-foreground font-black text-[10px] uppercase tracking-widest">Trust Protocol</Text>
                             <Text className="text-muted-foreground text-xs font-medium">Data is secured</Text>
-                        </VStack>
+                        </VStack> */}
                     </Box>
 
                     {error ? (
