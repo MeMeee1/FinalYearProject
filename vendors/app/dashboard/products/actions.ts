@@ -75,7 +75,16 @@ export async function createProduct(
     sku: string,
     images?: string[],
     video?: string,
-    productTags?: string
+    productTags?: string,
+    additionalData?: {
+        speciesBreed?: string;
+        age?: string;
+        weightSize?: string;
+        growthStage?: string;
+        healthStatus?: string;
+        vaccinationStatus?: string;
+        diseaseHistory?: string;
+    }
 ) {
     let redirectUrl = '/dashboard/products';
     try {
@@ -87,7 +96,7 @@ export async function createProduct(
                 Authorization: `${token}`,
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ name, description, price, stock, sku, images, video, productTags }),
+            body: JSON.stringify({ name, description, price, stock, sku, images, video, productTags, ...additionalData }),
         });
 
         if (!res.ok) {
@@ -133,6 +142,13 @@ export async function updateProduct(
         images?: string[];
         image?: string;
         video?: string;
+        speciesBreed?: string;
+        age?: string;
+        weightSize?: string;
+        growthStage?: string;
+        healthStatus?: string;
+        vaccinationStatus?: string;
+        diseaseHistory?: string;
     }
 ) {
     const token = cookies().get('token')?.value;

@@ -30,6 +30,19 @@ export const productsTable = pgTable('products', {
   // Status
   status: varchar({ length: 50, enum: ['active', 'draft', 'out_of_stock'] }).notNull().default('active'),
 
+  // Identification & Listing
+  speciesBreed: varchar({ length: 255 }), // Species / Breed
+
+  // Age & Size
+  age: varchar({ length: 100 }), // Age (days / weeks / months)
+  weightSize: varchar({ length: 100 }), // Average Weight / Size
+  growthStage: varchar({ length: 50, enum: ['chick', 'juvenile', 'adult', 'mature'] }), // Growth Stage
+
+  // Health & Quality
+  healthStatus: varchar({ length: 100 }), // Health Status (Healthy, Vaccinated, Treated)
+  vaccinationStatus: text(),
+  diseaseHistory: text(),
+
   createdAt: timestamp().notNull().defaultNow(),
   updatedAt: timestamp().notNull().defaultNow(),
 });

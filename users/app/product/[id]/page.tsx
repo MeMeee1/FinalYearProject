@@ -203,10 +203,64 @@ export default function ProductDetails() {
                         <VStack space="md">
                             <HStack space="sm" className="items-center">
                                 <Box className="w-1.5 h-4 bg-primary rounded-full shadow-lg shadow-primary/30" />
-                                <Heading size="xs" className="font-black text-foreground uppercase tracking-[0.2em] text-[10px]">Specifications Detail</Heading>
+                                <Heading size="xs" className="font-black text-foreground uppercase tracking-[0.2em] text-[10px]">Product Overview</Heading>
                             </HStack>
                             <Box className="bg-card/30 border border-border/30 p-8 rounded-[2.5rem]">
                                 <Text className="text-muted-foreground font-medium text-lg leading-relaxed">{product.description || 'No detailed specifications provided for this listing.'}</Text>
+                            </Box>
+                        </VStack>
+
+                        {/* Agricultural Specifications */}
+                        <VStack space="md">
+                            <HStack space="sm" className="items-center">
+                                <Box className="w-1.5 h-4 bg-orange-500 rounded-full" />
+                                <Heading size="xs" className="font-black text-foreground uppercase tracking-[0.2em] text-[10px]">Technical Specifications</Heading>
+                            </HStack>
+                            <Box className="bg-card/30 border border-border/30 p-8 rounded-[2.5rem]">
+                                <div className="grid grid-cols-2 gap-y-6 gap-x-12">
+                                    <VStack>
+                                        <Text className="text-[10px] text-muted-foreground font-black uppercase tracking-widest mb-1">Species / Breed</Text>
+                                        <Text className="text-foreground font-bold">{product.speciesBreed || 'N/A'}</Text>
+                                    </VStack>
+                                    <VStack>
+                                        <Text className="text-[10px] text-muted-foreground font-black uppercase tracking-widest mb-1">Growth Stage</Text>
+                                        <Text className="text-foreground font-bold capitalize">{product.growthStage || 'N/A'}</Text>
+                                    </VStack>
+                                    <VStack>
+                                        <Text className="text-[10px] text-muted-foreground font-black uppercase tracking-widest mb-1">Age</Text>
+                                        <Text className="text-foreground font-bold">{product.age || 'N/A'}</Text>
+                                    </VStack>
+                                    <VStack>
+                                        <Text className="text-[10px] text-muted-foreground font-black uppercase tracking-widest mb-1">Avg. Weight / Size</Text>
+                                        <Text className="text-foreground font-bold">{product.weightSize || 'N/A'}</Text>
+                                    </VStack>
+                                </div>
+                            </Box>
+                        </VStack>
+
+                        {/* Health & Quality Section */}
+                        <VStack space="md">
+                            <HStack space="sm" className="items-center">
+                                <Box className="w-1.5 h-4 bg-green-500 rounded-full" />
+                                <Heading size="xs" className="font-black text-foreground uppercase tracking-[0.2em] text-[10px]">Health & Quality</Heading>
+                            </HStack>
+                            <Box className="bg-card/30 border border-border/30 p-8 rounded-[2.5rem] space-y-6">
+                                <VStack>
+                                    <Text className="text-[10px] text-muted-foreground font-black uppercase tracking-widest mb-1">Health Status</Text>
+                                    <Text className="text-foreground font-bold">{product.healthStatus || 'Verified Healthy'}</Text>
+                                </VStack>
+                                {product.vaccinationStatus && (
+                                    <VStack>
+                                        <Text className="text-[10px] text-muted-foreground font-black uppercase tracking-widest mb-1">Vaccination History</Text>
+                                        <Text className="text-muted-foreground text-sm font-medium">{product.vaccinationStatus}</Text>
+                                    </VStack>
+                                )}
+                                {product.diseaseHistory && (
+                                    <VStack>
+                                        <Text className="text-[10px] text-muted-foreground font-black uppercase tracking-widest mb-1">Medical Record</Text>
+                                        <Text className="text-muted-foreground text-sm font-medium">{product.diseaseHistory}</Text>
+                                    </VStack>
+                                )}
                             </Box>
                         </VStack>
 

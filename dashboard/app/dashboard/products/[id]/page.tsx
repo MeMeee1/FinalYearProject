@@ -98,7 +98,7 @@ export default async function ProductPage({
               </div>
 
               {/* Attributes Grid */}
-              <div className="grid grid-cols-2 gap-4 mb-8">
+              <div className="grid grid-cols-2 gap-4 mb-4">
                 <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 flex items-start gap-3">
                   <Package className="w-5 h-5 text-blue-500 mt-0.5" />
                   <div>
@@ -116,18 +116,53 @@ export default async function ProductPage({
                     </p>
                   </div>
                 </div>
-                <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 flex items-start gap-3 col-span-2">
-                  <Clock className="w-5 h-5 text-orange-500 mt-0.5" />
+              </div>
+
+              {/* Agricultural Specs Grid */}
+              <div className="grid grid-cols-2 gap-4 mb-8">
+                <div className="bg-orange-50/50 rounded-xl p-4 border border-orange-100 flex items-start gap-3">
                   <div>
-                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Added On</p>
-                    <p className="text-gray-900 font-medium text-sm">
-                      {product.createdAt ? new Date(product.createdAt).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                      }) : 'N/A'}
-                    </p>
+                    <p className="text-[10px] font-black text-orange-600 uppercase tracking-widest mb-1">Breed / Species</p>
+                    <p className="text-gray-900 font-bold text-sm">{product.speciesBreed || 'N/A'}</p>
                   </div>
+                </div>
+                <div className="bg-orange-50/50 rounded-xl p-4 border border-orange-100 flex items-start gap-3">
+                  <div>
+                    <p className="text-[10px] font-black text-orange-600 uppercase tracking-widest mb-1">Growth Stage</p>
+                    <p className="text-gray-900 font-bold text-sm capitalize">{product.growthStage || 'N/A'}</p>
+                  </div>
+                </div>
+                <div className="bg-orange-50/50 rounded-xl p-4 border border-orange-100 flex items-start gap-3">
+                  <div>
+                    <p className="text-[10px] font-black text-orange-600 uppercase tracking-widest mb-1">Age</p>
+                    <p className="text-gray-900 font-bold text-sm">{product.age || 'N/A'}</p>
+                  </div>
+                </div>
+                <div className="bg-orange-50/50 rounded-xl p-4 border border-orange-100 flex items-start gap-3">
+                  <div>
+                    <p className="text-[10px] font-black text-orange-600 uppercase tracking-widest mb-1">Weight / Size</p>
+                    <p className="text-gray-900 font-bold text-sm">{product.weightSize || 'N/A'}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Health Info */}
+              <div className="bg-green-50/30 rounded-2xl p-6 border border-green-100 mb-8">
+                <h3 className="text-xs font-black text-green-700 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                  Health & Quality Records
+                </h3>
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Status</p>
+                    <p className="text-gray-900 font-semibold">{product.healthStatus || 'N/A'}</p>
+                  </div>
+                  {product.vaccinationStatus && (
+                    <div>
+                      <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Vaccinations</p>
+                      <p className="text-sm text-gray-600">{product.vaccinationStatus}</p>
+                    </div>
+                  )}
                 </div>
               </div>
 

@@ -21,6 +21,13 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
     const [stock, setStock] = useState('0');
     const [sku, setSku] = useState('');
     const [status, setStatus] = useState('active');
+    const [speciesBreed, setSpeciesBreed] = useState('');
+    const [age, setAge] = useState('');
+    const [weightSize, setWeightSize] = useState('');
+    const [growthStage, setGrowthStage] = useState('adult');
+    const [healthStatus, setHealthStatus] = useState('Healthy');
+    const [vaccinationStatus, setVaccinationStatus] = useState('');
+    const [diseaseHistory, setDiseaseHistory] = useState('');
 
     // Images: can be File (new) or string (existing URL)
     const [images, setImages] = useState<{ file?: File; preview: string }[]>([]);
@@ -42,6 +49,13 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                     setStock(String(product.stock));
                     setSku(product.sku || '');
                     setStatus(product.status || 'active');
+                    setSpeciesBreed(product.speciesBreed || '');
+                    setAge(product.age || '');
+                    setWeightSize(product.weightSize || '');
+                    setGrowthStage(product.growthStage || 'adult');
+                    setHealthStatus(product.healthStatus || 'Healthy');
+                    setVaccinationStatus(product.vaccinationStatus || '');
+                    setDiseaseHistory(product.diseaseHistory || '');
 
                     if (product.image) {
                         try {
@@ -173,7 +187,14 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                     stock: Number(stock),
                     sku,
                     images: uploadedUrls,
-                    video: (videoUrl || null) as any
+                    video: (videoUrl || null) as any,
+                    speciesBreed,
+                    age,
+                    weightSize,
+                    growthStage,
+                    healthStatus,
+                    vaccinationStatus,
+                    diseaseHistory,
                 }
             );
 
@@ -256,6 +277,87 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                                         />
                                     </Box>
                                 </FormControl>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <FormControl>
+                                        <FormControlLabel className="mb-1"><FormControlLabelText className="text-gray-700 font-medium">Species / Breed</FormControlLabelText></FormControlLabel>
+                                        <input
+                                            type="text"
+                                            value={speciesBreed}
+                                            onChange={(e) => setSpeciesBreed(e.target.value)}
+                                            placeholder="e.g. Noiler, Tilapia..."
+                                            className="w-full border border-gray-300 rounded-md px-3 h-10 focus:border-blue-500 hover:border-gray-400 outline-none text-gray-900"
+                                        />
+                                    </FormControl>
+                                    <FormControl>
+                                        <FormControlLabel className="mb-1"><FormControlLabelText className="text-gray-700 font-medium">Growth Stage</FormControlLabelText></FormControlLabel>
+                                        <select
+                                            value={growthStage}
+                                            onChange={(e) => setGrowthStage(e.target.value)}
+                                            className="w-full border border-gray-300 rounded-md px-3 h-10 focus:border-blue-500 hover:border-gray-400 outline-none text-gray-900"
+                                        >
+                                            <option value="chick">Chick / Fry</option>
+                                            <option value="juvenile">Juvenile</option>
+                                            <option value="adult">Adult</option>
+                                            <option value="mature">Mature / Point of Lay</option>
+                                        </select>
+                                    </FormControl>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <FormControl>
+                                        <FormControlLabel className="mb-1"><FormControlLabelText className="text-gray-700 font-medium">Age</FormControlLabelText></FormControlLabel>
+                                        <input
+                                            type="text"
+                                            value={age}
+                                            onChange={(e) => setAge(e.target.value)}
+                                            placeholder="e.g. 4 weeks, 2 months"
+                                            className="w-full border border-gray-300 rounded-md px-3 h-10 focus:border-blue-500 hover:border-gray-400 outline-none text-gray-900"
+                                        />
+                                    </FormControl>
+                                    <FormControl>
+                                        <FormControlLabel className="mb-1"><FormControlLabelText className="text-gray-700 font-medium">Avg. Weight / Size</FormControlLabelText></FormControlLabel>
+                                        <input
+                                            type="text"
+                                            value={weightSize}
+                                            onChange={(e) => setWeightSize(e.target.value)}
+                                            placeholder="e.g. 1.5kg, 20cm"
+                                            className="w-full border border-gray-300 rounded-md px-3 h-10 focus:border-blue-500 hover:border-gray-400 outline-none text-gray-900"
+                                        />
+                                    </FormControl>
+                                </div>
+
+                                <FormControl>
+                                    <FormControlLabel className="mb-1"><FormControlLabelText className="text-gray-700 font-medium">Health Status</FormControlLabelText></FormControlLabel>
+                                    <input
+                                        type="text"
+                                        value={healthStatus}
+                                        onChange={(e) => setHealthStatus(e.target.value)}
+                                        placeholder="e.g. Healthy, Vaccinated..."
+                                        className="w-full border border-gray-300 rounded-md px-3 h-10 focus:border-blue-500 hover:border-gray-400 outline-none text-gray-900"
+                                    />
+                                </FormControl>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <FormControl>
+                                        <FormControlLabel className="mb-1"><FormControlLabelText className="text-gray-700 font-medium">Vaccination Details</FormControlLabelText></FormControlLabel>
+                                        <textarea
+                                            value={vaccinationStatus}
+                                            onChange={(e) => setVaccinationStatus(e.target.value)}
+                                            className="w-full border border-gray-300 rounded-md p-3 focus:border-blue-500 hover:border-gray-400 outline-none text-gray-900 h-24 resize-none text-sm"
+                                            placeholder="Recent vaccinations..."
+                                        />
+                                    </FormControl>
+                                    <FormControl>
+                                        <FormControlLabel className="mb-1"><FormControlLabelText className="text-gray-700 font-medium">Disease History</FormControlLabelText></FormControlLabel>
+                                        <textarea
+                                            value={diseaseHistory}
+                                            onChange={(e) => setDiseaseHistory(e.target.value)}
+                                            className="w-full border border-gray-300 rounded-md p-3 focus:border-blue-500 hover:border-gray-400 outline-none text-gray-900 h-24 resize-none text-sm"
+                                            placeholder="Past illnesses..."
+                                        />
+                                    </FormControl>
+                                </div>
                             </VStack>
                         </Box>
 

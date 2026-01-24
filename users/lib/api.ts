@@ -169,16 +169,10 @@ export async function getProduct(id: number): Promise<Product | null> {
 }
 
 export async function reduceStock(id: number, quantity: number) {
-    const res = await fetch(`${API_URL}/products/${id}/reduce`, {
+    return fetchWithAuth(`/products/${id}/reduce`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ quantity }),
     });
-    if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.message || 'Failed to reduce stock');
-    }
-    return res.json();
 }
 
 export async function getVendor(id: number): Promise<any> {

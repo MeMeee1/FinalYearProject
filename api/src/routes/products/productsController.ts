@@ -540,11 +540,15 @@ export async function reduceStock(req: Request, res: Response) {
       .returning();
 
     // Broadcast stock update via WebSockets
-    if (req.io) {
+    if (req.io && updatedProduct) {
       req.io.emit('stock_updated', {
         productId: id,
         newStock: updatedProduct.stock
       });
+    }
+
+    if (!updatedProduct) {
+      return res.status(404).json({ message: 'Failed to update stock: Product not found during update' });
     }
 
     res.json(updatedProduct);

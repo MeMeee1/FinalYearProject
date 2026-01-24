@@ -14,6 +14,13 @@ export interface Product {
     sellerId: number;
     video: string | null;
     productTags?: string;
+    speciesBreed?: string;
+    age?: string;
+    weightSize?: string;
+    growthStage?: string;
+    healthStatus?: string;
+    vaccinationStatus?: string;
+    diseaseHistory?: string;
     vendor?: {
         id: number;
         storeName: string;

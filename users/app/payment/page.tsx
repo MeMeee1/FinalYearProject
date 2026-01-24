@@ -129,15 +129,16 @@ export default function Payment() {
                     </VStack>
 
                     {/* Trust Indicators */}
-                    <HStack space="md" className="bg-secondary/10 border border-border/30 p-6 rounded-[2.5rem] mt-4">
+                    {/* <HStack space="md" className="bg-secondary/10 border border-border/30 p-6 rounded-[2.5rem] mt-4">
                         <Box className="w-10 h-10 bg-blue-500/10 rounded-xl items-center justify-center">
                             <ShieldCheckIcon size={20} color="rgb(59 130 246)" />
                         </Box>
-                        <VStack className="flex-1">
+                        {/* <VStack className="flex-1">
                             <Text className="text-foreground font-black text-[10px] uppercase tracking-widest">PCI-DSS Compliant</Text>
                             <Text className="text-muted-foreground text-[10px] font-medium leading-relaxed">All transactions are handled by PayStack</Text>
                         </VStack>
-                    </HStack>
+                        </HStack> */}
+
                 </VStack>
             </Box>
 
@@ -171,6 +172,6 @@ export default function Payment() {
                     </Button>
                 </Box>
             </Box>
-        </Box>
+        </Box >
     );
 }

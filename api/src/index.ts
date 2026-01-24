@@ -23,7 +23,11 @@ const io = new Server(httpServer, {
   },
 });
 
-app.use(cors());
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
 app.use(urlencoded({ extended: false }));
 app.use(
   json({

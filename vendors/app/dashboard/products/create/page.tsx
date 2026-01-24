@@ -20,6 +20,11 @@ const productSchema = z.object({
   stock: z.number().int().positive('Quantity must be greater than zero'),
   sku: z.string().optional(),
   productTags: z.enum(['Chicken', 'Fish', 'Eggs']).optional(),
+  speciesBreed: z.string().optional(),
+  age: z.string().optional(),
+  weightSize: z.string().optional(),
+  growthStage: z.enum(['chick', 'juvenile', 'adult', 'mature']).optional(),
+  healthStatus: z.string().optional(),
 });
 
 export default function CreateProductPage() {
@@ -30,6 +35,13 @@ export default function CreateProductPage() {
   const [stock, setStock] = useState('0');
   const [sku, setSku] = useState('');
   const [tag, setTag] = useState('Chicken');
+  const [speciesBreed, setSpeciesBreed] = useState('');
+  const [age, setAge] = useState('');
+  const [weightSize, setWeightSize] = useState('');
+  const [growthStage, setGrowthStage] = useState('adult');
+  const [healthStatus, setHealthStatus] = useState('Healthy');
+  const [vaccinationStatus, setVaccinationStatus] = useState('');
+  const [diseaseHistory, setDiseaseHistory] = useState('');
   const [images, setImages] = useState<{ file?: File; preview: string }[]>([]);
   const [video, setVideo] = useState<{ file?: File; preview: string } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -124,7 +136,16 @@ export default function CreateProductPage() {
         sku,
         uploadedUrls.length > 0 ? uploadedUrls : undefined,
         videoUrl,
-        tag
+        tag,
+        {
+          speciesBreed,
+          age,
+          weightSize,
+          growthStage,
+          healthStatus,
+          vaccinationStatus,
+          diseaseHistory,
+        }
       );
 
       router.push('/dashboard/products');
@@ -233,6 +254,105 @@ export default function CreateProductPage() {
                       <option value="Eggs">Dairy / Eggs</option>
                     </select>
                     <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-2">Species / Breed</label>
+                    <input
+                      type="text"
+                      value={speciesBreed}
+                      onChange={(e) => setSpeciesBreed(e.target.value)}
+                      placeholder="e.g. Noiler, Tilapia..."
+                      className="w-full px-6 py-4 bg-secondary/30 border border-border rounded-2xl text-sm font-bold focus:bg-card focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-2">Growth Stage</label>
+                    <div className="relative">
+                      <select
+                        value={growthStage}
+                        onChange={(e) => setGrowthStage(e.target.value)}
+                        className="w-full px-6 py-4 bg-secondary/30 border border-border rounded-2xl text-sm font-bold focus:bg-card focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none appearance-none cursor-pointer"
+                      >
+                        <option value="chick">Chick / Fry</option>
+                        <option value="juvenile">Juvenile</option>
+                        <option value="adult">Adult</option>
+                        <option value="mature">Mature / Point of Lay</option>
+                      </select>
+                      <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-2">Age</label>
+                    <input
+                      type="text"
+                      value={age}
+                      onChange={(e) => setAge(e.target.value)}
+                      placeholder="e.g. 4 weeks, 2 months"
+                      className="w-full px-6 py-4 bg-secondary/30 border border-border rounded-2xl text-sm font-bold focus:bg-card focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-2">Avg. Weight / Size</label>
+                    <input
+                      type="text"
+                      value={weightSize}
+                      onChange={(e) => setWeightSize(e.target.value)}
+                      placeholder="e.g. 1.5kg, 20cm"
+                      className="w-full px-6 py-4 bg-secondary/30 border border-border rounded-2xl text-sm font-bold focus:bg-card focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Health & Quality */}
+            <div className="bg-card rounded-[2.5rem] border border-border p-8 md:p-10 space-y-8">
+              <div className="flex items-center gap-4 border-b border-border/50 pb-6">
+                <div className="w-12 h-12 rounded-2xl bg-green-500/10 flex items-center justify-center">
+                  <Activity className="w-6 h-6 text-green-500" />
+                </div>
+                <div>
+                  <Heading className="text-xl font-black text-foreground">Health & Quality</Heading>
+                  <Text className="text-xs text-muted-foreground font-medium">Veterinary records and physical health status.</Text>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-2">Current Health Status</label>
+                  <input
+                    type="text"
+                    value={healthStatus}
+                    onChange={(e) => setHealthStatus(e.target.value)}
+                    placeholder="e.g. Healthy, Vaccinated, Under Treatment"
+                    className="w-full px-6 py-4 bg-secondary/30 border border-border rounded-2xl text-sm font-bold focus:bg-card focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-2">Vaccination Details</label>
+                    <textarea
+                      value={vaccinationStatus}
+                      onChange={(e) => setVaccinationStatus(e.target.value)}
+                      placeholder="List recent vaccinations..."
+                      className="w-full px-6 py-4 bg-secondary/30 border border-border rounded-2xl text-sm font-medium focus:bg-card focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none h-24 resize-none"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-2">Disease History</label>
+                    <textarea
+                      value={diseaseHistory}
+                      onChange={(e) => setDiseaseHistory(e.target.value)}
+                      placeholder="Any notable past illnesses..."
+                      className="w-full px-6 py-4 bg-secondary/30 border border-border rounded-2xl text-sm font-medium focus:bg-card focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none h-24 resize-none"
+                    />
                   </div>
                 </div>
               </div>
