@@ -17,7 +17,6 @@ import { useCart } from '@/context/CartContext';
 export default function Cart() {
     const router = useRouter();
     const { items, updateQuantity, removeFromCart, subtotal, total } = useCart();
-    const delivery = items.length > 0 ? 2000 : 0;
 
     return (
         <Box className="flex-1 min-h-screen bg-background pb-40">
@@ -117,15 +116,7 @@ export default function Cart() {
                                         <Text className="text-muted-foreground font-black text-[10px] uppercase tracking-[0.25em]">Base Valuation</Text>
                                         <Text className="font-black text-foreground text-xl">₦{subtotal.toLocaleString()}</Text>
                                     </HStack>
-                                    <HStack className="justify-between items-center">
-                                        <Text className="text-muted-foreground font-black text-[10px] uppercase tracking-[0.25em]">Logistics Fee</Text>
-                                        <HStack space="md" className="items-center">
-                                            <Box className="bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
-                                                <Text className="text-primary text-[8px] font-black uppercase tracking-widest">Standard</Text>
-                                            </Box>
-                                            <Text className="font-black text-foreground text-xl">₦{delivery.toLocaleString()}</Text>
-                                        </HStack>
-                                    </HStack>
+                                    {/* Logistics Fee removed per user request */}
                                     <Box className="h-[1px] bg-border/40 my-4" />
                                     <HStack className="justify-between items-center">
                                         <VStack>
@@ -142,20 +133,22 @@ export default function Cart() {
 
                         {/* Action Deck (Now in Scroll Area) */}
                         <Box className="mt-4 pb-12">
-                            <Link href="/checkout" passHref legacyBehavior>
-                                <Button size="xl" className="w-full rounded-[2.5rem] bg-primary hover:scale-[1.02] shadow-[0_24px_48px_rgba(29,185,84,0.3)] border-0 h-24 transition-all active:scale-[0.98] group overflow-hidden relative">
-                                    <Box className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
-                                    <HStack space="xl" className="items-center relative z-10">
-                                        <Box className="bg-black/10 p-4 rounded-2xl group-hover:rotate-12 transition-transform shadow-inner">
-                                            <ShoppingBagIcon size={28} color="black" />
-                                        </Box>
-                                        <VStack className="items-start">
-                                            <ButtonText className="font-black text-black text-2xl uppercase tracking-[0.2em] leading-none">Checkout</ButtonText>
-                                            <Text className="text-black/60 text-[10px] font-black uppercase tracking-[0.3em] mt-2">Pay Up</Text>
-                                        </VStack>
-                                    </HStack>
-                                </Button>
-                            </Link>
+                            <Button
+                                size="xl"
+                                className="w-full rounded-[2.5rem] bg-primary hover:scale-[1.02] shadow-[0_24px_48px_rgba(29,185,84,0.3)] border-0 h-24 transition-all active:scale-[0.98] group overflow-hidden relative"
+                                onPress={() => router.push('/checkout')}
+                            >
+                                <Box className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
+                                <HStack space="xl" className="items-center relative z-10">
+                                    <Box className="bg-black/10 p-4 rounded-2xl group-hover:rotate-12 transition-transform shadow-inner">
+                                        <ShoppingBagIcon size={28} color="black" />
+                                    </Box>
+                                    <VStack className="items-start">
+                                        <ButtonText className="font-black text-black text-2xl uppercase tracking-[0.2em] leading-none">Checkout</ButtonText>
+                                        <Text className="text-black/60 text-[10px] font-black uppercase tracking-[0.3em] mt-2">Pay Up</Text>
+                                    </VStack>
+                                </HStack>
+                            </Button>
                         </Box>
                     </VStack>
                 </Box>

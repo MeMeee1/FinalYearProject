@@ -10,6 +10,7 @@ import Link from 'next/link';
 import { Icon } from '@/components/ui/icon';
 import { LayoutGrid, ShoppingBag, TrendingUp, Settings as SettingsIcon, Star, Bell } from 'lucide-react';
 import { VendorProfileSync } from '@/components/VendorProfileSync';
+import { VendorRealTimeSync } from '@/components/VendorRealTimeSync';
 import { ThemeToggle } from '@/components/ThemeToggle';
 
 type DashboardLayoutProps = {
@@ -53,6 +54,7 @@ export default async function DashboardLayout({ children }: DashboardLayoutProps
   return (
     <>
       <VendorProfileSync initialProfile={vendorProfile} />
+      <VendorRealTimeSync />
       <div className="h-screen flex flex-col overflow-hidden bg-background text-foreground">
         {/* Header */}
         <Header vendorProfile={vendorProfile} />

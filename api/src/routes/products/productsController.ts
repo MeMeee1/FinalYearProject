@@ -31,12 +31,14 @@ export async function listProducts(req: Request, res: Response) {
         createdAt: productsTable.createdAt,
         updatedAt: productsTable.updatedAt,
         sellerId: productsTable.sellerId,
-        video: productsTable.video, // Add video
+        video: productsTable.video,
+        supportsOutsideLgaDelivery: productsTable.supportsOutsideLgaDelivery,
         vendor: {
           id: vendorsTable.id,
           storeName: vendorsTable.storeName,
           storeDescription: vendorsTable.storeDescription,
           businessAddress: vendorsTable.businessAddress,
+          assignedVerificationPointId: vendorsTable.assignedVerificationPointId,
         },
       })
       .from(productsTable)
@@ -86,7 +88,8 @@ export async function getProductById(req: Request, res: Response) {
         createdAt: productsTable.createdAt,
         updatedAt: productsTable.updatedAt,
         sellerId: productsTable.sellerId,
-        video: productsTable.video, // Add video
+        video: productsTable.video,
+        supportsOutsideLgaDelivery: productsTable.supportsOutsideLgaDelivery,
         vendor: {
           id: vendorsTable.id,
           storeName: vendorsTable.storeName,
@@ -94,6 +97,7 @@ export async function getProductById(req: Request, res: Response) {
           businessAddress: vendorsTable.businessAddress,
           businessPhone: vendorsTable.businessPhone,
           businessEmail: vendorsTable.businessEmail,
+          assignedVerificationPointId: vendorsTable.assignedVerificationPointId,
         },
       })
       .from(productsTable)
@@ -444,12 +448,14 @@ export async function searchProducts(req: Request, res: Response) {
         sellerId: productsTable.sellerId,
         video: productsTable.video,
         productTags: productsTable.productTags,
+        supportsOutsideLgaDelivery: productsTable.supportsOutsideLgaDelivery,
         vendor: {
           id: vendorsTable.id,
           storeName: vendorsTable.storeName,
           storeDescription: vendorsTable.storeDescription,
           businessAddress: vendorsTable.businessAddress,
           lga: vendorsTable.lga,
+          assignedVerificationPointId: vendorsTable.assignedVerificationPointId,
         },
       })
       .from(productsTable)

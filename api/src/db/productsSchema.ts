@@ -5,6 +5,7 @@ import {
   text,
   doublePrecision,
   timestamp,
+  boolean,
 
 } from 'drizzle-orm/pg-core';
 import { createInsertSchema } from 'drizzle-zod';
@@ -24,6 +25,7 @@ export const productsTable = pgTable('products', {
   // Inventory
   stock: integer().notNull().default(0),
   sku: varchar({ length: 100 }),
+  supportsOutsideLgaDelivery: boolean().default(true),
 
   // Status
   status: varchar({ length: 50, enum: ['active', 'draft', 'out_of_stock'] }).notNull().default('active'),

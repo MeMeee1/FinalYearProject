@@ -7,6 +7,7 @@ export interface Product {
     price: number;
     stock: number;
     sku: string | null;
+    supportsOutsideLgaDelivery?: boolean;
     status: string;
     createdAt: string;
     updatedAt: string;
@@ -18,6 +19,7 @@ export interface Product {
         storeName: string;
         storeDescription: string | null;
         businessAddress: string | null;
+        assignedVerificationPointId?: number;
     };
 }
 
@@ -37,9 +39,15 @@ export interface User {
 export interface Order {
     id: number;
     status: string;
-    total: number;
-    totalAmount?: number;
+    totalAmount: number;
+    deliveryStatus: 'pending' | 'dropped_off' | 'collected';
+    pickupCode?: string;
+    fulfillmentPointId?: number;
+    fulfillmentPoint?: {
+        name: string;
+        address: string;
+        city: string;
+    };
     createdAt: string;
     items: CartItem[];
-    pickupLocation?: string;
 }

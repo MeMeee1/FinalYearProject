@@ -30,7 +30,7 @@ export const ordersTable = pgTable('orders', {
 
   // Fulfillment (Pickup)
   fulfillmentPointId: integer().references(() => fulfillmentPointsTable.id),
-  pickupCode: varchar({ length: 6 }), // 6-digit code for verification
+  pickupCode: varchar({ length: 20 }), // Alphanumeric code for verification (e.g. ABCD-1234)
   deliveryStatus: varchar({ length: 50, enum: ['pending', 'dropped_off', 'collected'] }).default('pending'),
 
   // Legacy Shipping (Optional fallback)
@@ -59,16 +59,28 @@ export const insertOrderSchema = createInsertSchema(ordersTable).omit({
   status: true,
   createdAt: true,
   updatedAt: true,
+  totalAmount: true,
+  platformFee: true,
+  sellerAmount: true,
+  pickupCode: true,
 });
 
 export const insertOrderItemSchema = createInsertSchema(orderItemsTable).omit({
   id: true,
   orderId: true,
+  subtotal: true,
 });
 
 export const insertOrderWithItemsSchema = z.object({
-  order: insertOrderSchema,
-  items: z.array(insertOrderItemSchema),
+  order: insertOrderSchema.partial().and(z.object({
+    fulfillmentPointId: z.number().optional(),
+  })),
+  items: z.array(z.object({
+    id: z.number(),
+    price: z.number(),
+    quantity: z.number(),
+    sellerId: z.number().optional(),
+  })),
 });
 
 export const updateOrderSchema = createInsertSchema(ordersTable).pick({

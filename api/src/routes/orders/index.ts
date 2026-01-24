@@ -4,6 +4,8 @@ import {
   getOrder,
   listOrders,
   updateOrder,
+  markAsDroppedOff,
+  verifyPickupCode,
 } from './ordersController.js';
 import { validateData } from '../../middlewares/validationMiddleware.js';
 import { insertOrderWithItemsSchema, updateOrderSchema } from '../../db/ordersSchema.js';
@@ -21,5 +23,9 @@ router.post(
 router.get('/', verifyToken, listOrders);
 router.get('/:id', verifyToken, getOrder);
 router.put('/:id', verifyToken, validateData(updateOrderSchema), updateOrder);
+
+// Fulfillment Routes
+router.patch('/:id/drop-off', verifyToken, markAsDroppedOff);
+router.post('/:id/verify-pickup', verifyToken, verifyPickupCode);
 
 export default router;

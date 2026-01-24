@@ -95,7 +95,12 @@ async function fetchWithAuth(url: string, options: RequestInit = {}) {
 
     const data = await res.json();
     if (!res.ok) {
-        throw new Error(data.message || 'An error occurred');
+        let errorMessage = data.message || data.error || 'An error occurred';
+        if (data.details && Array.isArray(data.details)) {
+            const details = data.details.map((d: any) => d.message).join(', ');
+            errorMessage = `${errorMessage}: ${details}`;
+        }
+        throw new Error(errorMessage);
     }
     return data;
 }
@@ -137,6 +142,13 @@ export async function getProductCategories(): Promise<string[]> {
     const data = await res.json();
     if (!res.ok) throw new Error('Failed to fetch categories');
     return data;
+}
+
+export async function getFulfillmentPoints(): Promise<any[]> {
+    const res = await fetch(`${API_URL}/fulfillment-points`);
+    const data = await res.json();
+    if (!res.ok) throw new Error('Failed to fetch fulfillment points');
+    return Array.isArray(data) ? data : (data.data || []);
 }
 
 export async function getProduct(id: number): Promise<Product | null> {
@@ -191,14 +203,19 @@ export async function getOrder(id: string | number): Promise<Order> {
     return fetchWithAuth(`/orders/${id}`);
 }
 
-export async function createOrder(items: CartItem[], pickupLocation?: string) {
-    // Matches ecommerce-mobile/api/orders.ts structure
-    // body: { order: {}, items }
+export async function createOrder(items: CartItem[], pickupLocation?: string, fulfillmentPointId?: number) {
     return fetchWithAuth('/orders', {
         method: 'POST',
         body: JSON.stringify({
-            order: { pickupLocation },
+            order: { pickupLocation, fulfillmentPointId },
             items
         })
+    });
+}
+
+export async function verifyPickup(orderId: number | string, code: string) {
+    return fetchWithAuth(`/orders/${orderId}/verify-pickup`, {
+        method: 'POST',
+        body: JSON.stringify({ code })
     });
 }

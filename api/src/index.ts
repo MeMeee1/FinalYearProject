@@ -56,6 +56,12 @@ app.use('/fulfillment-points', fulfillmentPointsRoutes);
 
 io.on('connection', (socket) => {
   console.log('Client connected:', socket.id);
+
+  socket.on('join', (room) => {
+    console.log(`Socket ${socket.id} joining room: ${room}`);
+    socket.join(room);
+  });
+
   socket.on('disconnect', () => {
     console.log('Client disconnected:', socket.id);
   });

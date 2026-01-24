@@ -1,11 +1,25 @@
 import { Request, Response } from 'express';
 import { db } from '../../db/index.js';
 import { orderItemsTable, ordersTable } from '../../db/ordersSchema.js';
-import { eq } from 'drizzle-orm';
+import { productsTable } from '../../db/productsSchema.js';
+import { vendorsTable } from '../../db/vendorsSchema.js';
+import { fulfillmentPointsTable } from '../../db/fulfillmentPointsSchema.js';
+import { eq, and, inArray, sql } from 'drizzle-orm';
+import crypto from 'crypto';
+
+function generatePickupCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let result = '';
+  for (let i = 0; i < 8; i++) {
+    if (i === 4) result += '-';
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+}
 
 export async function createOrder(req: Request, res: Response) {
   try {
-    const { items } = req.cleanBody;
+    const { order, items } = req.cleanBody;
     const userId = req.userId;
 
     if (!userId) {
@@ -16,82 +30,287 @@ export async function createOrder(req: Request, res: Response) {
       return res.status(400).json({ message: 'Order items are required' });
     }
 
-    // Calculate amounts
-    const subtotal = items.reduce((acc: number, item: any) => acc + (item.price * item.quantity), 0);
-    const platformFee = subtotal * 0.1; // 10% platform fee
-    const shippingCost = 2000; // Fixed shipping for now
-    const totalAmount = subtotal + shippingCost;
-    const sellerAmount = subtotal - platformFee;
+    const { fulfillmentPointId } = order || {};
 
-    const [newOrder] = await db
-      .insert(ordersTable)
-      .values({
-        userId: Number(userId),
-        totalAmount: Number(totalAmount),
-        platformFee: Number(platformFee),
-        sellerAmount: Number(sellerAmount),
-        shippingCost: Number(shippingCost),
-        status: 'New'
-      })
-      .returning();
+    // Start a transaction to ensure atomic order creation and stock reduction
+    const result = await db.transaction(async (tx) => {
+      // 1. Fetch products to validate logistics and stock
+      const productIds = items.map(i => i.id || i.productId);
+      const dbProducts = await tx
+        .select({
+          id: productsTable.id,
+          name: productsTable.name,
+          stock: productsTable.stock,
+          sellerId: productsTable.sellerId,
+          supportsOutsideLgaDelivery: productsTable.supportsOutsideLgaDelivery,
+          vendor: {
+            assignedVerificationPointId: vendorsTable.assignedVerificationPointId
+          }
+        })
+        .from(productsTable)
+        .leftJoin(vendorsTable, eq(productsTable.sellerId, vendorsTable.id))
+        .where(inArray(productsTable.id, productIds));
 
-    const orderItems = items.map((item: any) => ({
-      orderId: newOrder.id,
-      productId: item.id || item.productId,
-      sellerId: item.sellerId || 1,
-      quantity: item.quantity,
-      price: item.price,
-      subtotal: item.price * item.quantity
-    }));
+      // 2. Perform Logistics and Stock Validation
+      for (const item of items) {
+        const p = dbProducts.find(dbP => dbP.id === (item.id || item.productId));
+        if (!p) {
+          throw new Error(`Product ${item.id || item.productId} not found`);
+        }
 
-    const newOrderItems = await db
-      .insert(orderItemsTable)
-      .values(orderItems)
-      .returning();
+        // Stock check
+        if (p.stock < item.quantity) {
+          throw new Error(`Insufficient stock for product "${p.name}". Available: ${p.stock}, Requested: ${item.quantity}`);
+        }
 
-    res.status(201).json({ ...newOrder, items: newOrderItems });
+        // Logistics check
+        if (!p.supportsOutsideLgaDelivery) {
+          if (!fulfillmentPointId) {
+            throw new Error(`Logistics Constraint: Item "${p.name}" requires on-site collection. Please select a fulfillment hub.`);
+          }
+          if (p.vendor?.assignedVerificationPointId !== Number(fulfillmentPointId)) {
+            throw new Error(`Logistics Constraint: Item "${p.name}" can only be picked up from the vendor's assigned verification point.`);
+          }
+        }
+      }
+
+      // 3. Reduce stock for each item and prepare for broadcast
+      const stockUpdates = [];
+      for (const item of items) {
+        const [updatedProduct] = await tx
+          .update(productsTable)
+          .set({ stock: sql`${productsTable.stock} - ${item.quantity}` })
+          .where(eq(productsTable.id, item.id || item.productId))
+          .returning({ id: productsTable.id, stock: productsTable.stock });
+
+        stockUpdates.push(updatedProduct);
+      }
+
+      // Calculate amounts
+      const subtotal = items.reduce((acc: number, item: any) => acc + (item.price * item.quantity), 0);
+      const platformFee = subtotal * 0.1; // 10% platform fee
+      const shippingCost = 0;
+      const totalAmount = subtotal;
+      const sellerAmount = subtotal - platformFee;
+
+      // Get sellerId from the first item
+      const orderSellerId = items[0].sellerId || dbProducts[0].sellerId || 1;
+
+      // 4. Create Order
+      const [newOrder] = await tx
+        .insert(ordersTable)
+        .values({
+          userId: Number(userId),
+          sellerId: Number(orderSellerId),
+          totalAmount: Number(totalAmount),
+          platformFee: Number(platformFee),
+          sellerAmount: Number(sellerAmount),
+          shippingCost: Number(shippingCost),
+          fulfillmentPointId: fulfillmentPointId ? Number(fulfillmentPointId) : null,
+          pickupCode: generatePickupCode(),
+          deliveryStatus: 'pending',
+          status: 'New'
+        })
+        .returning();
+
+      // 5. Create Order Items
+      const orderItems = items.map((item: any) => ({
+        orderId: newOrder.id,
+        productId: item.id || item.productId,
+        sellerId: item.sellerId || orderSellerId,
+        quantity: item.quantity,
+        price: item.price,
+        subtotal: item.price * item.quantity
+      }));
+
+      const newOrderItems = await tx
+        .insert(orderItemsTable)
+        .values(orderItems)
+        .returning();
+
+      return { newOrder, newOrderItems, stockUpdates, orderSellerId };
+    });
+
+    // 6. Broadcast stock updates and new order notification via WebSockets (outside transaction)
+    if (req.io) {
+      // Notify vendor about the new order
+      req.io.to(`vendor_${result.orderSellerId}`).emit('new_order', {
+        orderId: result.newOrder.id,
+        totalAmount: result.newOrder.totalAmount,
+        message: 'New procurement authorization received!'
+      });
+
+      result.stockUpdates.forEach(update => {
+        req.io.emit('stock_updated', {
+          productId: update.id,
+          newStock: update.stock
+        });
+      });
+    }
+
+    res.status(201).json({ ...result.newOrder, items: result.newOrderItems });
   } catch (e) {
     console.log(e);
     res.status(500).json({ message: 'Internal server error while creating order' });
   }
 }
 
-// if req.role is admin, return all orders
-// if req.role is seller, return orders by sellerId
-// else, return only orders filtered by req.userId
+export async function markAsDroppedOff(req: Request, res: Response) {
+  try {
+    const id = Number(req.params.id);
+
+    const [order] = await db
+      .select()
+      .from(ordersTable)
+      .where(eq(ordersTable.id, id));
+
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+
+    const [updatedOrder] = await db
+      .update(ordersTable)
+      .set({
+        deliveryStatus: 'dropped_off',
+        updatedAt: new Date()
+      })
+      .where(eq(ordersTable.id, id))
+      .returning();
+
+    // Notify User via WebSockets
+    if (req.io) {
+      req.io.to(`user_${order.userId}`).emit('order_status_update', {
+        orderId: id,
+        deliveryStatus: 'dropped_off',
+        pickupCode: order.pickupCode,
+        message: 'Your order has been dropped off at the fulfillment center!'
+      });
+      // Also broadcast globally if needed, but per-user is better
+    }
+
+    res.json(updatedOrder);
+  } catch (e) {
+    res.status(500).json({ message: 'Failed to update delivery status' });
+  }
+}
+
+export async function verifyPickupCode(req: Request, res: Response) {
+  try {
+    const id = Number(req.params.id);
+    const { code } = req.body;
+
+    const [order] = await db
+      .select({
+        id: ordersTable.id,
+        pickupCode: ordersTable.pickupCode,
+        deliveryStatus: ordersTable.deliveryStatus,
+        userId: ordersTable.userId
+      })
+      .from(ordersTable)
+      .where(eq(ordersTable.id, id));
+
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+
+    if (order.pickupCode !== code) {
+      return res.status(400).json({ message: 'Invalid pickup code' });
+    }
+
+    if (order.deliveryStatus === 'collected') {
+      return res.status(400).json({ message: 'Order already collected' });
+    }
+
+    const [updatedOrder] = await db
+      .update(ordersTable)
+      .set({
+        deliveryStatus: 'collected',
+        status: 'Completed',
+        updatedAt: new Date()
+      })
+      .where(eq(ordersTable.id, id))
+      .returning();
+
+    if (req.io) {
+      req.io.to(`user_${order.userId}`).emit('order_status_update', {
+        orderId: id,
+        deliveryStatus: 'collected',
+        message: 'Order successfully collected!'
+      });
+    }
+
+    res.json(updatedOrder);
+  } catch (e) {
+    res.status(500).json({ message: 'Verification failed' });
+  }
+}
+
 export async function listOrders(req: Request, res: Response) {
   try {
-    const orders = await db.select().from(ordersTable);
-    res.json(orders);
+    const userId = req.userId;
+    const role = req.role;
+
+    if (!userId) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    const conditions = [];
+
+    // Filtering based on role
+    if (role === 'seller') {
+      const vendorResult = await db
+        .select({ id: vendorsTable.id })
+        .from(vendorsTable)
+        .where(eq(vendorsTable.userId, Number(userId)));
+
+      if (vendorResult.length > 0) {
+        conditions.push(eq(ordersTable.sellerId, vendorResult[0].id));
+      } else {
+        return res.json({ data: [] });
+      }
+    } else if (role !== 'admin') {
+      conditions.push(eq(ordersTable.userId, Number(userId)));
+    }
+
+    const ordersWithPoints = await db
+      .select({
+        orders: ordersTable,
+        fulfillmentPoint: fulfillmentPointsTable
+      })
+      .from(ordersTable)
+      .leftJoin(fulfillmentPointsTable, eq(ordersTable.fulfillmentPointId, fulfillmentPointsTable.id))
+      .where(and(...conditions))
+      .orderBy(ordersTable.createdAt);
+
+    const result = ordersWithPoints.map(row => ({
+      ...row.orders,
+      fulfillmentPoint: row.fulfillmentPoint
+    }));
+
+    res.json({ data: result });
   } catch (error) {
-    res.status(500).send(error);
+    console.error('Error listing orders:', error);
+    res.status(500).json({ message: 'Internal server error while fetching orders' });
   }
 }
 
 export async function getOrder(req: Request, res: Response) {
   try {
     const id = parseInt(req.params.id);
-
-    // TODO: required to setup the relationship
-    // const result = await db.query.ordersTable.findFirst({
-    //   where: eq(ordersTable.id, id),
-    //   with: {
-    //     items: true,
-    //   },
-    // });
-
     const orderWithItems = await db
-      .select()
+      .select({
+        orders: ordersTable,
+        order_items: orderItemsTable,
+        fulfillmentPoint: fulfillmentPointsTable
+      })
       .from(ordersTable)
       .where(eq(ordersTable.id, id))
-      .leftJoin(orderItemsTable, eq(ordersTable.id, orderItemsTable.orderId));
+      .leftJoin(orderItemsTable, eq(ordersTable.id, orderItemsTable.orderId))
+      .leftJoin(fulfillmentPointsTable, eq(ordersTable.fulfillmentPointId, fulfillmentPointsTable.id));
 
     if (orderWithItems.length === 0) {
-      res.status(404).send('Order not found');
+      return res.status(404).send('Order not found');
     }
 
     const mergedOrder = {
       ...orderWithItems[0].orders,
+      fulfillmentPoint: orderWithItems[0].fulfillmentPoint,
       items: orderWithItems.map((oi) => oi.order_items),
     };
 

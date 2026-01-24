@@ -20,7 +20,7 @@ export async function fetchVendorOrders(page = 1, limit = 20) {
 		});
 
 		const url = `${API_URL}/orders?${params.toString()}`;
-		
+
 		const response = await fetch(url, {
 			headers: {
 				Authorization: token,
@@ -139,6 +139,39 @@ export async function updateOrderStatus(
 		return await response.json();
 	} catch (error) {
 		console.error('Error updating order status:', error);
+		throw error;
+	}
+}
+
+/**
+ * Simulate drop-off at fulfillment center
+ */
+export async function simulateDropOff(orderId: number | string) {
+	try {
+		const token = cookies().get('token')?.value;
+
+		if (!token) {
+			throw new Error('No authentication token found');
+		}
+
+		const response = await fetch(`${API_URL}/orders/${orderId}/drop-off`, {
+			method: 'PATCH',
+			headers: {
+				Authorization: token,
+				'Content-Type': 'application/json',
+			},
+		});
+
+		if (!response.ok) {
+			const errorData = await response.json().catch(() => ({}));
+			throw new Error(errorData.message || 'Failed to simulate drop-off');
+		}
+
+		revalidatePath(`/dashboard/orders/${orderId}`);
+		revalidatePath('/dashboard/orders');
+		return await response.json();
+	} catch (error) {
+		console.error('Error simulating drop-off:', error);
 		throw error;
 	}
 }

@@ -24,13 +24,14 @@ export default function Payment() {
     const city = searchParams.get('city') || '';
     const lga = searchParams.get('lga') || '';
     const phone = searchParams.get('phone') || '';
+    const fulfillmentPointId = searchParams.get('fulfillmentPointId') ? Number(searchParams.get('fulfillmentPointId')) : undefined;
 
     const handleExecutePayment = async () => {
         setIsSubmitting(true);
         try {
             const pickupLocation = `${address}, ${city}, ${lga}`.trim();
-            // Just pass the items as they are, they already match CartItem[]
-            await createOrder(items, pickupLocation);
+            // Pass fulfillmentPointId to createOrder
+            await createOrder(items, pickupLocation, fulfillmentPointId);
             clearCart();
             router.push('/orders');
         } catch (err: any) {

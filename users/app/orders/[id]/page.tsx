@@ -5,31 +5,81 @@ import { VStack } from '@/components/ui/vstack';
 import { HStack } from '@/components/ui/hstack';
 import { Text } from '@/components/ui/text';
 import { Heading } from '@/components/ui/heading';
-import { Button, ButtonIcon } from '@/components/ui/button';
-import { ArrowLeftIcon, MapPinIcon, CheckCircle2Icon, PackageIcon, ClockIcon, ShieldCheckIcon } from 'lucide-react-native';
+import { Button, ButtonIcon, ButtonText } from '@/components/ui/button';
+import { Input, InputField } from '@/components/ui/input';
+import { ArrowLeftIcon, MapPinIcon, CheckCircle2Icon, PackageIcon, ClockIcon, ShieldCheckIcon, CopyIcon, KeyIcon } from 'lucide-react-native';
 import { useRouter, useParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { getOrder, verifyPickup } from '@/lib/api';
+import { Order } from '@/lib/types';
 
 export default function OrderDetails() {
     const router = useRouter();
     const params = useParams();
+    const [order, setOrder] = useState<Order | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [pickupCode, setPickupCode] = useState('');
+    const [isVerifying, setIsVerifying] = useState(false);
 
-    // Mock data for specific order
-    const order = {
-        id: params.id,
-        status: 'Ready for Pickup',
-        pickupLocation: 'Ikeja City Mall Pickup Center, Shop L45',
-        items: [
-            { name: 'Local Rice', quantity: 2, price: 15000 },
-            { name: 'Palm Oil', quantity: 1, price: 8000 }
-        ],
-        total: 38000,
-        date: new Date().toISOString()
+    useEffect(() => {
+        const fetchOrderDetails = async () => {
+            try {
+                const data = await getOrder(params.id as string);
+                setOrder(data);
+            } catch (error) {
+                console.error('Failed to fetch order:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (params.id) {
+            fetchOrderDetails();
+        }
+    }, [params.id]);
+
+    const handleVerifyPickup = async () => {
+        if (!order || !pickupCode) return;
+        setIsVerifying(true);
+        try {
+            await verifyPickup(order.id, pickupCode);
+            // Re-fetch order to show updated status
+            const updated = await getOrder(order.id);
+            setOrder(updated);
+            alert('Order successfully collected! Simulation complete.');
+        } catch (error: any) {
+            alert(error.message || 'Verification failed. Please check the code.');
+        } finally {
+            setIsVerifying(false);
+        }
     };
+
+    if (loading) {
+        return (
+            <Box className="flex-1 items-center justify-center bg-background">
+                <Text className="text-muted-foreground font-black uppercase tracking-widest text-xs">Accessing Manifest...</Text>
+            </Box>
+        );
+    }
+
+    if (!order) {
+        return (
+            <Box className="flex-1 items-center justify-center bg-background">
+                <Heading className="text-foreground">Manifest Not Found</Heading>
+                <Button onPress={() => router.back()} className="mt-4 bg-primary rounded-xl">
+                    <ButtonText className="text-black font-bold">Return to Hub</ButtonText>
+                </Button>
+            </Box>
+        );
+    }
+
+    const isCollected = order.deliveryStatus === 'collected';
+    const isReadyForPickup = order.deliveryStatus === 'dropped_off';
 
     return (
         <Box className="flex-1 min-h-screen bg-background">
             {/* Immersive Header Section */}
-            <Box className="bg-primary/90 pt-16 pb-32 px-6 rounded-b-[4rem] shadow-[0_32px_64px_rgba(var(--primary-rgb),0.2)]">
+            <Box className={`pt-16 pb-32 px-6 rounded-b-[4rem] shadow-2xl transition-colors duration-700 ${isCollected ? 'bg-green-500' : isReadyForPickup ? 'bg-primary' : 'bg-secondary'}`}>
                 <HStack className="items-center justify-between mb-8">
                     <Button
                         variant="solid"
@@ -40,15 +90,17 @@ export default function OrderDetails() {
                     </Button>
                     <VStack className="items-end">
                         <Text className="text-black/60 text-[10px] font-black uppercase tracking-[0.2em]">Transaction Log</Text>
-                        <Text className="text-black font-black text-xs">{new Date(order.date).toLocaleDateString()}</Text>
+                        <Text className="text-black font-black text-xs">{new Date(order.createdAt).toLocaleDateString()}</Text>
                     </VStack>
                 </HStack>
 
                 <VStack className="items-center" space="xs">
                     <Box className="bg-black/10 px-4 py-1.5 rounded-full border border-black/5 mb-2">
-                        <Text className="text-black font-black text-[10px] uppercase tracking-[0.3em]">#{order.id.toString().padStart(6, '0')}</Text>
+                        <Text className="text-black font-black text-[10px] uppercase tracking-[0.3em] font-mono">#{order.id.toString().padStart(6, '0')}</Text>
                     </Box>
-                    <Heading size="3xl" className="text-black font-black tracking-tighter text-center leading-none">Manifest Authorized</Heading>
+                    <Heading size="3xl" className="text-black font-black tracking-tighter text-center leading-none">
+                        {isCollected ? 'Fulfillment Verified' : isReadyForPickup ? 'Awaiting Retrieval' : 'Manifest Authorized'}
+                    </Heading>
                     <HStack space="xs" className="items-center bg-white/20 px-4 py-2 rounded-2xl mt-4">
                         <CheckCircle2Icon size={16} color="black" />
                         <Text className="text-black font-bold uppercase tracking-widest text-[10px]">{order.status}</Text>
@@ -56,8 +108,73 @@ export default function OrderDetails() {
                 </VStack>
             </Box>
 
-            <Box className="px-6 -mt-16 max-w-4xl mx-auto">
+            <Box className="px-6 -mt-16 max-w-4xl mx-auto pb-40">
                 <VStack space="xl">
+                    {/* Pickup Verification Section (New Simulation Feature) */}
+                    {isReadyForPickup && (
+                        <Box className="bg-card p-8 rounded-[3rem] border-2 border-primary shadow-2xl overflow-hidden relative">
+                            <Box className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full -mr-16 -mt-16" />
+                            <VStack space="lg">
+                                <HStack space="md" className="items-center">
+                                    <Box className="bg-primary/20 p-3 rounded-xl">
+                                        <KeyIcon size={20} color="hsl(var(--primary))" />
+                                    </Box>
+                                    <VStack>
+                                        <Text className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Simulation Node</Text>
+                                        <Heading size="md" className="text-foreground font-black tracking-tight">Complete Retrieval</Heading>
+                                    </VStack>
+                                </HStack>
+
+                                <VStack space="md">
+                                    <Text className="text-muted-foreground text-xs font-medium leading-relaxed">
+                                        Your order has been dropped off! Enter your pickup code below to simulate the final collection.
+                                    </Text>
+
+                                    <HStack space="md" className="bg-secondary/20 p-4 rounded-2xl border border-border/30 justify-between items-center">
+                                        <VStack>
+                                            <Text className="text-[8px] text-muted-foreground font-black uppercase tracking-widest mb-1">Generated Secret</Text>
+                                            <Text className="text-foreground font-black text-xl tracking-[0.2em] font-mono">{order.pickupCode}</Text>
+                                        </VStack>
+                                        <Button variant="link" className="bg-primary/20 p-2 rounded-xl" onPress={() => setPickupCode(order.pickupCode || '')}>
+                                            <CopyIcon size={14} color="hsl(var(--primary))" />
+                                        </Button>
+                                    </HStack>
+
+                                    <Input variant="underlined" size="xl" className="h-16 border-b-2 border-primary/30 focus:border-primary">
+                                        <InputField
+                                            placeholder="Enter Code to Simulate Pickup"
+                                            value={pickupCode}
+                                            onChangeText={setPickupCode}
+                                            className="text-foreground font-black tracking-[0.3em] uppercase text-center"
+                                        />
+                                    </Input>
+
+                                    <Button
+                                        isDisabled={!pickupCode || isVerifying}
+                                        onPress={handleVerifyPickup}
+                                        className="h-16 rounded-2xl bg-primary shadow-lg shadow-primary/20 active:scale-95 transition-all"
+                                    >
+                                        <ButtonText className="text-black font-black uppercase tracking-widest text-xs">Verify & Collect</ButtonText>
+                                    </Button>
+                                </VStack>
+                            </VStack>
+                        </Box>
+                    )}
+
+                    {isCollected && (
+                        <Box className="bg-green-500/10 p-8 rounded-[3rem] border border-green-500/20 shadow-xl overflow-hidden relative">
+                            <HStack space="md" className="items-center">
+                                <Box className="bg-green-500/20 p-3 rounded-xl">
+                                    <CheckCircle2Icon size={20} color="#22c55e" />
+                                </Box>
+                                <VStack>
+                                    <Text className="text-[10px] font-black text-green-500 uppercase tracking-[0.2em]">Manifest Finalized</Text>
+                                    <Text className="text-foreground font-black tracking-tight">Items Successfully Retrieved</Text>
+                                </VStack>
+                            </HStack>
+                        </Box>
+                    )}
+
                     {/* Pickup Node Card */}
                     <Box className="bg-card/40 backdrop-blur-3xl p-8 rounded-[3rem] border border-border/50 shadow-2xl">
                         <HStack space="md" className="items-start">
@@ -66,11 +183,17 @@ export default function OrderDetails() {
                             </Box>
                             <VStack className="flex-1">
                                 <Text className="text-[10px] text-muted-foreground font-black uppercase tracking-widest mb-1">Retrieval Node</Text>
-                                <Heading size="md" className="text-foreground font-black tracking-tight mb-2">{order.pickupLocation}</Heading>
+                                <Heading size="md" className="text-foreground font-black tracking-tight mb-2">
+                                    {order.fulfillmentPoint ? order.fulfillmentPoint.name : (order as any).pickupLocation || 'Pickup Terminal'}
+                                </Heading>
                                 <Box className="bg-secondary/20 p-4 rounded-2xl border border-border/30">
                                     <HStack space="sm" className="items-center">
                                         <ShieldCheckIcon size={14} color="hsl(var(--muted-foreground))" />
-                                        <Text className="text-muted-foreground text-[10px] font-bold leading-relaxed uppercase tracking-wider">Present Transaction ID & Valid Identification for clearance.</Text>
+                                        <Text className="text-muted-foreground text-[10px] font-bold leading-relaxed uppercase tracking-wider">
+                                            {order.fulfillmentPoint
+                                                ? `${order.fulfillmentPoint.address}, ${order.fulfillmentPoint.city}`
+                                                : 'Present Transaction ID & Valid Identification for clearance.'}
+                                        </Text>
                                     </HStack>
                                 </Box>
                             </VStack>
@@ -82,19 +205,19 @@ export default function OrderDetails() {
                         <HStack className="items-center justify-between mb-8">
                             <Heading size="md" className="text-foreground font-black tracking-tight">Manifest Itemization</Heading>
                             <Box className="bg-secondary/40 px-3 py-1 rounded-full border border-border/40">
-                                <Text className="text-foreground/70 font-black text-[8px] uppercase tracking-widest">{order.items.length} Units</Text>
+                                <Text className="text-foreground/70 font-black text-[8px] uppercase tracking-widest">{order.items?.length || 0} Units</Text>
                             </Box>
                         </HStack>
 
                         <VStack space="lg">
-                            {order.items.map((item, index) => (
+                            {order.items?.map((item: any, index: number) => (
                                 <HStack key={index} className="justify-between items-center group">
                                     <HStack space="md" className="items-center">
                                         <Box className="bg-secondary/40 w-10 h-10 rounded-xl items-center justify-center border border-border/30 group-hover:bg-primary/10 transition-colors">
                                             <PackageIcon size={18} color="hsl(var(--muted-foreground))" />
                                         </Box>
                                         <VStack>
-                                            <Text className="text-foreground font-black tracking-tight">{item.name}</Text>
+                                            <Text className="text-foreground font-black tracking-tight">Product #{item.productId}</Text>
                                             <Text className="text-muted-foreground text-[10px] font-bold uppercase">Quantity: {item.quantity}</Text>
                                         </VStack>
                                     </HStack>
@@ -106,20 +229,12 @@ export default function OrderDetails() {
 
                             <VStack space="sm">
                                 <HStack className="justify-between items-center">
-                                    <Text className="text-muted-foreground font-bold text-[10px] uppercase tracking-widest">Base Valuation</Text>
-                                    <Text className="text-foreground font-bold">₦{(order.total - 2000).toLocaleString()}</Text>
+                                    <Text className="text-muted-foreground font-bold text-[10px] uppercase tracking-widest">Authorized Valuation</Text>
+                                    <Heading size="xl" className="text-primary font-black tracking-tighter leading-none">₦{order.totalAmount.toLocaleString()}</Heading>
                                 </HStack>
-                                <HStack className="justify-between items-center">
-                                    <Text className="text-muted-foreground font-bold text-[10px] uppercase tracking-widest">Network Fee</Text>
-                                    <Text className="text-foreground font-bold">₦2,000</Text>
-                                </HStack>
-                                <HStack className="justify-between items-end mt-4 pt-4 border-t border-border/20">
-                                    <VStack>
-                                        <Text className="text-muted-foreground font-black text-[10px] uppercase tracking-[0.3em] mb-1">Total Authorized</Text>
-                                        <Heading size="xl" className="text-primary font-black tracking-tighter leading-none">₦{order.total.toLocaleString()}</Heading>
-                                    </VStack>
+                                <HStack className="justify-end mt-4">
                                     <Box className="bg-primary/20 px-3 py-1.5 rounded-full border border-primary/30">
-                                        <Text className="text-primary font-black text-[10px] uppercase tracking-widest">Settled</Text>
+                                        <Text className="text-primary font-black text-[10px] uppercase tracking-widest">Settled via Escrow</Text>
                                     </Box>
                                 </HStack>
                             </VStack>
@@ -127,7 +242,7 @@ export default function OrderDetails() {
                     </Box>
 
                     {/* Operational Support */}
-                    <HStack space="md" className="justify-center pb-12">
+                    <HStack space="md" className="justify-center">
                         <Button variant="link" size="sm" className="opacity-60 hover:opacity-100">
                             <ClockIcon size={14} color="hsl(var(--muted-foreground))" className="mr-2" />
                             <Text className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">Request Support</Text>
