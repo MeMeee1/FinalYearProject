@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { Box } from '@/components/ui/box';
 import { VStack } from '@/components/ui/vstack';
 import { HStack } from '@/components/ui/hstack';
@@ -16,6 +16,18 @@ import { Product } from '@/lib/types';
 import { ProductCard } from '@/components/ProductCard';
 
 export default function AllProducts() {
+    return (
+        <Suspense fallback={
+            <Box className="flex-1 justify-center items-center h-screen">
+                <ButtonSpinner color="black" />
+            </Box>
+        }>
+            <AllProductsContent />
+        </Suspense>
+    );
+}
+
+function AllProductsContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const initialQuery = searchParams.get('q') || '';

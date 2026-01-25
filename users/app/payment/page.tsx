@@ -9,11 +9,23 @@ import { Button, ButtonText, ButtonIcon } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ArrowLeftIcon, CreditCardIcon, ShieldCheckIcon, LockIcon, BanknoteIcon } from 'lucide-react-native';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useCart } from '@/context/CartContext';
 import { createOrder } from '@/lib/api';
 
 export default function Payment() {
+    return (
+        <Suspense fallback={
+            <div className="flex items-center justify-center min-h-screen">
+                <Text>Loading payment gateway...</Text>
+            </div>
+        }>
+            <PaymentContent />
+        </Suspense>
+    );
+}
+
+function PaymentContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const { total, items, clearCart } = useCart();
