@@ -122,7 +122,7 @@ export default function Login() {
                 </Box>
 
                 {/* Footer Actions */}
-                <VStack space="lg" className="items-center">
+                <VStack space="lg" className="items-center mt-6">
                     <HStack space="xs" className="items-center">
                         <Text className="text-muted-foreground font-medium text-sm">Don't have an account?</Text>
                         <Link href="/signup">
