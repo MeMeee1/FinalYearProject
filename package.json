@@ -6,7 +6,7 @@
     "node": ">=20.0.0"
   },
   "scripts": {
-    "build": "npm install --include=dev --prefix api && npm run build --prefix api",
+    "build": "npm install --include=dev --prefix api && npm run build --prefix api && npm run db:migrate --prefix api",
     "start": "npm run start --prefix api",
     "dev": "npm run dev --prefix api",
     "db:generate": "npm run db:generate --prefix api",
