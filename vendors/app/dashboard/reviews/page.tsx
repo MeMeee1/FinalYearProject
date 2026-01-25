@@ -4,6 +4,9 @@ import { Heading } from '@/components/ui/heading';
 import { Text } from '@/components/ui/text';
 import { Star, MessageCircle } from 'lucide-react';
 
+// Force dynamic rendering - this page uses cookies for authentication
+export const dynamic = 'force-dynamic';
+
 export default async function ReviewsPage() {
     let reviews = [];
     try {

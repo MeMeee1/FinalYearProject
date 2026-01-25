@@ -4,6 +4,9 @@ import { Text } from '@/components/ui/text';
 import Link from 'next/link';
 import { Package, Calendar, DollarSign, TrendingUp, Search, Filter, ArrowRight } from 'lucide-react';
 
+// Force dynamic rendering - this page fetches authenticated data
+export const dynamic = 'force-dynamic';
+
 export default async function OrdersPage({
   searchParams,
 }: {
@@ -84,8 +87,8 @@ export default async function OrdersPage({
             ].map((tab) => (
               <Link key={tab.id} href={tab.id === 'all' ? '/dashboard/orders' : `/dashboard/orders?status=${tab.id}`} className="flex-shrink-0">
                 <div className={`px-6 py-2.5 rounded-full text-xs font-black uppercase tracking-widest transition-all ${statusFilter === tab.id
-                    ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-105'
-                    : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
+                  ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-105'
+                  : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
                   }`}>
                   {tab.label} <span className="ml-1 opacity-50">[{tab.count}]</span>
                 </div>
@@ -134,8 +137,8 @@ export default async function OrdersPage({
                       </td>
                       <td className="px-8 py-6">
                         <div className={`inline-flex items-center px-3 py-1 rounded-full border ${order.status === 'delivered' ? 'bg-green-500/10 text-green-500 border-green-500/20' :
-                            order.status === 'pending' ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20' :
-                              'bg-blue-500/10 text-blue-500 border-blue-500/20'
+                          order.status === 'pending' ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20' :
+                            'bg-blue-500/10 text-blue-500 border-blue-500/20'
                           }`}>
                           <Text className="text-[10px] font-black uppercase tracking-tighter">{order.status}</Text>
                         </div>

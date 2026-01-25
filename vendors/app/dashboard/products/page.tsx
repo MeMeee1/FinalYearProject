@@ -2,6 +2,9 @@ import { getMyProducts } from '@/api/products';
 import { getVendorProfile } from '@/api/vendors';
 import ProductsClient from './ProductsClient';
 
+// Force dynamic rendering - this page fetches authenticated data
+export const dynamic = 'force-dynamic';
+
 export default async function ProductsPage({
   searchParams,
 }: {

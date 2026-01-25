@@ -13,6 +13,9 @@ import { VendorProfileSync } from '@/components/VendorProfileSync';
 import { VendorRealTimeSync } from '@/components/VendorRealTimeSync';
 import { ThemeToggle } from '@/components/ThemeToggle';
 
+// Force dynamic rendering - this layout uses cookies for authentication
+export const dynamic = 'force-dynamic';
+
 type DashboardLayoutProps = {
   children: React.ReactNode;
 };

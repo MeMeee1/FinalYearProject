@@ -11,6 +11,9 @@ import Link from 'next/link';
 import StatusSelector from './StatusSelector';
 import { SimulateDropOffButton } from '@/components/SimulateDropOffButton';
 
+// Force dynamic rendering - this page fetches authenticated data
+export const dynamic = 'force-dynamic';
+
 export default async function OrderPage({
   params,
 }: {

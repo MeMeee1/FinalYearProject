@@ -8,6 +8,9 @@ import { Text } from '@/components/ui/text';
 import { AddIcon, Icon } from '@/components/ui/icon';
 import { ArrowLeft } from 'lucide-react';
 
+// Force dynamic rendering - this page fetches authenticated data
+export const dynamic = 'force-dynamic';
+
 export default async function VendorProductsPage({
   params,
   searchParams,
@@ -38,14 +41,14 @@ export default async function VendorProductsPage({
       <div className="w-full max-w-[1400px] mx-auto px-2 sm:px-4 lg:px-6 py-4 sm:py-6">
         {/* Header */}
         <div className="mb-4 sm:mb-6 lg:mb-8">
-          <Link 
-            href="/dashboard/products" 
+          <Link
+            href="/dashboard/products"
             className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 mb-4"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Vendors
           </Link>
-          
+
           <div className="flex items-start gap-4">
             {vendor.storeLogo && (
               <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
@@ -97,7 +100,7 @@ export default async function VendorProductsPage({
                 <div className="mt-6 sm:mt-8 pt-4 border-t border-gray-200">
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3">
                     {currentPage > 1 && (
-                      <Link 
+                      <Link
                         href={`/dashboard/products/vendor/${vendorId}?page=${currentPage - 1}`}
                         className="w-full sm:w-auto px-4 py-2 border rounded hover:bg-gray-50 text-center text-sm"
                       >
@@ -108,7 +111,7 @@ export default async function VendorProductsPage({
                       Page {currentPage} of {pagination.totalPages}
                     </span>
                     {currentPage < pagination.totalPages && (
-                      <Link 
+                      <Link
                         href={`/dashboard/products/vendor/${vendorId}?page=${currentPage + 1}`}
                         className="w-full sm:w-auto px-4 py-2 border rounded hover:bg-gray-50 text-center text-sm"
                       >
@@ -127,8 +130,8 @@ export default async function VendorProductsPage({
     console.error('Error loading vendor products:', error);
     return (
       <div className="w-full max-w-[1400px] mx-auto px-4 py-10">
-        <Link 
-          href="/dashboard/products" 
+        <Link
+          href="/dashboard/products"
           className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 mb-4"
         >
           <ArrowLeft className="w-4 h-4" />
