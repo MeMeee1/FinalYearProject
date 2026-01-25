@@ -8,10 +8,11 @@ import { redirect } from 'next/navigation';
 import { Text } from '@/components/ui/text';
 import Link from 'next/link';
 import { Icon } from '@/components/ui/icon';
-import { LayoutGrid, ShoppingBag, TrendingUp, Settings as SettingsIcon, Star, Bell } from 'lucide-react';
+import { LayoutGrid, ShoppingBag, TrendingUp, Settings as SettingsIcon, Star, Bell, LogOut } from 'lucide-react';
 import { VendorProfileSync } from '@/components/VendorProfileSync';
 import { VendorRealTimeSync } from '@/components/VendorRealTimeSync';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import LogoutButton from './LogoutButton';
 
 // Force dynamic rendering - this layout uses cookies for authentication
 export const dynamic = 'force-dynamic';
@@ -166,7 +167,8 @@ function Sidebar({ isActive }: { isActive: boolean }) {
         </div>
       </div>
 
-      <div className="mt-auto pt-6">
+      <div className="mt-auto pt-6 space-y-4">
+        <LogoutButton variant="sidebar" />
         <Text className="text-[10px] text-muted-foreground/50 font-medium text-center tracking-tight">
           Final Year Project v1.0
         </Text>
