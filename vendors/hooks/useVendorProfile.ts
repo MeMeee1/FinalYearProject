@@ -84,11 +84,11 @@ export function useVendorProfile() {
   /**
    * Update profile locally (optimistic update)
    */
-  const updateProfileLocal = useCallback((updates: Partial<typeof vendorProfile>) => {
+  const updateProfileLocal = useCallback((updates: Partial<Exclude<typeof vendorProfile, null>>) => {
     updateProfile(updates);
   }, [updateProfile]);
 
-  return {
+  return {  
     vendorProfile,
     isLoading,
     error,

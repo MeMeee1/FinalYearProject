@@ -5,16 +5,16 @@ import { useVendorStore } from '@/store/vendorStore';
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 export function useRealTimeSync() {
-    const { profile } = useVendorStore();
+    const vendorProfile = useVendorStore((state) => state.vendorProfile);
 
     useEffect(() => {
-        if (!profile?.id) return;
+        if (!vendorProfile?.id) return;
 
         const socket = io(API_URL);
 
         // Join vendor room
-        console.log(`[Socket] Joining room vendor_${profile.id}`);
-        socket.emit('join', `vendor_${profile.id}`);
+        console.log(`[Socket] Joining room vendor_${vendorProfile.id}`);
+        socket.emit('join', `vendor_${vendorProfile.id}`);
 
         // Listen for new orders
         socket.on('new_order', (data) => {
@@ -49,5 +49,5 @@ export function useRealTimeSync() {
             console.log('[Socket] Disconnecting');
             socket.disconnect();
         };
-    }, [profile?.id]);
+    }, [vendorProfile?.id]);
 }
