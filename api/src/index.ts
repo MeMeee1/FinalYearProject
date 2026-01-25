@@ -13,7 +13,7 @@ import uploadRoutes from './routes/upload/index.js';
 import fulfillmentPointsRoutes from './routes/fulfillmentPoints.js';
 import serverless from 'serverless-http';
 
-const port = 3001;
+const port = process.env.PORT || 3001;
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
@@ -69,9 +69,9 @@ io.on('connection', (socket) => {
   });
 });
 
-if (!process.env.NODE_ENV || process.env.NODE_ENV.trim() === 'dev') {
+if (process.env.NODE_ENV !== 'production' || process.env.PORT) {
   httpServer.listen(port, () => {
-    console.log(`Example app listening on port ${port} with WebSockets`);
+    console.log(`Server listening on port ${port} with WebSockets`);
   });
 }
 

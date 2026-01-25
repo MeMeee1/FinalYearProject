@@ -13,8 +13,14 @@
     "noEmit": false, // Allow emitting output
     "isolatedModules": true, // Required for using ESM modules
     "baseUrl": ".", // Allow absolute imports relative to project root
+    "rootDir": "./src",
     "paths": {
-      "*": ["node_modules/*"]
+      "*": [
+        "node_modules/*"
+      ]
     }
-  }
+  },
+  "include": [
+    "src/**/*"
+  ]
 }
