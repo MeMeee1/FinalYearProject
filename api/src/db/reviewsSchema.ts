@@ -1,8 +1,8 @@
 
 import { pgTable, integer, text, timestamp, varchar, boolean } from 'drizzle-orm/pg-core';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
-import { usersTable } from './usersSchema';
-import { productsTable } from './productsSchema';
+import { usersTable } from './usersSchema.js';
+import { productsTable } from './productsSchema.js';
 
 export const reviewsTable = pgTable('reviews', {
     id: integer().primaryKey().generatedAlwaysAsIdentity(),

@@ -6,10 +6,10 @@ import {
   varchar,
   text,
 } from 'drizzle-orm/pg-core';
-import { usersTable } from './usersSchema';
-import { productsTable } from './productsSchema';
-import { vendorsTable } from './vendorsSchema';
-import { fulfillmentPointsTable } from './fulfillmentPointsSchema';
+import { usersTable } from './usersSchema.js';
+import { productsTable } from './productsSchema.js';
+import { vendorsTable } from './vendorsSchema.js';
+import { fulfillmentPointsTable } from './fulfillmentPointsSchema.js';
 import { createInsertSchema } from 'drizzle-zod';
 import { z } from 'zod';
 

@@ -1,6 +1,6 @@
 import { integer, pgTable, varchar, text, timestamp } from 'drizzle-orm/pg-core';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
-import { lgaEnum } from './fulfillmentPointsSchema';
+import { lgaEnum } from './fulfillmentPointsSchema.js';
 
 export const usersTable = pgTable('users', {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
