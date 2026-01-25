@@ -1,15 +1,17 @@
 'use client';
 
+import { Avatar, AvatarFallbackText } from '@/components/ui/avatar';
+import { Button, ButtonText } from '@/components/ui/button';
 import { logout } from '@/api/auth';
-import { useTransition } from 'react';
-import { LogOut } from 'lucide-react';
+import { useTransition, useState } from 'react';
 
 interface LogoutButtonProps {
-  variant?: 'dropdown' | 'button';
+  variant?: 'header' | 'sidebar';
 }
 
-export default function LogoutButton({ variant = 'button' }: LogoutButtonProps) {
+export default function LogoutButton({ variant = 'header' }: LogoutButtonProps) {
   const [isPending, startTransition] = useTransition();
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleLogout = () => {
     startTransition(async () => {
@@ -17,27 +19,48 @@ export default function LogoutButton({ variant = 'button' }: LogoutButtonProps) 
     });
   };
 
-  if (variant === 'dropdown') {
+  if (variant === 'sidebar') {
     return (
-      <button
-        onClick={handleLogout}
-        disabled={isPending}
-        className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-50 flex items-center gap-2"
+      <Button
+        onPress={handleLogout}
+        variant="outline"
+        className="w-full"
+        isDisabled={isPending}
       >
-        <LogOut className="w-4 h-4" />
-        {isPending ? 'Logging out...' : 'Logout'}
-      </button>
+        <ButtonText>{isPending ? 'Logging out...' : 'Logout'}</ButtonText>
+      </Button>
     );
   }
 
   return (
-    <button
-      onClick={handleLogout}
-      disabled={isPending}
-      className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:bg-gray-400 flex items-center gap-2"
-    >
-      <LogOut className="w-5 h-5" />
-      {isPending ? 'Logging out...' : 'Logout'}
-    </button>
+    <div className="relative">
+      <button 
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+      >
+        <Avatar size="sm">
+          <AvatarFallbackText>AD</AvatarFallbackText>
+        </Avatar>
+      </button>
+
+      {/* Dropdown menu */}
+      {isOpen && (
+        <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border z-50">
+          <div className="p-3 border-b">
+            <p className="text-sm font-medium">Vendor</p>
+            <p className="text-xs text-slate-500">vendor</p>
+          </div>
+          <div className="p-2">
+            <button
+              onClick={handleLogout}
+              disabled={isPending}
+              className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-50"
+            >
+              {isPending ? 'Logging out...' : 'Logout'}
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
