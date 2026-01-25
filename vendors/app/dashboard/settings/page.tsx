@@ -7,6 +7,8 @@ import LogoutButton from '../LogoutButton';
 import { useVendorProfile } from '@/hooks/useVendorProfile';
 import { Heading } from '@/components/ui/heading';
 import { Text } from '@/components/ui/text';
+import { TrendingUp } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 import {
     Building2,
     Store,
@@ -241,8 +243,8 @@ export default function SettingsPage() {
                                         readOnly
                                         className="w-full pl-12 pr-4 py-4 bg-secondary/50 border border-border/50 rounded-2xl text-sm font-bold text-muted-foreground cursor-not-allowed"
                                     />
-                                    <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                                        <AlertCircle className="w-4 h-4 text-yellow-500" title="Store name cannot be changed" />
+                                    <div className="absolute right-4 top-1/2 -translate-y-1/2" title="Store name cannot be changed">
+                                        <AlertCircle className="w-4 h-4 text-yellow-500" />
                                     </div>
                                 </div>
                             </div>

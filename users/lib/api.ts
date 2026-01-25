@@ -44,7 +44,13 @@ export async function login(email: string, password: string) {
     });
 
     const data = await res.json();
+
     if (!res.ok) throw new Error(data.message || 'Failed to login');
+
+    // Check if the user has the 'user' role
+    if (data.user?.role !== 'user') {
+        throw new Error('Not authorized - User account required');
+    }
 
     if (data.token) {
         setToken(data.token);
@@ -101,6 +107,12 @@ async function fetchWithAuth(url: string, options: RequestInit = {}) {
             errorMessage = `${errorMessage}: ${details}`;
         }
         throw new Error(errorMessage);
+    }
+
+    // If the response contains user data (like from /users/me), verify the role
+    const role = data.role || data.user?.role;
+    if (role && role !== 'user') {
+        throw new Error('Not authorized');
     }
     return data;
 }

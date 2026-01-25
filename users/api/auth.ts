@@ -12,8 +12,9 @@ export async function login(email: string, password: string) {
 
   const data = await res.json();
   console.log(data);
-  if(data.user.role !== 'admin') {
+  if(data.user.role !== 'user') {
     throw Error('Not authorized');
+    console.log('Not authorized');
   }
   if (!res.ok) {
     console.log(data);

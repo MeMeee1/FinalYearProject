@@ -108,7 +108,7 @@ export default function Home() {
           <Text className="text-xl text-blue-100 mb-8">Join thousands of successful vendors on our platform</Text>
           <Link href="/signUp">
             <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100">
-              <ButtonText>Create Vendor Account</ButtonText>
+              <ButtonText className='bg-red'>Create Vendor Account</ButtonText>
             </Button>
           </Link>
         </div>
