@@ -2,7 +2,24 @@
 export * from './types';
 import { Product, Order, CartItem } from './types';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const API_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').replace(/\/$/, '');
+
+async function handleResponse(res: Response) {
+    const contentType = res.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || data.error || `Error ${res.status}: ${res.statusText}`);
+        return data;
+    } else {
+        // Handle non-JSON responses (e.g., HTML error pages)
+        const text = await res.text();
+        if (!res.ok) {
+            // Try to extract a meaningful message if possible, otherwise generic
+            throw new Error(`Server error (${res.status}): ${res.statusText}. Please contact support or try again later.`);
+        }
+        return text;
+    }
+}
 
 export async function getUserProfile() {
     return fetchWithAuth('/users/me');
@@ -43,9 +60,7 @@ export async function login(email: string, password: string) {
         body: JSON.stringify({ email, password }),
     });
 
-    const data = await res.json();
-
-    if (!res.ok) throw new Error(data.message || 'Failed to login');
+    const data = await handleResponse(res);
 
     // Check if the user has the 'user' role
     if (data.user?.role !== 'user') {
@@ -65,9 +80,7 @@ export async function signup(email: string, password: string, name: string, lga?
         body: JSON.stringify({ email, password, name, lga, address, city, country }),
     });
 
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || 'Failed to register');
-    return data;
+    return handleResponse(res);
 }
 
 export async function uploadImage(file: File) {
@@ -80,8 +93,7 @@ export async function uploadImage(file: File) {
         body: formData,
     });
 
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || 'Failed to upload image');
+    const data = await handleResponse(res);
     return data.url;
 }
 
@@ -99,15 +111,7 @@ async function fetchWithAuth(url: string, options: RequestInit = {}) {
         headers,
     });
 
-    const data = await res.json();
-    if (!res.ok) {
-        let errorMessage = data.message || data.error || 'An error occurred';
-        if (data.details && Array.isArray(data.details)) {
-            const details = data.details.map((d: any) => d.message).join(', ');
-            errorMessage = `${errorMessage}: ${details}`;
-        }
-        throw new Error(errorMessage);
-    }
+    const data = await handleResponse(res);
 
     // If the response contains user data (like from /users/me), verify the role
     const role = data.role || data.user?.role;

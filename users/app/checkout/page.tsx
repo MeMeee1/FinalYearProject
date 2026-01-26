@@ -5,8 +5,8 @@ import { VStack } from '@/components/ui/vstack';
 import { HStack } from '@/components/ui/hstack';
 import { Text } from '@/components/ui/text';
 import { Heading } from '@/components/ui/heading';
-import { Button, ButtonText, ButtonIcon } from '@/components/ui/button';
-import { Input, InputField } from '@/components/ui/input';
+
+
 import { ArrowLeftIcon, CreditCardIcon, MapPinIcon, ShieldCheckIcon, TruckIcon, StoreIcon, ChevronRightIcon } from 'lucide-react-native';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -64,13 +64,12 @@ export default function Checkout() {
             {/* Premium Header */}
             <Box className="bg-background/80 backdrop-blur-3xl px-6 pt-12 pb-6 border-b border-border/40 sticky top-0 z-50">
                 <HStack space="md" className="items-center">
-                    <Button
-                        variant="solid"
-                        className="rounded-xl bg-secondary/50 border border-border/40 w-10 h-10 p-0 items-center justify-center hover:bg-secondary/80 transition-all active:scale-95"
-                        onPress={() => router.back()}
+                    <button
+                        className="rounded-xl bg-secondary/50 border border-border/40 w-10 h-10 p-0 items-center justify-center hover:bg-secondary/80 transition-all active:scale-95 flex"
+                        onClick={() => router.back()}
                     >
                         <ArrowLeftIcon size={20} color="hsl(var(--foreground))" />
-                    </Button>
+                    </button>
                     <VStack>
                         <Text className="text-[10px] text-muted-foreground font-black uppercase tracking-[0.3em] leading-none mb-1">Transaction</Text>
                         <Heading size="lg" className="text-foreground font-black tracking-tighter">Finalize Procurement</Heading>
@@ -104,11 +103,10 @@ export default function Checkout() {
 
                         <VStack space="md">
                             {fulfillmentPoints.filter(p => !logisticsConstraint.isConstrained || p.id === logisticsConstraint.requiredPointId).map(point => (
-                                <Button
+                                <button
                                     key={point.id}
-                                    variant="link"
-                                    onPress={() => !logisticsConstraint.isConstrained && setSelectedPointId(point.id)}
-                                    className={`p-5 rounded-[2rem] border-2 h-auto text-left flex-row items-center justify-start ${selectedPointId === point.id ? 'border-primary bg-primary/5' : 'border-border/30 bg-secondary/10'}`}
+                                    onClick={() => !logisticsConstraint.isConstrained && setSelectedPointId(point.id)}
+                                    className={`p-5 rounded-[2rem] border-2 h-auto text-left flex flex-row items-center justify-start w-full ${selectedPointId === point.id ? 'border-primary bg-primary/5' : 'border-border/30 bg-secondary/10'}`}
                                 >
                                     <HStack space="md" className="items-center w-full">
                                         <Box className={`w-10 h-10 rounded-xl items-center justify-center ${selectedPointId === point.id ? 'bg-primary' : 'bg-background/40'}`}>
@@ -124,7 +122,7 @@ export default function Checkout() {
                                             </Box>
                                         )}
                                     </HStack>
-                                </Button>
+                                </button>
                             ))}
                         </VStack>
                     </Box>
@@ -141,52 +139,44 @@ export default function Checkout() {
                         <VStack space="lg">
                             <VStack space="xs">
                                 <Text className="text-[10px] text-muted-foreground font-black uppercase tracking-widest ml-1 mb-1">Backup Address (Optional)</Text>
-                                <Input size="xl" className="rounded-2xl bg-secondary/20 border-border/30 h-16 px-4">
-                                    <InputField
-                                        placeholder="e.g. 123 Blockchain Ave"
-                                        value={address}
-                                        onChangeText={setAddress}
-                                        className="text-foreground font-bold"
-                                    />
-                                </Input>
+                                <input
+                                    placeholder="e.g. 123 Blockchain Ave"
+                                    value={address}
+                                    onChange={(e) => setAddress(e.target.value)}
+                                    className="w-full rounded-2xl bg-secondary/20 border border-border/30 h-16 px-4 text-foreground font-bold focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder:text-muted-foreground/50"
+                                />
                             </VStack>
 
                             <Box className="grid grid-cols-2 gap-4">
                                 <VStack space="xs">
                                     <Text className="text-[10px] text-muted-foreground font-black uppercase tracking-widest ml-1 mb-1">Zone / City</Text>
-                                    <Input size="xl" className="rounded-2xl bg-secondary/20 border-border/30 h-16 px-4">
-                                        <InputField
-                                            placeholder="City"
-                                            value={city}
-                                            onChangeText={setCity}
-                                            className="text-foreground font-bold"
-                                        />
-                                    </Input>
+                                    <input
+                                        placeholder="City"
+                                        value={city}
+                                        onChange={(e) => setCity(e.target.value)}
+                                        className="w-full rounded-2xl bg-secondary/20 border border-border/30 h-16 px-4 text-foreground font-bold focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder:text-muted-foreground/50"
+                                    />
                                 </VStack>
                                 <VStack space="xs">
                                     <Text className="text-[10px] text-muted-foreground font-black uppercase tracking-widest ml-1 mb-1">Administrative Area (LGA)</Text>
-                                    <Input size="xl" className="rounded-2xl bg-secondary/20 border-border/30 h-16 px-4">
-                                        <InputField
-                                            placeholder="LGA"
-                                            value={lga}
-                                            onChangeText={setLga}
-                                            className="text-foreground font-bold"
-                                        />
-                                    </Input>
+                                    <input
+                                        placeholder="LGA"
+                                        value={lga}
+                                        onChange={(e) => setLga(e.target.value)}
+                                        className="w-full rounded-2xl bg-secondary/20 border border-border/30 h-16 px-4 text-foreground font-bold focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder:text-muted-foreground/50"
+                                    />
                                 </VStack>
                             </Box>
 
                             <VStack space="xs">
                                 <Text className="text-[10px] text-muted-foreground font-black uppercase tracking-widest ml-1 mb-1">Communication Channel (Phone)</Text>
-                                <Input size="xl" className="rounded-2xl bg-secondary/20 border-border/30 h-16 px-4">
-                                    <InputField
-                                        placeholder="+234 ..."
-                                        value={phone}
-                                        onChangeText={setPhone}
-                                        keyboardType="phone-pad"
-                                        className="text-foreground font-bold"
-                                    />
-                                </Input>
+                                <input
+                                    placeholder="+234 ..."
+                                    value={phone}
+                                    onChange={(e) => setPhone(e.target.value)}
+                                    type="tel"
+                                    className="w-full rounded-2xl bg-secondary/20 border border-border/30 h-16 px-4 text-foreground font-bold focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder:text-muted-foreground/50"
+                                />
                             </VStack>
                         </VStack>
                     </Box>
@@ -242,10 +232,9 @@ export default function Checkout() {
             {/* Bottom Interaction Deck */}
             <Box className="fixed bottom-0 left-0 right-0 bg-background/80 backdrop-blur-3xl p-8 border-t border-border/30 pb-12 z-50">
                 <Box className="max-w-4xl mx-auto">
-                    <Button
-                        size="xl"
+                    <button
                         disabled={!address || !city || !phone || !selectedPointId}
-                        onPress={() => {
+                        onClick={() => {
                             const params = new URLSearchParams({
                                 address,
                                 city,
@@ -255,7 +244,7 @@ export default function Checkout() {
                             });
                             router.push(`/payment?${params.toString()}`);
                         }}
-                        className={`w-full rounded-[2.5rem] bg-primary hover:scale-[1.02] shadow-[0_24px_48px_rgba(29,185,84,0.3)] border-0 h-24 transition-all active:scale-[0.98] group overflow-hidden relative ${(!address || !city || !phone || !selectedPointId) ? 'opacity-50 grayscale' : ''}`}
+                        className={`w-full rounded-[2.5rem] bg-primary hover:scale-[1.02] shadow-[0_24px_48px_rgba(29,185,84,0.3)] border-0 h-24 transition-all active:scale-[0.98] group overflow-hidden relative flex items-center justify-center ${(!address || !city || !phone || !selectedPointId) ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}
                     >
                         <Box className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
                         <HStack space="lg" className="items-center relative z-10">
@@ -263,11 +252,11 @@ export default function Checkout() {
                                 <CreditCardIcon size={24} color="black" />
                             </Box>
                             <VStack className="items-start">
-                                <ButtonText className="font-black text-black text-xl uppercase tracking-[0.25em] leading-none">Initialize Ledger Settlement</ButtonText>
+                                <Text className="font-black text-black text-xl uppercase tracking-[0.25em] leading-none">Initialize Ledger Settlement</Text>
                                 <Text className="text-black/60 text-[10px] font-black uppercase tracking-widest mt-1">Authorize Transaction Through Secure Payment Gateway</Text>
                             </VStack>
                         </HStack>
-                    </Button>
+                    </button>
                 </Box>
             </Box>
         </Box>

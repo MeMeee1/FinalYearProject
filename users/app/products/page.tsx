@@ -6,8 +6,8 @@ import { VStack } from '@/components/ui/vstack';
 import { HStack } from '@/components/ui/hstack';
 import { Text } from '@/components/ui/text';
 import { Heading } from '@/components/ui/heading';
-import { Input, InputField, InputSlot, InputIcon } from '@/components/ui/input';
-import { Button, ButtonText, ButtonIcon, ButtonSpinner } from '@/components/ui/button';
+
+
 import { SearchIcon, ArrowLeftIcon, ChevronLeftIcon, ChevronRightIcon, FilterIcon, SlidersHorizontalIcon } from 'lucide-react-native';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -19,7 +19,7 @@ export default function AllProducts() {
     return (
         <Suspense fallback={
             <Box className="flex-1 justify-center items-center h-screen">
-                <ButtonSpinner color="black" />
+                <Text>Loading Inventory...</Text>
             </Box>
         }>
             <AllProductsContent />
@@ -79,13 +79,12 @@ function AllProductsContent() {
                 <VStack space="lg">
                     <HStack className="items-center justify-between">
                         <HStack space="md" className="items-center">
-                            <Button
-                                variant="solid"
-                                className="rounded-xl bg-secondary/50 border border-border/40 w-10 h-10 p-0 items-center justify-center hover:bg-secondary/80 transition-all active:scale-95"
-                                onPress={() => router.back()}
+                            <button
+                                className="rounded-xl bg-secondary/50 border border-border/40 w-10 h-10 p-0 items-center justify-center hover:bg-secondary/80 transition-all active:scale-95 flex"
+                                onClick={() => router.back()}
                             >
                                 <ArrowLeftIcon size={20} color="hsl(var(--foreground))" />
-                            </Button>
+                            </button>
                             <VStack>
                                 <Text className="text-[10px] text-muted-foreground font-black uppercase tracking-[0.3em] leading-none mb-1">Marketplace Pipeline</Text>
                                 <Heading size="lg" className="text-foreground font-black tracking-tighter">Global Inventory</Heading>
@@ -97,32 +96,34 @@ function AllProductsContent() {
                     </HStack>
 
                     <HStack space="sm">
-                        <Input size="xl" className="flex-1 bg-secondary/40 border-border/40 rounded-2xl h-14 px-4 focus:bg-secondary/60 transition-all">
-                            <InputSlot className="mr-3">
-                                <SearchIcon size={20} color="hsl(var(--muted-foreground))" />
-                            </InputSlot>
-                            <InputField
-                                placeholder="Scan inventory..."
-                                value={searchQuery}
-                                onChangeText={setSearchQuery}
-                                onSubmitEditing={handleSearch}
-                                className="text-foreground font-bold placeholder:text-muted-foreground/50"
-                            />
-                        </Input>
+                        <HStack space="sm">
+                            <Box className="flex-1 relative">
+                                <Box className="absolute left-4 top-1/2 -translate-y-1/2 z-10">
+                                    <SearchIcon size={20} color="hsl(var(--muted-foreground))" />
+                                </Box>
+                                <input
+                                    placeholder="Scan inventory..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                                    className="w-full bg-secondary/40 border border-border/40 rounded-2xl h-14 pl-12 pr-4 focus:bg-secondary/60 transition-all text-foreground font-bold placeholder:text-muted-foreground/50 focus:outline-none"
+                                />
+                            </Box>
+                        </HStack>
                     </HStack>
 
                     {/* Taxonomy Navigation */}
                     <HStack space="xs" className="overflow-x-auto pb-1 scrollbar-hide py-1">
                         {categories.map((cat) => (
-                            <Button
+                            <button
                                 key={cat}
-                                onPress={() => { setActiveCategory(cat); setPage(1); }}
-                                className={`rounded-xl px-4 py-1.5 h-10 border transition-all ${activeCategory === cat ? 'bg-primary border-primary shadow-lg shadow-primary/20 scale-105' : 'bg-card/40 border-border/40 hover:bg-card/60'}`}
+                                onClick={() => { setActiveCategory(cat); setPage(1); }}
+                                className={`rounded-xl px-4 py-1.5 h-10 border transition-all flex items-center justify-center ${activeCategory === cat ? 'bg-primary border-primary shadow-lg shadow-primary/20 scale-105' : 'bg-card/40 border-border/40 hover:bg-card/60'}`}
                             >
-                                <ButtonText className={`text-[10px] font-black uppercase tracking-widest ${activeCategory === cat ? 'text-black' : 'text-muted-foreground'}`}>
+                                <Text className={`text-[10px] font-black uppercase tracking-widest ${activeCategory === cat ? 'text-black' : 'text-muted-foreground'}`}>
                                     {cat}
-                                </ButtonText>
-                            </Button>
+                                </Text>
+                            </button>
                         ))}
                     </HStack>
                 </VStack>
@@ -141,16 +142,15 @@ function AllProductsContent() {
                             { id: 'price_asc', label: 'Val: Low' },
                             { id: 'price_desc', label: 'Val: High' }
                         ].map((s) => (
-                            <Button
+                            <button
                                 key={s.id}
-                                variant="link"
                                 className="px-2"
-                                onPress={() => { setActiveSort(s.id); setPage(1); }}
+                                onClick={() => { setActiveSort(s.id); setPage(1); }}
                             >
-                                <ButtonText className={`text-[10px] font-black uppercase tracking-widest transition-colors ${activeSort === s.id ? 'text-primary' : 'text-muted-foreground/40 hover:text-muted-foreground'}`}>
+                                <Text className={`text-[10px] font-black uppercase tracking-widest transition-colors ${activeSort === s.id ? 'text-primary' : 'text-muted-foreground/40 hover:text-muted-foreground'}`}>
                                     {s.label}
-                                </ButtonText>
-                            </Button>
+                                </Text>
+                            </button>
                         ))}
                     </HStack>
                 </HStack>
@@ -180,27 +180,25 @@ function AllProductsContent() {
                                 {/* Pagination Controls */}
                                 {pagination.totalPages > 1 && (
                                     <HStack className="justify-center items-center space-x-4 mt-12 mb-8">
-                                        <Button
-                                            variant="solid"
-                                            className="rounded-2xl bg-card border border-border/40 h-14 w-14 p-0 items-center justify-center hover:bg-secondary/40 active:scale-90 transition-all disabled:opacity-20"
+                                        <button
+                                            className="rounded-2xl bg-card border border-border/40 h-14 w-14 p-0 items-center justify-center hover:bg-secondary/40 active:scale-90 transition-all disabled:opacity-20 flex"
                                             disabled={page === 1}
-                                            onPress={() => setPage(page - 1)}
+                                            onClick={() => setPage(page - 1)}
                                         >
                                             <ChevronLeftIcon size={24} color="hsl(var(--foreground))" />
-                                        </Button>
+                                        </button>
 
                                         <Box className="bg-primary/10 border border-primary/20 px-8 py-3 rounded-2xl">
                                             <Text className="text-primary font-black text-sm uppercase tracking-widest">{page} / {pagination.totalPages}</Text>
                                         </Box>
 
-                                        <Button
-                                            variant="solid"
-                                            className="rounded-2xl bg-card border border-border/40 h-14 w-14 p-0 items-center justify-center hover:bg-secondary/40 active:scale-90 transition-all disabled:opacity-20"
+                                        <button
+                                            className="rounded-2xl bg-card border border-border/40 h-14 w-14 p-0 items-center justify-center hover:bg-secondary/40 active:scale-90 transition-all disabled:opacity-20 flex"
                                             disabled={!pagination.hasMore}
-                                            onPress={() => setPage(page + 1)}
+                                            onClick={() => setPage(page + 1)}
                                         >
                                             <ChevronRightIcon size={24} color="hsl(var(--foreground))" />
-                                        </Button>
+                                        </button>
                                     </HStack>
                                 )}
                             </>
@@ -214,13 +212,13 @@ function AllProductsContent() {
                                         <Heading className="text-foreground font-black tracking-tight text-center">Null Result Detected</Heading>
                                         <Text className="text-muted-foreground text-center font-medium max-w-[280px]">No active inventory units match your current filter parameters or search query.</Text>
                                     </VStack>
-                                    <Button className="mt-4 rounded-2xl bg-primary px-8 h-16 shadow-xl shadow-primary/20" onPress={() => {
+                                    <button className="mt-4 rounded-2xl bg-primary px-8 h-16 shadow-xl shadow-primary/20 flex items-center justify-center" onClick={() => {
                                         setSearchQuery('');
                                         setActiveCategory('All');
                                         setPage(1);
                                     }}>
-                                        <ButtonText className="text-black font-black uppercase tracking-widest text-sm">Reset Filter</ButtonText>
-                                    </Button>
+                                        <Text className="text-black font-black uppercase tracking-widest text-sm">Reset Filter</Text>
+                                    </button>
                                 </VStack>
                             </Box>
                         )}

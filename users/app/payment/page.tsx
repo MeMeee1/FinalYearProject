@@ -5,7 +5,6 @@ import { VStack } from '@/components/ui/vstack';
 import { HStack } from '@/components/ui/hstack';
 import { Text } from '@/components/ui/text';
 import { Heading } from '@/components/ui/heading';
-import { Button, ButtonText, ButtonIcon } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ArrowLeftIcon, CreditCardIcon, ShieldCheckIcon, LockIcon, BanknoteIcon } from 'lucide-react-native';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -59,13 +58,12 @@ function PaymentContent() {
             {/* Premium Header */}
             <Box className="bg-background/80 backdrop-blur-3xl px-6 pt-12 pb-6 border-b border-border/40 sticky top-0 z-50">
                 <HStack space="md" className="items-center">
-                    <Button
-                        variant="solid"
-                        className="rounded-xl bg-secondary/50 border border-border/40 w-10 h-10 p-0 items-center justify-center hover:bg-secondary/80 transition-all active:scale-95"
-                        onPress={() => router.back()}
+                    <button
+                        className="rounded-xl bg-secondary/50 border border-border/40 w-10 h-10 p-0 items-center justify-center hover:bg-secondary/80 transition-all active:scale-95 flex"
+                        onClick={() => router.back()}
                     >
                         <ArrowLeftIcon size={20} color="hsl(var(--foreground))" />
-                    </Button>
+                    </button>
                     <VStack>
                         <Text className="text-[10px] text-muted-foreground font-black uppercase tracking-[0.3em] leading-none mb-1">Settlement Gateway</Text>
                         <Heading size="lg" className="text-foreground font-black tracking-tighter">Authorize Payment</Heading>
@@ -90,10 +88,9 @@ function PaymentContent() {
                         <Heading className="text-foreground font-black tracking-tight text-xl ml-2 mb-2">Payment Infrastructure</Heading>
 
                         {/* Card Method */}
-                        <Button
-                            variant="link"
-                            className={`p-6 h-auto rounded-[2.5rem] border-2 transition-all cursor-pointer ${selectedMethod === 'card' ? 'border-primary bg-primary/10 shadow-lg shadow-primary/10' : 'border-border/40 bg-card/40'}`}
-                            onPress={() => setSelectedMethod('card')}
+                        <button
+                            className={`p-6 h-auto rounded-[2.5rem] border-2 transition-all cursor-pointer flex w-full ${selectedMethod === 'card' ? 'border-primary bg-primary/10 shadow-lg shadow-primary/10' : 'border-border/40 bg-card/40'}`}
+                            onClick={() => setSelectedMethod('card')}
                         >
                             <HStack className="items-center justify-between w-full">
                                 <HStack space="md" className="items-center">
@@ -107,7 +104,7 @@ function PaymentContent() {
                                 </HStack>
                                 {selectedMethod === 'card' && <ShieldCheckIcon size={24} color="hsl(var(--primary))" />}
                             </HStack>
-                        </Button>
+                        </button>
 
                         {/* USSD Method - Coming Soon */}
                         <Box className="p-6 rounded-[2.5rem] border border-border/20 bg-card/20 opacity-40 grayscale">
@@ -157,10 +154,9 @@ function PaymentContent() {
             {/* Bottom Interaction Deck */}
             <Box className="fixed bottom-0 left-0 right-0 bg-background/80 backdrop-blur-3xl p-8 border-t border-border/30 pb-12 z-50">
                 <Box className="max-w-4xl mx-auto">
-                    <Button
-                        size="xl"
-                        className="w-full rounded-[2.5rem] bg-primary hover:scale-[1.02] shadow-[0_24px_48px_rgba(var(--primary-rgb),0.3)] border-0 h-24 transition-all active:scale-[0.98] group overflow-hidden relative"
-                        onPress={handleExecutePayment}
+                    <button
+                        className="w-full rounded-[2.5rem] bg-primary hover:scale-[1.02] shadow-[0_24px_48px_rgba(var(--primary-rgb),0.3)] border-0 h-24 transition-all active:scale-[0.98] group overflow-hidden relative flex items-center justify-center"
+                        onClick={handleExecutePayment}
                         disabled={isSubmitting}
                     >
                         <Box className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
@@ -175,13 +171,13 @@ function PaymentContent() {
                                     </HStack>
                                 ) : (
                                     <>
-                                        <ButtonText className="font-black text-black text-xl uppercase tracking-[0.25em] leading-none">Execute Authorization</ButtonText>
+                                        <Text className="font-black text-black text-xl uppercase tracking-[0.25em] leading-none">Execute Authorization</Text>
                                         <Text className="text-black/60 text-[10px] font-black uppercase tracking-widest mt-1">Finalize Secure Financial Handshake</Text>
                                     </>
                                 )}
                             </VStack>
                         </HStack>
-                    </Button>
+                    </button>
                 </Box>
             </Box>
         </Box >

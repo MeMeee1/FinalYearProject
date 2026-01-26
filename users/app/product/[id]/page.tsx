@@ -6,8 +6,8 @@ import { VStack } from '@/components/ui/vstack';
 import { HStack } from '@/components/ui/hstack';
 import { Text } from '@/components/ui/text';
 import { Heading } from '@/components/ui/heading';
-import { Button, ButtonText, ButtonIcon, ButtonSpinner } from '@/components/ui/button';
-import { Image } from '@/components/ui/image';
+
+
 import { Icon } from '@/components/ui/icon';
 import { ArrowLeftIcon, ShoppingBagIcon, MapPinIcon, StoreIcon } from 'lucide-react-native';
 import Link from 'next/link';
@@ -56,7 +56,7 @@ export default function ProductDetails() {
     if (loading) {
         return (
             <Box className="flex-1 justify-center items-center bg-background">
-                <ButtonSpinner color="#1DB954" size="large" />
+                <Text className="text-primary font-black uppercase tracking-widest">Loading Node...</Text>
             </Box>
         );
     }
@@ -66,7 +66,7 @@ export default function ProductDetails() {
             <Box className="flex-1 justify-center items-center bg-background">
                 <Text className="text-white mb-4">Product not found.</Text>
                 <Link href="/">
-                    <Button className="bg-[#1DB954]"><ButtonText className="text-black font-bold">Go Home</ButtonText></Button>
+                    <button className="bg-[#1DB954] px-6 py-3 rounded-xl font-bold text-black transition-transform hover:scale-105">Go Home</button>
                 </Link>
             </Box>
         );
@@ -77,37 +77,41 @@ export default function ProductDetails() {
         <Box className="flex-1 min-h-screen bg-background pb-40">
             {/* Header / Navigation Rail */}
             <Box className="fixed top-8 left-8 right-8 z-[100] flex-row justify-between items-center pointer-events-none">
-                <Button
-                    variant="solid"
-                    className="rounded-2xl bg-background/60 backdrop-blur-3xl border border-border/40 shadow-2xl w-14 h-14 p-0 items-center justify-center hover:bg-background/80 transition-all active:scale-90 pointer-events-auto"
-                    onPress={() => router.back()}
+                <button
+                    className="rounded-2xl bg-background/60 backdrop-blur-3xl border border-border/40 shadow-2xl w-14 h-14 p-0 items-center justify-center hover:bg-background/80 transition-all active:scale-90 pointer-events-auto flex"
+                    onClick={() => router.back()}
                 >
                     <ArrowLeftIcon size={24} color="hsl(var(--foreground))" />
-                </Button>
+                </button>
 
                 <HStack space="md" className="pointer-events-auto">
-                    <Button
-                        variant="solid"
-                        className="rounded-2xl bg-background/60 backdrop-blur-3xl border border-border/40 shadow-2xl w-14 h-14 p-0 items-center justify-center hover:bg-background/80 transition-all active:scale-90"
-                        onPress={() => setIsWishlisted(!isWishlisted)}
+                    <button
+                        className="rounded-2xl bg-background/60 backdrop-blur-3xl border border-border/40 shadow-2xl w-14 h-14 p-0 items-center justify-center hover:bg-background/80 transition-all active:scale-90 flex"
+                        onClick={() => setIsWishlisted(!isWishlisted)}
                     >
                         <HeartIcon size={20} color={isWishlisted ? "hsl(var(--primary))" : "hsl(var(--foreground))"} fill={isWishlisted ? "hsl(var(--primary))" : "transparent"} />
-                    </Button>
-                    <Button
-                        variant="solid"
-                        className="rounded-2xl bg-background/60 backdrop-blur-3xl border border-border/40 shadow-2xl w-14 h-14 p-0 items-center justify-center hover:bg-background/80 transition-all active:scale-90"
+                    </button>
+                    <button
+                        className="rounded-2xl bg-background/60 backdrop-blur-3xl border border-border/40 shadow-2xl w-14 h-14 p-0 items-center justify-center hover:bg-background/80 transition-all active:scale-90 flex"
                     >
                         <Share2Icon size={20} color="hsl(var(--foreground))" />
-                    </Button>
+                    </button>
                 </HStack>
             </Box>
 
             {/* Immersive Gallery / Hero */}
             <Box className="h-[65vh] w-full relative overflow-hidden bg-secondary/20">
-                <Image
-                    source={{ uri: product.image || 'https://placehold.co/1200x800' }}
+                <img
+                    src={product.image
+                        ? product.image.startsWith('http')
+                            ? product.image
+                            : `${(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').replace(/\/$/, '')}${product.image.startsWith('/') ? '' : '/'}${product.image}`
+                        : 'https://placehold.co/1200x800'}
                     alt={product.name}
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                        (e.target as HTMLImageElement).src = 'https://placehold.co/1200x800';
+                    }}
                 />
                 <Box className="absolute inset-x-0 bottom-0 h-96 bg-gradient-to-t from-background via-background/40 to-transparent" />
 
@@ -150,23 +154,21 @@ export default function ProductDetails() {
 
                                     {/* Advanced Quantity Selector */}
                                     <HStack className="bg-secondary/40 p-1.5 rounded-2xl border border-border/50 items-center">
-                                        <Button
-                                            variant="link"
-                                            className="w-10 h-10 rounded-xl bg-background/40 items-center justify-center hover:bg-background/60"
-                                            onPress={() => setQuantity(Math.max(1, quantity - 1))}
+                                        <button
+                                            className="w-10 h-10 rounded-xl bg-background/40 items-center justify-center hover:bg-background/60 flex"
+                                            onClick={() => setQuantity(Math.max(1, quantity - 1))}
                                         >
                                             <MinusIcon size={16} color="hsl(var(--foreground))" />
-                                        </Button>
+                                        </button>
                                         <Box className="w-12 items-center">
                                             <Text className="text-foreground font-black text-lg">{quantity}</Text>
                                         </Box>
-                                        <Button
-                                            variant="link"
-                                            className="w-10 h-10 rounded-xl bg-background/40 items-center justify-center hover:bg-background/60"
-                                            onPress={() => setQuantity(Math.min(product.stock, quantity + 1))}
+                                        <button
+                                            className="w-10 h-10 rounded-xl bg-background/40 items-center justify-center hover:bg-background/60 flex"
+                                            onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
                                         >
                                             <PlusIcon size={16} color="hsl(var(--foreground))" />
-                                        </Button>
+                                        </button>
                                     </HStack>
                                 </HStack>
                             </VStack>
@@ -303,15 +305,14 @@ export default function ProductDetails() {
                         <Text className="text-foreground font-black text-2xl tracking-tighter">₦{(product.price * quantity).toLocaleString()}</Text>
                     </VStack>
 
-                    <Button
-                        size="xl"
-                        onPress={() => {
+                    <button
+                        onClick={() => {
                             if (product) {
                                 addToCart(product, quantity);
                                 router.push('/cart');
                             }
                         }}
-                        className="flex-1 rounded-[2.5rem] bg-primary hover:scale-[1.02] shadow-[0_24px_48px_rgba(var(--primary),0.3)] border-0 h-24 transition-all active:scale-[0.98] group overflow-hidden relative"
+                        className="flex-1 rounded-[2.5rem] bg-primary hover:scale-[1.02] shadow-[0_24px_48px_rgba(var(--primary),0.3)] border-0 h-24 transition-all active:scale-[0.98] group overflow-hidden relative flex items-center justify-center"
                     >
                         <Box className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
                         <HStack space="lg" className="items-center relative z-10">
@@ -319,11 +320,11 @@ export default function ProductDetails() {
                                 <ShoppingBagIcon size={24} color="black" />
                             </Box>
                             <VStack className="items-start">
-                                <ButtonText className="font-black text-black text-xl uppercase tracking-[0.25em] leading-none">Add To Cart</ButtonText>
+                                <Text className="font-black text-black text-xl uppercase tracking-[0.25em] leading-none">Add To Cart</Text>
                                 <Text className="text-black/60 text-[10px] font-black uppercase tracking-widest mt-1">Get a product!</Text>
                             </VStack>
                         </HStack>
-                    </Button>
+                    </button>
                 </Box>
             </Box>
         </Box>

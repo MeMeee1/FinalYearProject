@@ -6,7 +6,7 @@ import { HStack } from '@/components/ui/hstack';
 import { Text } from '@/components/ui/text';
 import { Heading } from '@/components/ui/heading';
 import { Button, ButtonIcon, ButtonText } from '@/components/ui/button';
-import { Input, InputField } from '@/components/ui/input';
+
 import { ArrowLeftIcon, MapPinIcon, CheckCircle2Icon, PackageIcon, ClockIcon, ShieldCheckIcon, CopyIcon, KeyIcon } from 'lucide-react-native';
 import { useRouter, useParams } from 'next/navigation';
 import { useEffect, useState, useCallback } from 'react';
@@ -150,14 +150,12 @@ export default function OrderDetails() {
                                         </Button>
                                     </HStack>
 
-                                    <Input variant="underlined" size="xl" className="h-16 border-b-2 border-primary/30 focus:border-primary">
-                                        <InputField
-                                            placeholder="Enter Code to Simulate Pickup"
-                                            value={pickupCode}
-                                            onChangeText={setPickupCode}
-                                            className="text-foreground font-black tracking-[0.3em] uppercase text-center"
-                                        />
-                                    </Input>
+                                    <input
+                                        placeholder="Enter Code to Simulate Pickup"
+                                        value={pickupCode}
+                                        onChange={(e) => setPickupCode(e.target.value)}
+                                        className="w-full bg-transparent border-b-2 border-primary/30 h-16 text-foreground font-black tracking-[0.3em] uppercase text-center focus:outline-none focus:border-primary transition-all placeholder:text-muted-foreground/50"
+                                    />
 
                                     <Button
                                         isDisabled={!pickupCode || isVerifying}

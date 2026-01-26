@@ -6,8 +6,8 @@ import { VStack } from '@/components/ui/vstack';
 import { HStack } from '@/components/ui/hstack';
 import { Text } from '@/components/ui/text';
 import { Heading } from '@/components/ui/heading';
-import { Input, InputField, InputSlot, InputIcon } from '@/components/ui/input';
-import { Button, ButtonText, ButtonIcon } from '@/components/ui/button';
+
+
 import { SearchIcon, ShoppingCartIcon, UserIcon, MapPinIcon, ChevronRightIcon } from 'lucide-react-native';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -73,11 +73,9 @@ export default function Home() {
               <HStack className="items-center space-x-2 bg-secondary/50 backdrop-blur-md px-3 py-1.5 rounded-full border border-border/50 self-start mb-2">
                 <MapPinIcon size={12} color="hsl(var(--primary))" />
                 <Text className="text-foreground font-black text-[10px] uppercase tracking-widest">{userLga}, Abuja</Text>
-                <Button
-                  variant="link"
-                  size="xs"
+                <button
                   className="p-0 ml-2"
-                  onPress={() => {
+                  onClick={() => {
                     const next = availableLgas[(availableLgas.indexOf(userLga) + 1) % availableLgas.length];
                     setUserLga(next);
                     // Optionally update profile in background
@@ -85,7 +83,7 @@ export default function Home() {
                   }}
                 >
                   <Text className="text-primary text-[8px] font-bold uppercase">(Switch)</Text>
-                </Button>
+                </button>
               </HStack>
               <Heading className="text-5xl font-black text-foreground tracking-tighter leading-[0.9] mb-1">
                 Welcome, <Text className="text-primary italic">{userName || 'Shopper'}</Text>
@@ -103,21 +101,20 @@ export default function Home() {
             </HStack>
           </HStack>
 
-          {/* Premium Search Bar */}
           <Box className="relative group">
-            <Box className="absolute inset-0 bg-primary/5 rounded-[2rem] blur-xl group-focus-within:bg-primary/10 transition-all" />
-            <Input size="xl" className="bg-secondary/40 backdrop-blur-xl border border-border/30 rounded-[2rem] h-20 focus:border-primary/50 transition-all relative z-10">
-              <InputSlot className="pl-8">
-                <InputIcon as={SearchIcon} className="text-muted-foreground w-6 h-6" />
-              </InputSlot>
-              <InputField
+            <Box className="absolute inset-0 bg-secondary/20 rounded-[2rem] blur-xl group-focus-within:bg-primary/10 transition-all" />
+            <Box className="relative">
+              <Box className="absolute left-8 top-1/2 -translate-y-1/2 z-10 pointer-events-none">
+                <SearchIcon size={24} className="text-muted-foreground" />
+              </Box>
+              <input
                 placeholder="Search local agricultural hub..."
                 value={searchQuery}
-                onChangeText={setSearchQuery}
-                onSubmitEditing={handleSearch}
-                className="text-foreground placeholder:text-muted-foreground/40 font-bold text-lg"
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                className="w-full bg-secondary/40 backdrop-blur-xl border border-border/30 rounded-[2rem] h-20 pl-20 pr-8 focus:border-primary/50 transition-all text-foreground placeholder:text-muted-foreground/40 font-bold text-lg focus:outline-none"
               />
-            </Input>
+            </Box>
           </Box>
         </VStack>
       </Box>
@@ -135,19 +132,18 @@ export default function Home() {
         </HStack>
         <HStack space="md" className="overflow-x-auto pb-6 px-8 scrollbar-hide">
           {categories.map((cat, index) => (
-            <Button
+            <button
               key={`${cat}-${index}`}
-              size="sm"
-              onPress={() => navigateToCategory(cat)}
-              className={`rounded-[1.25rem] px-8 h-12 border transition-all active:scale-95 ${activeCategory === cat
+              onClick={() => navigateToCategory(cat)}
+              className={`rounded-[1.25rem] px-8 h-12 border transition-all active:scale-95 flex items-center justify-center ${activeCategory === cat
                 ? 'bg-primary border-primary shadow-xl shadow-primary/30 scale-105'
                 : 'bg-secondary/30 border-border/20 hover:bg-secondary/60'
                 }`}
             >
-              <ButtonText className={`font-black uppercase tracking-widest text-[10px] ${activeCategory === cat ? 'text-primary-foreground' : 'text-foreground'}`}>
+              <Text className={`uppercase tracking-widest text-[10px] font-bold ${activeCategory === cat ? 'text-primary-foreground' : 'text-foreground'}`}>
                 {cat}
-              </ButtonText>
-            </Button>
+              </Text>
+            </button>
           ))}
         </HStack>
       </Box>
@@ -183,19 +179,18 @@ export default function Home() {
                 <Heading size="md" className="text-foreground font-black tracking-tight">No products in your {userLga}</Heading>
                 <Text className="text-muted-foreground text-sm font-medium text-center px-10">We couldn't find any active listings in this region. Try switching LGAs or checking the marketplace.</Text>
               </VStack>
-              <Button
-                variant="outline"
-                className="rounded-2xl border-primary mt-4"
-                onPress={() => router.push('/products')}
+              <button
+                className="rounded-2xl border border-primary mt-4 px-6 py-3 flex items-center justify-center hover:bg-primary/10 transition-colors"
+                onClick={() => router.push('/products')}
               >
-                <ButtonText className="text-primary font-black uppercase tracking-widest text-[10px]">Explore Global Market</ButtonText>
-              </Button>
+                <Text className="text-primary font-black uppercase tracking-widest text-[10px]">Explore Global Market</Text>
+              </button>
             </VStack>
           </Box>
         )}
 
         {/* Global Action CTA */}
-        <Box className="mt-24 mb-50">
+        {/* <Box className="mt-24 mb-50">
           <Link href="/products">
             <Button size="sm" className="w-[50%] mx-auto rounded-[2.5rem] bg-foreground hover:bg-foreground/90 h-20 border-0 shadow-2xl transition-all active:scale-[0.98] group overflow-hidden relative" variant="solid">
               <Box className="absolute inset-0 bg-primary/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
@@ -207,7 +202,7 @@ export default function Home() {
               </HStack>
             </Button>
           </Link>
-        </Box>
+        </Box> */}
       </Box>
     </Box>
   );

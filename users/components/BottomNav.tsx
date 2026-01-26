@@ -45,7 +45,7 @@ export function BottomNav() {
 
     return (
         <Box className="fixed bottom-4 left-6 right-6 z-[300]">
-            <Box className="bg-background/20 backdrop-blur-3xl border border-border/40 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden">
+            <Box className="bg-secondary/20 backdrop-blur-3xl border border-border/40 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden">
                 <HStack className="justify-around items-center px-4 py-3">
                     {items.map((item) => {
                         const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
@@ -65,7 +65,7 @@ export function BottomNav() {
                                             </Box>
                                         )}
                                     </Box>
-                                    <Text className={`text-[8px] font-black uppercase tracking-widest ${isActive ? 'text-primary' : 'text-muted-foreground/60'}`}>
+                                    <Text className={`text-[8px] font-white uppercase tracking-widest ${isActive ? 'text-primary' : 'text-muted-foreground/60'}`}>
                                         {item.label}
                                     </Text>
                                     {isActive && (
