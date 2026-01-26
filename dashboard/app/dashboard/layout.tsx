@@ -97,23 +97,25 @@ function MobileNavbar() {
     <HStack className="fixed bottom-0 left-0 right-0 p-4 border-t gap-4 bg-white justify-around md:hidden shadow-lg z-50">
       <Link href="/dashboard" className="flex flex-col items-center gap-1">
         <Icon as={MenuIcon} className="w-6 h-6" />
-        <span className="text-xs">Home</span>
+        <span className="text-xs text-blue-600">Home</span>
       </Link>
 
       <Link href="/dashboard/products" className="flex flex-col items-center gap-1">
         <Icon as={StarIcon} className="w-6 h-6" />
-        <span className="text-xs">Products</span>
+        <span className="text-xs text-blue-600">Products</span>
       </Link>
 
       <Link href="/dashboard/orders" className="flex flex-col items-center gap-1">
         <Icon as={ThreeDotsIcon} className="w-6 h-6" />
-        <span className="text-xs">Orders</span>
+        <span className="text-xs text-blue-600">Orders</span>
       </Link>
 
       <Link href="/dashboard/vendors" className="flex flex-col items-center gap-1">
         <Icon as={MessageCircleIcon} className="w-6 h-6" />
-        <span className="text-xs">Vendors</span>
+        <span className="text-xs text-blue-600">Vendors</span>
       </Link>
+
+      <LogoutButton variant="mobile" />
     </HStack>
   );
 }

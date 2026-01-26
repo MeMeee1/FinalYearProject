@@ -4,9 +4,10 @@ import { Avatar, AvatarFallbackText } from '@/components/ui/avatar';
 import { Button, ButtonText } from '@/components/ui/button';
 import { logout } from '@/api/auth';
 import { useTransition, useState } from 'react';
+import { LogOut } from 'lucide-react';
 
 interface LogoutButtonProps {
-  variant?: 'header' | 'sidebar';
+  variant?: 'header' | 'sidebar' | 'mobile';
 }
 
 export default function LogoutButton({ variant = 'header' }: LogoutButtonProps) {
@@ -32,9 +33,22 @@ export default function LogoutButton({ variant = 'header' }: LogoutButtonProps) 
     );
   }
 
+  if (variant === 'mobile') {
+    return (
+      <button
+        onClick={handleLogout}
+        disabled={isPending}
+        className="flex flex-col items-center gap-1 hover:opacity-80 transition-opacity"
+      >
+        <LogOut className="w-6 h-6" />
+        <span className="text-xs">{isPending ? '...' : 'Logout'}</span>
+      </button>
+    );
+  }
+
   return (
     <div className="relative">
-      <button 
+      <button
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 hover:opacity-80 transition-opacity"
       >
