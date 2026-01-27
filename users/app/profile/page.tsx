@@ -9,8 +9,9 @@ import { Heading } from '@/components/ui/heading';
 
 
 import { Select, SelectTrigger, SelectInput, SelectIcon, SelectPortal, SelectBackdrop, SelectContent, SelectDragIndicatorWrapper, SelectDragIndicator, SelectItem } from '@/components/ui/select';
-import { ArrowLeftIcon, ChevronDownIcon, LogOutIcon, CameraIcon, UserIcon, MapPinIcon, ShieldCheckIcon, CalendarIcon } from 'lucide-react-native';
+import { ArrowLeftIcon, ChevronDownIcon, LogOutIcon, CameraIcon, UserIcon, MapPinIcon, ShieldCheckIcon, CalendarIcon, BookOpenIcon, ChevronRightIcon } from 'lucide-react-native';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { getUserProfile, updateUserProfile, logout, uploadImage, getLgas } from '@/lib/api';
 import { ActivityIndicator } from 'react-native';
 
@@ -267,6 +268,24 @@ export default function Profile() {
                     ) : null}
 
                     <Box className="mt-4 pb-12">
+                        {/* Rules & Guidelines Link */}
+                        <Link href="/rules" className="block mb-4">
+                            <Box className="rounded-2xl bg-secondary/30 border border-border/30 p-4 hover:bg-secondary/50 transition-all group">
+                                <HStack className="justify-between items-center">
+                                    <HStack space="md" className="items-center">
+                                        <Box className="w-10 h-10 bg-primary/20 rounded-xl items-center justify-center">
+                                            <BookOpenIcon size={18} color="hsl(var(--primary))" />
+                                        </Box>
+                                        <VStack>
+                                            <Text className="text-foreground font-bold">Rules & Guidelines</Text>
+                                            <Text className="text-muted-foreground text-xs">View platform community standards</Text>
+                                        </VStack>
+                                    </HStack>
+                                    <ChevronRightIcon size={20} color="hsl(var(--muted-foreground))" className="group-hover:translate-x-1 transition-transform" />
+                                </HStack>
+                            </Box>
+                        </Link>
+
                         <button
                             className="rounded-[2.5rem] bg-primary hover:scale-[1.02] shadow-[0_24px_48px_rgba(29,185,84,0.3)] border-0 h-20 transition-all active:scale-[0.98] group overflow-hidden relative w-full flex items-center justify-center"
                             onClick={handleUpdate}

@@ -28,6 +28,7 @@ import {
 import { API_URL } from '@/config';
 import { Heading } from '@/components/ui/heading';
 import { Text } from '@/components/ui/text';
+import { TermsAndConditionsModal } from '@/components/TermsAndConditionsModal';
 
 type FormData = {
   email: string;
@@ -86,6 +87,7 @@ export default function SignUpPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const searchParams = useSearchParams();
   const serverError = searchParams.get('errorMessage');
+  const [showTermsModal, setShowTermsModal] = useState(false);
 
   const [formData, setFormData] = useState<FormData>({
     email: '',
@@ -159,6 +161,20 @@ export default function SignUpPage() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleShowTerms = () => {
+    if (!validateStep(4)) return;
+    setShowTermsModal(true);
+  };
+
+  const handleAcceptTerms = () => {
+    setShowTermsModal(false);
+    handleSubmit();
+  };
+
+  const handleDeclineTerms = () => {
+    setShowTermsModal(false);
   };
 
   return (
@@ -319,7 +335,7 @@ export default function SignUpPage() {
                 </button>
               ) : (
                 <button
-                  onClick={() => validateStep(4) && !isSubmitting && handleSubmit()}
+                  onClick={handleShowTerms}
                   disabled={isSubmitting}
                   className="flex-[2] px-8 py-4 bg-primary text-primary-foreground rounded-2xl font-black text-xs uppercase tracking-widest transition-all hover:scale-[1.02] active:scale-[0.98] shadow-xl shadow-primary/20 flex items-center justify-center gap-2"
                 >
@@ -344,6 +360,13 @@ export default function SignUpPage() {
           </div>
         </div>
       </div>
+
+      {/* Terms and Conditions Modal */}
+      <TermsAndConditionsModal
+        isOpen={showTermsModal}
+        onAccept={handleAcceptTerms}
+        onDecline={handleDeclineTerms}
+      />
     </div>
   );
 }

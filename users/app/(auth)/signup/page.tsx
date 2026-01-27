@@ -13,6 +13,7 @@ import { MailIcon, LockIcon, UserIcon, MapPinIcon, GlobeIcon, HomeIcon, ArrowRig
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { signup } from '@/lib/api';
+import { TermsAndConditionsModal } from '@/components/TermsAndConditionsModal';
 
 const LGAs = [
     'Abaji',
@@ -40,6 +41,7 @@ export default function Signup() {
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [showTermsModal, setShowTermsModal] = useState(false);
 
     const handleSignup = async () => {
         setLoading(true);
@@ -52,6 +54,24 @@ export default function Signup() {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleShowTerms = () => {
+        if (!address || !lga) {
+            setError('Please complete all location fields.');
+            return;
+        }
+        setError('');
+        setShowTermsModal(true);
+    };
+
+    const handleAcceptTerms = () => {
+        setShowTermsModal(false);
+        handleSignup();
+    };
+
+    const handleDeclineTerms = () => {
+        setShowTermsModal(false);
     };
 
     const nextStep = () => {
@@ -241,7 +261,7 @@ export default function Signup() {
                                 <VStack space="md" className="mt-4">
                                     <button
                                         className="w-full rounded-2xl bg-primary hover:bg-primary/90 hover:scale-[1.02] shadow-[0_20px_40px_-10px_rgba(var(--primary-rgb),0.4)] border-0 h-16 transition-all active:scale-[0.98] group overflow-hidden relative flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                                        onClick={handleSignup}
+                                        onClick={handleShowTerms}
                                         disabled={loading}
                                     >
                                         <Box className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
@@ -273,6 +293,13 @@ export default function Signup() {
                     </HStack>
                 </VStack>
             </VStack>
+
+            {/* Terms and Conditions Modal */}
+            <TermsAndConditionsModal
+                isOpen={showTermsModal}
+                onAccept={handleAcceptTerms}
+                onDecline={handleDeclineTerms}
+            />
         </Box>
     );
 }
