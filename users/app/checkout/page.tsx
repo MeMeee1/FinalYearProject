@@ -7,7 +7,7 @@ import { Text } from '@/components/ui/text';
 import { Heading } from '@/components/ui/heading';
 
 
-import { ArrowLeftIcon, CreditCardIcon, MapPinIcon, ShieldCheckIcon, TruckIcon, StoreIcon, ChevronRightIcon } from 'lucide-react-native';
+import { ArrowLeftIcon, CreditCardIcon, MapPinIcon, ShieldCheckIcon, StoreIcon, ChevronRightIcon } from 'lucide-react-native';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect, useMemo } from 'react';
@@ -125,6 +125,49 @@ export default function Checkout() {
                                 </button>
                             ))}
                         </VStack>
+
+                        {/* Map Preview for Selected Point */}
+                        {selectedPointId && (() => {
+                            const selectedPoint = fulfillmentPoints.find(p => p.id === selectedPointId);
+                            if (!selectedPoint) return null;
+
+                            const lat = selectedPoint.latitude || 9.0765;
+                            const lng = selectedPoint.longitude || 7.3986;
+
+                            return (
+                                <Box className="mt-6">
+                                    <HStack space="sm" className="items-center mb-4">
+                                        <Box className="w-6 h-6 bg-blue-500/20 rounded-lg items-center justify-center">
+                                            <MapPinIcon size={12} color="rgb(59 130 246)" />
+                                        </Box>
+                                        <Text className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">Location Preview</Text>
+                                    </HStack>
+
+                                    <div className="w-full h-40 sm:h-48 bg-secondary/20 rounded-xl sm:rounded-2xl overflow-hidden border border-border/30 mb-3">
+                                        <iframe
+                                            width="100%"
+                                            height="100%"
+                                            title="Selected Pickup Point"
+                                            loading="lazy"
+                                            style={{ border: 0 }}
+                                            src={`https://www.openstreetmap.org/export/embed.html?bbox=${lng - 0.008},${lat - 0.008},${lng + 0.008},${lat + 0.008}&layer=mapnik&marker=${lat},${lng}`}
+                                        />
+                                    </div>
+
+                                    <a
+                                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(selectedPoint.address + ', ' + selectedPoint.city)}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-500/10 border border-blue-500/20 text-blue-500 rounded-xl sm:rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-500/20 active:scale-[0.98] transition-all"
+                                    >
+                                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                                        </svg>
+                                        View on Google Maps
+                                    </a>
+                                </Box>
+                            );
+                        })()}
                     </Box>
 
                     {/* Delivery Logistics Card */}
@@ -186,21 +229,21 @@ export default function Checkout() {
                     {/* Infrastructure Grid */}
                     <Box className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                         <Box className="bg-secondary/10 border border-border/30 p-6 rounded-[2rem] flex-row items-center space-x-4">
-                            <Box className="w-12 h-12 bg-primary/10 rounded-2xl items-center justify-center">
-                                <TruckIcon size={24} color="hsl(var(--primary))" />
-                            </Box>
-                            <VStack>
-                                <Text className="text-foreground font-black text-[10px] uppercase tracking-widest">Delivery Strategy</Text>
-                                <Text className="text-muted-foreground text-xs font-medium">Standard Ground (Next Day)</Text>
-                            </VStack>
-                        </Box>
-                        <Box className="bg-secondary/10 border border-border/30 p-6 rounded-[2rem] flex-row items-center space-x-4">
                             <Box className="w-12 h-12 bg-blue-500/10 rounded-2xl items-center justify-center">
                                 <ShieldCheckIcon size={24} color="rgb(59 130 246)" />
                             </Box>
                             <VStack>
                                 <Text className="text-foreground font-black text-[10px] uppercase tracking-widest">Transaction Guard</Text>
                                 <Text className="text-muted-foreground text-xs font-medium">End-to-End Encryption Enabled</Text>
+                            </VStack>
+                        </Box>
+                        <Box className="bg-secondary/10 border border-border/30 p-6 rounded-[2rem] flex-row items-center space-x-4">
+                            <Box className="w-12 h-12 bg-primary/10 rounded-2xl items-center justify-center">
+                                <StoreIcon size={24} color="hsl(var(--primary))" />
+                            </Box>
+                            <VStack>
+                                <Text className="text-foreground font-black text-[10px] uppercase tracking-widest">Fulfillment Pickup</Text>
+                                <Text className="text-muted-foreground text-xs font-medium">Collect at your selected point</Text>
                             </VStack>
                         </Box>
                     </Box>

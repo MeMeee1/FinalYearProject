@@ -21,6 +21,10 @@ export const fulfillmentPointsTable = pgTable('fulfillment_points', {
 
     instructions: text(), // e.g., "Enter through the side gate"
 
+    // Map coordinates for location display
+    latitude: doublePrecision(), // e.g., 9.0765
+    longitude: doublePrecision(), // e.g., 7.3986
+
     isActive: boolean().default(true),
     canVerifyVendors: boolean().default(false), // TRUE for Vets
 

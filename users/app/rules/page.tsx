@@ -12,7 +12,7 @@ import {
     AlertTriangleIcon,
     CheckCircle2Icon,
     XCircleIcon,
-    TruckIcon,
+    StoreIcon,
     CreditCardIcon,
     PackageIcon,
     HeartHandshakeIcon,
@@ -146,7 +146,7 @@ export default function RulesPage() {
                         />
 
                         <RuleCard
-                            icon={<TruckIcon size={20} color="rgb(34 197 94)" />}
+                            icon={<StoreIcon size={20} color="rgb(34 197 94)" />}
                             title="Pickup & Collection"
                             variant="do"
                             items={[

@@ -54,6 +54,9 @@ export interface Order {
         name: string;
         address: string;
         city: string;
+        lga?: string;
+        latitude?: number;
+        longitude?: number;
     };
     createdAt: string;
     items: CartItem[];

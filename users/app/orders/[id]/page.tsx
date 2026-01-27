@@ -307,29 +307,52 @@ export default function OrderDetails() {
 
                     {/* Fulfillment Point Map */}
                     {order.fulfillmentPoint && (
-                        <Box className="bg-card/40 backdrop-blur-3xl p-8 rounded-[3rem] border border-border/50 shadow-2xl overflow-hidden">
-                            <HStack space="md" className="items-center mb-6">
-                                <Box className="w-10 h-10 bg-blue-500/20 rounded-xl items-center justify-center">
+                        <Box className="bg-card/40 backdrop-blur-3xl p-4 sm:p-6 md:p-8 rounded-xl sm:rounded-[2rem] md:rounded-[3rem] border border-border/50 shadow-2xl overflow-hidden">
+                            <HStack space="md" className="items-center mb-4 sm:mb-6">
+                                <Box className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-500/20 rounded-xl sm:rounded-2xl items-center justify-center">
                                     <MapPinIcon size={20} color="rgb(59 130 246)" />
                                 </Box>
-                                <VStack>
+                                <VStack className="flex-1">
                                     <Text className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">Location Intelligence</Text>
-                                    <Heading size="sm" className="text-foreground font-black tracking-tight">Pickup Point Map</Heading>
+                                    <Heading size="sm" className="text-foreground font-black tracking-tight">Find Pickup Point</Heading>
                                 </VStack>
                             </HStack>
-                            <div className="w-full h-64 bg-secondary/20 rounded-2xl overflow-hidden border border-border/30">
+
+                            {/* Map Container */}
+                            <div className="w-full h-56 sm:h-64 md:h-72 bg-secondary/20 rounded-xl sm:rounded-2xl overflow-hidden border border-border/30 mb-4">
                                 <iframe
                                     width="100%"
                                     height="100%"
                                     title="Fulfillment Point Location"
                                     loading="lazy"
                                     style={{ border: 0 }}
-                                    src={`https://maps.google.com/maps?q=${encodeURIComponent(order.fulfillmentPoint.address + ', ' + order.fulfillmentPoint.city)}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
+                                    src={`https://www.openstreetmap.org/export/embed.html?bbox=${(order.fulfillmentPoint.longitude || 7.3986) - 0.01},${(order.fulfillmentPoint.latitude || 9.0765) - 0.01},${(order.fulfillmentPoint.longitude || 7.3986) + 0.01},${(order.fulfillmentPoint.latitude || 9.0765) + 0.01}&layer=mapnik&marker=${order.fulfillmentPoint.latitude || 9.0765},${order.fulfillmentPoint.longitude || 7.3986}`}
                                 />
                             </div>
-                            <Text className="text-muted-foreground text-[10px] font-medium mt-4 text-center uppercase tracking-wider">
-                                {order.fulfillmentPoint.address}, {order.fulfillmentPoint.city}
-                            </Text>
+
+                            {/* Address and Directions */}
+                            <VStack space="sm">
+                                <Box className="bg-secondary/20 p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-border/30">
+                                    <HStack space="sm" className="items-center">
+                                        <MapPinIcon size={14} color="hsl(var(--muted-foreground))" />
+                                        <Text className="text-muted-foreground text-xs font-medium">
+                                            {order.fulfillmentPoint.address}, {order.fulfillmentPoint.city}
+                                        </Text>
+                                    </HStack>
+                                </Box>
+
+                                <a
+                                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(order.fulfillmentPoint.address + ', ' + order.fulfillmentPoint.city)}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="w-full flex items-center justify-center gap-2 px-4 py-3 sm:py-4 bg-primary text-primary-foreground rounded-xl sm:rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-transform shadow-lg shadow-primary/20"
+                                >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                                    </svg>
+                                    Get Directions
+                                </a>
+                            </VStack>
                         </Box>
                     )}
 
