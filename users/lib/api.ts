@@ -240,3 +240,32 @@ export async function verifyPickup(orderId: number | string, code: string) {
         body: JSON.stringify({ code })
     });
 }
+
+// --- Paystack Payment ---
+
+export async function getPaystackPublicKey(): Promise<string> {
+    const res = await fetch(`${API_URL}/paystack/keys`);
+    const data = await res.json();
+    if (!res.ok) throw new Error('Failed to get Paystack keys');
+    return data.publicKey;
+}
+
+export async function initializePayment(orderId: number): Promise<{ authorization_url: string; access_code: string; reference: string }> {
+    const callbackUrl = typeof window !== 'undefined'
+        ? `${window.location.origin}/payment/callback`
+        : undefined;
+
+    return fetchWithAuth('/paystack/initialize', {
+        method: 'POST',
+        body: JSON.stringify({ orderId, callbackUrl })
+    });
+}
+
+export async function verifyPayment(reference: string): Promise<{ success: boolean; message: string; order?: any }> {
+    return fetchWithAuth(`/paystack/verify/${reference}`);
+}
+
+export async function getEscrowStatus(orderId: number): Promise<any> {
+    return fetchWithAuth(`/paystack/escrow/${orderId}`);
+}
+

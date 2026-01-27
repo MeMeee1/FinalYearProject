@@ -183,6 +183,58 @@ export default function OrderDetails() {
                         </Box>
                     )}
 
+                    {/* Escrow Status Card */}
+                    {(order as any).escrowStatus && (
+                        <Box className={`p-6 rounded-[2.5rem] border shadow-xl overflow-hidden ${(order as any).escrowStatus === 'held' ? 'bg-blue-500/10 border-blue-500/20' :
+                                (order as any).escrowStatus === 'released' ? 'bg-green-500/10 border-green-500/20' :
+                                    (order as any).escrowStatus === 'refunded' ? 'bg-orange-500/10 border-orange-500/20' :
+                                        'bg-secondary/10 border-border/30'
+                            }`}>
+                            <HStack space="md" className="items-center justify-between">
+                                <HStack space="md" className="items-center">
+                                    <Box className={`p-3 rounded-xl ${(order as any).escrowStatus === 'held' ? 'bg-blue-500/20' :
+                                            (order as any).escrowStatus === 'released' ? 'bg-green-500/20' :
+                                                (order as any).escrowStatus === 'refunded' ? 'bg-orange-500/20' :
+                                                    'bg-secondary/20'
+                                        }`}>
+                                        <ShieldCheckIcon size={18} color={
+                                            (order as any).escrowStatus === 'held' ? 'rgb(59 130 246)' :
+                                                (order as any).escrowStatus === 'released' ? '#22c55e' :
+                                                    (order as any).escrowStatus === 'refunded' ? '#f97316' :
+                                                        'hsl(var(--muted-foreground))'
+                                        } />
+                                    </Box>
+                                    <VStack>
+                                        <Text className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Escrow Status</Text>
+                                        <Text className={`font-black tracking-tight ${(order as any).escrowStatus === 'held' ? 'text-blue-500' :
+                                                (order as any).escrowStatus === 'released' ? 'text-green-500' :
+                                                    (order as any).escrowStatus === 'refunded' ? 'text-orange-500' :
+                                                        'text-muted-foreground'
+                                            }`}>
+                                            {(order as any).escrowStatus === 'held' ? 'Funds Held in Escrow' :
+                                                (order as any).escrowStatus === 'released' ? 'Funds Released to Vendor' :
+                                                    (order as any).escrowStatus === 'refunded' ? 'Funds Refunded' :
+                                                        'Pending Payment'}
+                                        </Text>
+                                    </VStack>
+                                </HStack>
+                                <Box className={`px-3 py-1.5 rounded-full ${(order as any).escrowStatus === 'held' ? 'bg-blue-500/20' :
+                                        (order as any).escrowStatus === 'released' ? 'bg-green-500/20' :
+                                            (order as any).escrowStatus === 'refunded' ? 'bg-orange-500/20' :
+                                                'bg-secondary/20'
+                                    }`}>
+                                    <Text className={`text-[8px] font-black uppercase tracking-widest ${(order as any).escrowStatus === 'held' ? 'text-blue-500' :
+                                            (order as any).escrowStatus === 'released' ? 'text-green-500' :
+                                                (order as any).escrowStatus === 'refunded' ? 'text-orange-500' :
+                                                    'text-muted-foreground'
+                                        }`}>
+                                        {(order as any).escrowStatus?.toUpperCase()}
+                                    </Text>
+                                </Box>
+                            </HStack>
+                        </Box>
+                    )}
+
                     {/* Pickup Node Card */}
                     <Box className="bg-card/40 backdrop-blur-3xl p-8 rounded-[3rem] border border-border/50 shadow-2xl">
                         <HStack space="md" className="items-start">

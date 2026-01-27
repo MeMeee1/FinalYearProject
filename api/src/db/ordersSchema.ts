@@ -26,12 +26,18 @@ export const ordersTable = pgTable('orders', {
 
   // Payment
   stripePaymentIntentId: varchar({ length: 255 }),
+  paystackReference: varchar({ length: 255 }),
   paymentStatus: varchar({ length: 50 }).default('pending'),
+  escrowStatus: varchar({ length: 50, enum: ['pending', 'held', 'released', 'refunded'] }).default('pending'),
+
+  // Disbursement tracking
+  fulfillmentFee: doublePrecision().default(0),
 
   // Fulfillment (Pickup)
   fulfillmentPointId: integer().references(() => fulfillmentPointsTable.id),
   pickupCode: varchar({ length: 20 }), // Alphanumeric code for verification (e.g. ABCD-1234)
-  deliveryStatus: varchar({ length: 50, enum: ['pending', 'dropped_off', 'collected'] }).default('pending'),
+  deliveryStatus: varchar({ length: 50, enum: ['pending', 'dropped_off', 'collected', 'rejected'] }).default('pending'),
+  notes: text(), // For rejection reasons, etc.
 
   // Legacy Shipping (Optional fallback)
   shippingAddress: text(),

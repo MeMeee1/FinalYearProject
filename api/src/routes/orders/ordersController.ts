@@ -223,6 +223,7 @@ export async function markAsBadDropOff(req: Request, res: Response) {
       .set({
         deliveryStatus: 'rejected',
         status: 'Cancelled',
+        escrowStatus: 'refunded', // Funds refunded to customer
         notes: reason || 'Animal rejected at fulfillment point - bad condition',
         updatedAt: new Date()
       })
@@ -292,6 +293,7 @@ export async function verifyPickupCode(req: Request, res: Response) {
       .set({
         deliveryStatus: 'collected',
         status: 'Completed',
+        escrowStatus: 'released', // Release funds to vendor
         updatedAt: new Date()
       })
       .where(eq(ordersTable.id, id))
@@ -302,20 +304,24 @@ export async function verifyPickupCode(req: Request, res: Response) {
       req.io.to(`user_${order.userId}`).emit('order_status_update', {
         orderId: id,
         deliveryStatus: 'collected',
-        message: 'Order successfully collected!'
+        escrowStatus: 'released',
+        message: 'Order successfully collected! Funds released to vendor.'
       });
 
       // Notify the vendor/seller
       const [orderWithSeller] = await db
-        .select({ sellerId: ordersTable.sellerId })
+        .select({ sellerId: ordersTable.sellerId, sellerAmount: ordersTable.sellerAmount, fulfillmentFee: ordersTable.fulfillmentFee })
         .from(ordersTable)
         .where(eq(ordersTable.id, id));
 
       if (orderWithSeller) {
+        const vendorPayout = Number(orderWithSeller.sellerAmount) - Number(orderWithSeller.fulfillmentFee || 0);
         req.io.to(`vendor_${orderWithSeller.sellerId}`).emit('order_status_update', {
           orderId: id,
           deliveryStatus: 'collected',
-          message: `Order #${id} has been collected by the customer.`
+          escrowStatus: 'released',
+          payout: vendorPayout,
+          message: `Order #${id} collected! ₦${vendorPayout.toLocaleString()} released to your account.`
         });
       }
     }

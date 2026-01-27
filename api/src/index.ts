@@ -11,6 +11,7 @@ import vendorsRoutes from './routes/vendors/index.js';
 import adminRoutes from './routes/admin/index.js';
 import uploadRoutes from './routes/upload/index.js';
 import fulfillmentPointsRoutes from './routes/fulfillmentPoints.js';
+import paystackRoutes from './routes/paystack/index.js';
 import serverless from 'serverless-http';
 
 const port = process.env.PORT || 3001;
@@ -55,6 +56,7 @@ app.use('/vendors', vendorsRoutes);
 app.use('/admin', adminRoutes);
 app.use('/upload', uploadRoutes);
 app.use('/fulfillment-points', fulfillmentPointsRoutes);
+app.use('/paystack', paystackRoutes);
 
 io.on('connection', (socket) => {
   console.log('Client connected:', socket.id);

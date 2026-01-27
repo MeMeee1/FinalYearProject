@@ -138,6 +138,66 @@ export default async function OrderPage({
             </Box>
           </Card>
 
+          {/* Escrow & Payout Card */}
+          <Card className={`p-8 rounded-[2.5rem] border shadow-sm overflow-hidden ${order.escrowStatus === 'released' ? 'bg-green-500/5 border-green-500/20' :
+              order.escrowStatus === 'held' ? 'bg-blue-500/5 border-blue-500/20' :
+                order.escrowStatus === 'refunded' ? 'bg-red-500/5 border-red-500/20' :
+                  'bg-card border-border'
+            }`}>
+            <Heading className="text-[11px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-6 px-1 opacity-60">Payment & Payout</Heading>
+
+            <VStack space="lg">
+              {/* Escrow Status */}
+              <HStack className="items-center justify-between">
+                <Text className="text-xs font-bold text-muted-foreground">Escrow Status</Text>
+                <Box className={`px-3 py-1.5 rounded-full ${order.escrowStatus === 'released' ? 'bg-green-500/20' :
+                    order.escrowStatus === 'held' ? 'bg-blue-500/20' :
+                      order.escrowStatus === 'refunded' ? 'bg-red-500/20' :
+                        'bg-secondary/50'
+                  }`}>
+                  <Text className={`text-[10px] font-black uppercase tracking-widest ${order.escrowStatus === 'released' ? 'text-green-500' :
+                      order.escrowStatus === 'held' ? 'text-blue-500' :
+                        order.escrowStatus === 'refunded' ? 'text-red-500' :
+                          'text-muted-foreground'
+                    }`}>
+                    {order.escrowStatus === 'released' ? 'Released' :
+                      order.escrowStatus === 'held' ? 'Held' :
+                        order.escrowStatus === 'refunded' ? 'Refunded' :
+                          'Pending'}
+                  </Text>
+                </Box>
+              </HStack>
+
+              {/* Payout Breakdown */}
+              <VStack space="sm" className="pt-4 border-t border-border/40">
+                <HStack className="justify-between">
+                  <Text className="text-xs text-muted-foreground">Order Total</Text>
+                  <Text className="text-xs font-bold text-foreground">₦{Number(order.totalAmount).toLocaleString()}</Text>
+                </HStack>
+                <HStack className="justify-between">
+                  <Text className="text-xs text-muted-foreground">Platform Fee</Text>
+                  <Text className="text-xs font-bold text-red-400">-₦{Number(order.platformFee || 0).toLocaleString()}</Text>
+                </HStack>
+                <HStack className="justify-between">
+                  <Text className="text-xs text-muted-foreground">Fulfillment Fee</Text>
+                  <Text className="text-xs font-bold text-orange-400">-₦{Number(order.fulfillmentFee || 0).toLocaleString()}</Text>
+                </HStack>
+                <Box className="h-px bg-border/40 my-2" />
+                <HStack className="justify-between items-end">
+                  <Text className="text-xs font-black text-muted-foreground uppercase tracking-widest">Your Payout</Text>
+                  <Text className={`text-xl font-black ${order.escrowStatus === 'released' ? 'text-green-500' : 'text-foreground'}`}>
+                    ₦{(Number(order.sellerAmount || 0) - Number(order.fulfillmentFee || 0)).toLocaleString()}
+                  </Text>
+                </HStack>
+                {order.escrowStatus === 'held' && (
+                  <Text className="text-[10px] text-blue-500 font-medium text-center mt-2">
+                    Released after customer pickup
+                  </Text>
+                )}
+              </VStack>
+            </VStack>
+          </Card>
+
           {/* Logistics Card */}
           <Card className="p-8 rounded-[2.5rem] border border-border shadow-sm bg-card">
             <Heading className="text-[11px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-6 px-1 opacity-60">Collection Logistics</Heading>
