@@ -23,6 +23,8 @@ import {
     LockIcon,
     ArrowRightIcon,
     ShieldCheckIcon,
+    EyeIcon,
+    EyeOffIcon,
 } from 'lucide-react-native';
 
 /* -------------------------
@@ -38,6 +40,7 @@ export default function Login() {
     -------------------------- */
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
@@ -130,12 +133,23 @@ export default function Login() {
                                     <LockIcon size={20} color="hsl(var(--muted-foreground))" />
                                 </Box>
                                 <input
-                                    type="password"
+                                    type={showPassword ? 'text' : 'password'}
                                     placeholder="••••••••••••"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full rounded-2xl bg-input border-transparent h-16 pl-14 pr-5 text-foreground font-bold text-lg placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                                    className="w-full rounded-2xl bg-input border-transparent h-16 pl-14 pr-14 text-foreground font-bold text-lg placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
                                 />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-5 top-1/2 -translate-y-1/2 z-10 p-1 hover:bg-white/10 rounded-lg transition-colors"
+                                >
+                                    {showPassword ? (
+                                        <EyeOffIcon size={20} color="hsl(var(--muted-foreground))" />
+                                    ) : (
+                                        <EyeIcon size={20} color="hsl(var(--muted-foreground))" />
+                                    )}
+                                </button>
                             </Box>
 
                             {error && (

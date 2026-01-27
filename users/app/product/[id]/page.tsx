@@ -177,13 +177,13 @@ export default function ProductDetails() {
 
                     {/* Infrastructure & Trusts Grid */}
                     <Box className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <Box className="bg-secondary/10 border border-border/30 p-6 rounded-[2rem] items-center text-center">
+                        {/* <Box className="bg-secondary/10 border border-border/30 p-6 rounded-[2rem] items-center text-center">
                             <Box className="w-12 h-12 bg-primary/10 rounded-2xl items-center justify-center mb-4">
                                 <TruckIcon size={24} color="hsl(var(--primary))" />
                             </Box>
                             <Text className="text-foreground font-black text-[10px] uppercase tracking-widest mb-1">Logistics</Text>
                             <Text className="text-muted-foreground text-xs font-medium">Standard 24h delivery within Central Abuja</Text>
-                        </Box>
+                        </Box> */}
                         <Box className="bg-secondary/10 border border-border/30 p-6 rounded-[2rem] items-center text-center">
                             <Box className="w-12 h-12 bg-blue-500/10 rounded-2xl items-center justify-center mb-4">
                                 <ShieldCheckIcon size={24} color="rgb(59 130 246)" />

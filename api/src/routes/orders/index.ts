@@ -5,6 +5,7 @@ import {
   listOrders,
   updateOrder,
   markAsDroppedOff,
+  markAsBadDropOff,
   verifyPickupCode,
 } from './ordersController.js';
 import { validateData } from '../../middlewares/validationMiddleware.js';
@@ -26,6 +27,7 @@ router.put('/:id', verifyToken, validateData(updateOrderSchema), updateOrder);
 
 // Fulfillment Routes
 router.patch('/:id/drop-off', verifyToken, markAsDroppedOff);
+router.patch('/:id/bad-drop-off', verifyToken, markAsBadDropOff);
 router.post('/:id/verify-pickup', verifyToken, verifyPickupCode);
 
 export default router;

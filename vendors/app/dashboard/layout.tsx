@@ -8,7 +8,7 @@ import { redirect } from 'next/navigation';
 import { Text } from '@/components/ui/text';
 import Link from 'next/link';
 import { Icon } from '@/components/ui/icon';
-import { LayoutGrid, ShoppingBag, TrendingUp, Settings as SettingsIcon, Star, Bell, LogOut } from 'lucide-react';
+import { LayoutGrid, ShoppingBag, TrendingUp, Settings as SettingsIcon, Star, Bell, LogOut, Scale } from 'lucide-react';
 import { VendorProfileSync } from '@/components/VendorProfileSync';
 import { VendorRealTimeSync } from '@/components/VendorRealTimeSync';
 import { ThemeToggle } from '@/components/ThemeToggle';
@@ -122,6 +122,7 @@ function Sidebar({ isActive }: { isActive: boolean }) {
     { href: '/dashboard/products', label: 'Products', icon: ShoppingBag, alwaysShow: false },
     { href: '/dashboard/orders', label: 'Order Hub', icon: ShoppingBag, alwaysShow: false },
     { href: '/dashboard/analytics', label: 'Analytics', icon: TrendingUp, alwaysShow: false },
+    { href: '/dashboard/rules', label: 'Guidelines', icon: Scale, alwaysShow: true },
     { href: '/dashboard/settings', label: 'Account', icon: SettingsIcon, alwaysShow: true },
   ];
 

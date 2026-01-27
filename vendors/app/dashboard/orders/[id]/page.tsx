@@ -98,6 +98,31 @@ export default async function OrderPage({
               </HStack>
             </Box>
           </Card>
+
+          {/* Fulfillment Point Map */}
+          {order.fulfillmentPoint && (
+            <Card className="p-8 rounded-[2.5rem] border border-border shadow-sm bg-card overflow-hidden">
+              <Heading className="text-xl font-black mb-6 tracking-tight flex items-center gap-3">
+                <MapPin className="w-5 h-5 text-primary" /> Drop-off Location
+              </Heading>
+              <div className="w-full h-64 bg-secondary/20 rounded-2xl overflow-hidden border border-border/30">
+                <iframe
+                  width="100%"
+                  height="100%"
+                  title="Fulfillment Point Location"
+                  loading="lazy"
+                  style={{ border: 0 }}
+                  src={`https://maps.google.com/maps?q=${encodeURIComponent(order.fulfillmentPoint.address + ', ' + order.fulfillmentPoint.city)}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
+                />
+              </div>
+              <VStack space="xs" className="mt-4">
+                <Text className="text-foreground font-black text-sm">{order.fulfillmentPoint.name}</Text>
+                <Text className="text-muted-foreground text-xs font-medium">
+                  {order.fulfillmentPoint.address}, {order.fulfillmentPoint.city}
+                </Text>
+              </VStack>
+            </Card>
+          )}
         </VStack>
 
         {/* Sidebar Info */}

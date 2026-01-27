@@ -177,6 +177,41 @@ export async function simulateDropOff(orderId: number | string) {
 }
 
 /**
+ * Simulate a bad drop-off (animal rejected/died at fulfillment center)
+ * This triggers the 70/30 refund rule
+ */
+export async function simulateBadDropOff(orderId: number | string, reason?: string) {
+	try {
+		const token = cookies().get('token')?.value;
+
+		if (!token) {
+			throw new Error('No authentication token found');
+		}
+
+		const response = await fetch(`${API_URL}/orders/${orderId}/bad-drop-off`, {
+			method: 'PATCH',
+			headers: {
+				Authorization: token,
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({ reason: reason || 'Animal failed health inspection at fulfillment point' }),
+		});
+
+		if (!response.ok) {
+			const errorData = await response.json().catch(() => ({}));
+			throw new Error(errorData.message || 'Failed to simulate bad drop-off');
+		}
+
+		revalidatePath(`/dashboard/orders/${orderId}`);
+		revalidatePath('/dashboard/orders');
+		return await response.json();
+	} catch (error) {
+		console.error('Error simulating bad drop-off:', error);
+		throw error;
+	}
+}
+
+/**
  * Update order details
  */
 export async function updateOrder(

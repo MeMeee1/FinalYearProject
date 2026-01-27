@@ -196,6 +196,72 @@ export async function markAsDroppedOff(req: Request, res: Response) {
   }
 }
 
+/**
+ * Mark an order as having a bad drop-off (animal rejected/died)
+ * This simulates the scenario where an animal is in bad condition or dies at the fulfillment point
+ * Customer gets 70% refund, fulfillment point gets 30% compensation
+ */
+export async function markAsBadDropOff(req: Request, res: Response) {
+  try {
+    const id = Number(req.params.id);
+    const { reason } = req.body;
+
+    const [order] = await db
+      .select()
+      .from(ordersTable)
+      .where(eq(ordersTable.id, id));
+
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+
+    // Calculate refund amounts based on the 70/30 rule
+    const totalAmount = Number(order.totalAmount);
+    const customerRefund = Math.round(totalAmount * 0.70 * 100) / 100;
+    const fulfillmentCompensation = Math.round(totalAmount * 0.30 * 100) / 100;
+
+    const [updatedOrder] = await db
+      .update(ordersTable)
+      .set({
+        deliveryStatus: 'rejected',
+        status: 'Cancelled',
+        notes: reason || 'Animal rejected at fulfillment point - bad condition',
+        updatedAt: new Date()
+      })
+      .where(eq(ordersTable.id, id))
+      .returning();
+
+    // Notify User via WebSockets
+    if (req.io) {
+      req.io.to(`user_${order.userId}`).emit('order_status_update', {
+        orderId: id,
+        deliveryStatus: 'rejected',
+        message: `Order #${id} has been rejected. You will receive a refund of ₦${customerRefund.toLocaleString()}.`,
+        refundAmount: customerRefund,
+        reason: reason || 'Animal failed health inspection at fulfillment point'
+      });
+
+      // Notify vendor about the rejection
+      req.io.to(`vendor_${order.sellerId}`).emit('order_status_update', {
+        orderId: id,
+        deliveryStatus: 'rejected',
+        message: `Order #${id} was rejected at the fulfillment point.`,
+        reason: reason || 'Animal failed health inspection'
+      });
+    }
+
+    res.json({
+      ...updatedOrder,
+      refundDetails: {
+        customerRefund,
+        fulfillmentCompensation,
+        reason: reason || 'Animal rejected at fulfillment point'
+      }
+    });
+  } catch (e) {
+    console.error('Failed to process bad drop-off:', e);
+    res.status(500).json({ message: 'Failed to process bad drop-off' });
+  }
+}
+
 export async function verifyPickupCode(req: Request, res: Response) {
   try {
     const id = Number(req.params.id);

@@ -208,6 +208,34 @@ export default function OrderDetails() {
                         </HStack>
                     </Box>
 
+                    {/* Fulfillment Point Map */}
+                    {order.fulfillmentPoint && (
+                        <Box className="bg-card/40 backdrop-blur-3xl p-8 rounded-[3rem] border border-border/50 shadow-2xl overflow-hidden">
+                            <HStack space="md" className="items-center mb-6">
+                                <Box className="w-10 h-10 bg-blue-500/20 rounded-xl items-center justify-center">
+                                    <MapPinIcon size={20} color="rgb(59 130 246)" />
+                                </Box>
+                                <VStack>
+                                    <Text className="text-[10px] text-muted-foreground font-black uppercase tracking-widest">Location Intelligence</Text>
+                                    <Heading size="sm" className="text-foreground font-black tracking-tight">Pickup Point Map</Heading>
+                                </VStack>
+                            </HStack>
+                            <div className="w-full h-64 bg-secondary/20 rounded-2xl overflow-hidden border border-border/30">
+                                <iframe
+                                    width="100%"
+                                    height="100%"
+                                    title="Fulfillment Point Location"
+                                    loading="lazy"
+                                    style={{ border: 0 }}
+                                    src={`https://maps.google.com/maps?q=${encodeURIComponent(order.fulfillmentPoint.address + ', ' + order.fulfillmentPoint.city)}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
+                                />
+                            </div>
+                            <Text className="text-muted-foreground text-[10px] font-medium mt-4 text-center uppercase tracking-wider">
+                                {order.fulfillmentPoint.address}, {order.fulfillmentPoint.city}
+                            </Text>
+                        </Box>
+                    )}
+
                     {/* Itemization Detail */}
                     <Box className="bg-card/40 backdrop-blur-3xl p-8 rounded-[3rem] border border-border/50 shadow-xl overflow-hidden">
                         <HStack className="items-center justify-between mb-8">

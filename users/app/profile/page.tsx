@@ -11,18 +11,8 @@ import { Heading } from '@/components/ui/heading';
 import { Select, SelectTrigger, SelectInput, SelectIcon, SelectPortal, SelectBackdrop, SelectContent, SelectDragIndicatorWrapper, SelectDragIndicator, SelectItem } from '@/components/ui/select';
 import { ArrowLeftIcon, ChevronDownIcon, LogOutIcon, CameraIcon, UserIcon, MapPinIcon, ShieldCheckIcon, CalendarIcon } from 'lucide-react-native';
 import { useRouter } from 'next/navigation';
-import { getUserProfile, updateUserProfile, logout, uploadImage } from '@/lib/api';
+import { getUserProfile, updateUserProfile, logout, uploadImage, getLgas } from '@/lib/api';
 import { ActivityIndicator } from 'react-native';
-
-
-const LGAs = [
-    'Abaji',
-    'Abuja Municipal',
-    'Bwari',
-    'Gwagwalada',
-    'Kuje',
-    'Kwali'
-];
 
 export default function Profile() {
     const router = useRouter();
@@ -39,8 +29,14 @@ export default function Profile() {
     const [dob, setDob] = useState('');
     const [image, setImage] = useState('');
     const [error, setError] = useState('');
+    const [lgas, setLgas] = useState<string[]>([]);
 
     useEffect(() => {
+        // Fetch LGAs from the backend
+        getLgas()
+            .then(setLgas)
+            .catch((err) => console.error('Failed to fetch LGAs:', err));
+
         getUserProfile()
             .then((data) => {
                 setUser(data);
@@ -220,7 +216,7 @@ export default function Profile() {
                                                 <SelectDragIndicatorWrapper>
                                                     <SelectDragIndicator className="bg-muted-foreground/30" />
                                                 </SelectDragIndicatorWrapper>
-                                                {LGAs.map(item => (
+                                                {lgas.map(item => (
                                                     <SelectItem label={item} value={item} key={item} className="text-popover-foreground hover:bg-accent font-bold" />
                                                 ))}
                                             </SelectContent>
