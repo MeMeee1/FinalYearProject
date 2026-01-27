@@ -102,10 +102,10 @@ export default function Profile() {
     }
 
     return (
-        <Box className="flex-1 min-h-screen bg-background/30 pb-32">
+        <Box className="flex-1 min-h-screen bg-background/30 pb-24 sm:pb-32">
             {/* Premium Immersive Header */}
-            <Box className="bg-primary/50 pt-16 pb-32 px-6 rounded-b-[4rem] shadow-[0_32px_64px_rgba(var(--primary-rgb),0.2)]">
-                <HStack className="items-center justify-between mb-8">
+            <Box className="bg-primary/50 pt-10 pb-20 px-4 sm:pt-12 sm:pb-24 sm:px-6 md:pt-16 md:pb-32 md:px-8 rounded-b-[2rem] sm:rounded-b-[3rem] md:rounded-b-[4rem] shadow-[0_32px_64px_rgba(var(--primary-rgb),0.2)]">
+                <HStack className="items-center justify-between mb-6 sm:mb-8">
                     <button
                         className="rounded-2xl bg-black/10 border border-black/10 w-12 h-12 p-0 items-center justify-center hover:bg-black/20 transition-all active:scale-95 flex"
                         onClick={() => router.back()}
@@ -122,7 +122,7 @@ export default function Profile() {
 
                 <VStack className="items-center" space="md">
                     <Box className="relative">
-                        <Box className="w-32 h-32 bg-white rounded-[2.5rem] items-center justify-center border-4 border-black/5 overflow-hidden shadow-2xl">
+                        <Box className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 bg-white rounded-[1.5rem] sm:rounded-[2rem] md:rounded-[2.5rem] items-center justify-center border-4 border-black/5 overflow-hidden shadow-2xl">
                             {image ? (
                                 <img
                                     src={
@@ -152,7 +152,7 @@ export default function Profile() {
                         />
                     </Box>
                     <VStack className="items-center" space="xs">
-                        <Heading size="2xl" className="text-black font-black tracking-tighter leading-none">{user?.name || 'Authorized User'}</Heading>
+                        <Heading className="text-xl sm:text-2xl text-black font-black tracking-tighter leading-none text-center">{user?.name || 'Authorized User'}</Heading>
                         <Box className="bg-black/10 px-3 py-1 rounded-full border border-black/5">
                             <Text className="text-black font-bold text-[10px] uppercase tracking-widest">{user?.email}</Text>
                         </Box>
@@ -160,8 +160,8 @@ export default function Profile() {
                 </VStack>
             </Box>
 
-            <Box className="px-6 -mt-16 max-w-4xl mx-auto">
-                <VStack space="xl">
+            <Box className="px-4 sm:px-6 -mt-10 sm:-mt-12 md:-mt-16 max-w-4xl mx-auto">
+                <VStack space="lg" className="sm:space-y-6">
                     {/* Identity Data Card */}
                     <Box className="bg-card/40 backdrop-blur-3xl p-8 rounded-[3rem] border border-border/50 shadow-2xl">
                         <HStack space="sm" className="items-center mb-8">

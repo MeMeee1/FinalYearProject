@@ -62,7 +62,7 @@ export default function Login() {
     };
 
     return (
-        <Box className="flex-1 min-h-screen bg-background relative overflow-hidden flex items-center justify-center p-6">
+        <Box className="flex-1 min-h-screen bg-background relative overflow-hidden flex items-center justify-center p-4 sm:p-6">
             {/* ======================
           Ambient Background
       ======================= */}
@@ -74,15 +74,15 @@ export default function Login() {
                 {/* ======================
             Branding
         ======================= */}
-                <VStack space="md" className="items-center mb-6">
-                    <Box className="w-24 h-24 bg-primary rounded-[2rem] items-center justify-center shadow-[0_0_60px_rgba(var(--primary-rgb),0.5)] rotate-6 border-4 border-white/5">
-                        <Heading size="4xl" className="text-primary-foreground font-black italic tracking-tighter">
+                <VStack space="md" className="items-center mb-4 sm:mb-6">
+                    <Box className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-primary rounded-[1.5rem] sm:rounded-[2rem] items-center justify-center shadow-[0_0_60px_rgba(var(--primary-rgb),0.5)] rotate-6 border-4 border-white/5">
+                        <Heading className="text-2xl sm:text-3xl md:text-4xl text-primary-foreground font-black italic tracking-tighter">
                             Lx
                         </Heading>
                     </Box>
 
                     <VStack className="items-center" space="xs">
-                        <Heading className="text-foreground font-black tracking-tighter text-5xl leading-none">
+                        <Heading className="text-foreground font-black tracking-tighter text-3xl sm:text-4xl md:text-5xl leading-none">
                             LiveX
                         </Heading>
 
@@ -98,7 +98,7 @@ export default function Login() {
                 {/* ======================
             Authentication Card
         ======================= */}
-                <Box className="bg-card/80 backdrop-blur-xl p-8 rounded-[2.5rem] border border-white/5 shadow-2xl">
+                <Box className="bg-card/80 backdrop-blur-xl p-4 sm:p-6 md:p-8 rounded-xl sm:rounded-[2rem] md:rounded-[2.5rem] border border-white/5 shadow-2xl">
                     <VStack space="xl">
 
                         {/* Email */}
@@ -117,7 +117,7 @@ export default function Login() {
                                     autoCapitalize="none"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="w-full rounded-2xl bg-input border-transparent h-16 pl-14 pr-5 text-foreground font-bold text-lg placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                                    className="w-full rounded-xl sm:rounded-2xl bg-input border-transparent h-12 sm:h-14 md:h-16 pl-10 sm:pl-12 md:pl-14 pr-4 sm:pr-5 text-foreground font-bold text-sm sm:text-base md:text-lg placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
                                 />
                             </Box>
                         </Box>
@@ -137,7 +137,7 @@ export default function Login() {
                                     placeholder="••••••••••••"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full rounded-2xl bg-input border-transparent h-16 pl-14 pr-14 text-foreground font-bold text-lg placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                                    className="w-full rounded-xl sm:rounded-2xl bg-input border-transparent h-12 sm:h-14 md:h-16 pl-10 sm:pl-12 md:pl-14 pr-12 sm:pr-14 text-foreground font-bold text-sm sm:text-base md:text-lg placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
                                 />
                                 <button
                                     type="button"
@@ -164,7 +164,7 @@ export default function Login() {
                         <button
                             onClick={handleLogin}
                             disabled={loading}
-                            className="w-full rounded-2xl bg-primary h-16 mt-2 transition-all group relative overflow-hidden flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full rounded-xl sm:rounded-2xl bg-primary h-12 sm:h-14 md:h-16 mt-2 transition-all group relative overflow-hidden flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             <Box className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
                             <HStack space="md" className="items-center justify-center relative z-10 w-full">

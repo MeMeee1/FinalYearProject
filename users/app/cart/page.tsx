@@ -18,9 +18,9 @@ export default function Cart() {
     const { items, updateQuantity, removeFromCart, subtotal, total } = useCart();
 
     return (
-        <Box className="flex-1 min-h-screen bg-background pb-40">
+        <Box className="flex-1 min-h-screen bg-background pb-32 sm:pb-40">
             {/* Premium Header */}
-            <Box className="bg-background/80 backdrop-blur-3xl px-6 pt-12 pb-6 border-b border-border/40 sticky top-0 z-50">
+            <Box className="bg-background/80 backdrop-blur-3xl px-4 pt-8 pb-4 sm:px-6 sm:pt-12 sm:pb-6 border-b border-border/40 sticky top-0 z-50">
                 <HStack className="items-center justify-between">
                     <HStack space="md" className="items-center">
                         <button
@@ -41,14 +41,14 @@ export default function Cart() {
             </Box>
 
             {items.length > 0 ? (
-                <Box className="p-6 w-full max-w-4xl mx-auto">
-                    <VStack space="2xl" className="w-full">
+                <Box className="p-4 sm:p-6 w-full max-w-4xl mx-auto">
+                    <VStack space="xl" className="w-full">
                         {/* Cart Items List */}
-                        <VStack space="lg" className="w-full">
+                        <VStack space="md" className="w-full">
                             {items.map((item) => (
-                                <Box key={item.id} className="bg-card/60 backdrop-blur-md p-6 rounded-[2.5rem] border border-border/40 group transition-all hover:bg-card/80 hover:shadow-2xl hover:shadow-primary/5 w-full">
-                                    <HStack space="xl" className="items-center w-full">
-                                        <Box className="relative w-32 h-32 rounded-3xl overflow-hidden bg-muted border border-border/40 shadow-inner">
+                                <Box key={item.id} className="bg-card/60 backdrop-blur-md p-4 sm:p-6 rounded-xl sm:rounded-[2rem] md:rounded-[2.5rem] border border-border/40 group transition-all hover:bg-card/80 hover:shadow-2xl hover:shadow-primary/5 w-full">
+                                    <HStack space="md" className="items-center w-full flex-wrap sm:flex-nowrap">
+                                        <Box className="relative w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 rounded-xl sm:rounded-2xl md:rounded-3xl overflow-hidden bg-muted border border-border/40 shadow-inner flex-shrink-0">
                                             <img
                                                 src={
                                                     item.image
@@ -62,7 +62,7 @@ export default function Cart() {
                                             />
                                         </Box>
 
-                                        <VStack className="flex-1 justify-between min-h-[128px] py-1">
+                                        <VStack className="flex-1 justify-between min-h-[80px] sm:min-h-[96px] md:min-h-[128px] py-1 w-full">
                                             <Box>
                                                 <HStack className="justify-between items-start w-full">
                                                     <VStack className="flex-1 mr-4">
@@ -79,7 +79,7 @@ export default function Cart() {
                                                 <Text className="text-foreground text-xl font-black mt-2 tracking-tighter">₦{item.price.toLocaleString()}</Text>
                                             </Box>
 
-                                            <HStack className="justify-between items-center mt-4">
+                                            <HStack className="justify-between items-center mt-2 sm:mt-4 flex-wrap gap-2">
                                                 <HStack className="bg-background/40 p-1.5 rounded-2xl border border-border/40 items-center">
                                                     <button
                                                         className="w-10 h-10 rounded-xl bg-secondary/50 items-center justify-center hover:bg-secondary/80 transition-all active:scale-95 flex"
@@ -109,7 +109,7 @@ export default function Cart() {
                         </VStack>
 
                         {/* Summary Card */}
-                        <Box className="bg-card/60 backdrop-blur-3xl p-10 rounded-[3rem] border border-border/50 shadow-2xl w-full">
+                        <Box className="bg-card/60 backdrop-blur-3xl p-6 sm:p-8 md:p-10 rounded-xl sm:rounded-[2rem] md:rounded-[3rem] border border-border/50 shadow-2xl w-full">
                             <VStack space="xl">
                                 <Heading className="text-foreground font-black tracking-tighter text-3xl mb-4">Valuation Summary</Heading>
                                 <VStack space="lg">
@@ -135,7 +135,7 @@ export default function Cart() {
                         {/* Action Deck (Now in Scroll Area) */}
                         <Box className="mt-4 pb-12">
                             <button
-                                className="w-full rounded-[2.5rem] bg-primary hover:scale-[1.02] shadow-[0_24px_48px_rgba(29,185,84,0.3)] border-0 h-24 transition-all active:scale-[0.98] group overflow-hidden relative flex items-center justify-center"
+                                className="w-full rounded-xl sm:rounded-2xl md:rounded-[2.5rem] bg-primary hover:scale-[1.02] shadow-[0_24px_48px_rgba(29,185,84,0.3)] border-0 h-16 sm:h-20 md:h-24 transition-all active:scale-[0.98] group overflow-hidden relative flex items-center justify-center"
                                 onClick={() => router.push('/checkout')}
                             >
                                 <Box className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />

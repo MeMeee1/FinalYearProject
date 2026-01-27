@@ -121,7 +121,7 @@ export default function Orders() {
     return (
         <Box className="flex-1 min-h-screen bg-background pb-24">
             {/* Premium Header */}
-            <Box className="bg-background/80 backdrop-blur-3xl px-6 pt-12 pb-6 border-b border-border/40 sticky top-0 z-50">
+            <Box className="bg-background/80 backdrop-blur-3xl px-4 pt-8 pb-4 sm:px-6 sm:pt-12 sm:pb-6 border-b border-border/40 sticky top-0 z-50">
                 <HStack space="md" className="items-center">
                     <Button
                         variant="solid"
@@ -137,9 +137,9 @@ export default function Orders() {
                 </HStack>
             </Box>
 
-            <Box className="p-6 max-w-4xl mx-auto">
+            <Box className="p-4 sm:p-6 max-w-4xl mx-auto">
                 {loading ? (
-                    <VStack space="xl" className="items-center justify-center pt-20">
+                    <VStack space="xl" className="items-center justify-center pt-16 sm:pt-20">
                         <Box className="w-12 h-12 bg-secondary/20 rounded-full items-center justify-center animate-pulse">
                             <ClockIcon size={24} color="hsl(var(--muted-foreground))" />
                         </Box>
@@ -150,8 +150,8 @@ export default function Orders() {
                         {orders.map((order) => {
                             const status = getStatusStyle(order);
                             return (
-                                <Box key={order.id} className="bg-card/40 backdrop-blur-md p-6 rounded-[2rem] border border-border/40 group transition-all hover:bg-card/60 relative">
-                                    <HStack className="justify-between items-start mb-6">
+                                <Box key={order.id} className="bg-card/40 backdrop-blur-md p-4 sm:p-6 rounded-xl sm:rounded-[1.5rem] md:rounded-[2rem] border border-border/40 group transition-all hover:bg-card/60 relative">
+                                    <HStack className="justify-between items-start mb-4 sm:mb-6 flex-wrap gap-2">
                                         <VStack space="xs">
                                             <Text className="text-[10px] text-muted-foreground font-black uppercase tracking-[0.2em]">Transaction ID</Text>
                                             <Heading size="md" className="text-foreground font-black tracking-tight">#{order.id.toString().padStart(6, '0')}</Heading>

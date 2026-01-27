@@ -74,11 +74,11 @@ export default function ProductDetails() {
 
 
     return (
-        <Box className="flex-1 min-h-screen bg-background pb-40">
+        <Box className="flex-1 min-h-screen bg-background pb-28 sm:pb-32 md:pb-40">
             {/* Header / Navigation Rail */}
-            <Box className="fixed top-8 left-8 right-8 z-[100] flex-row justify-between items-center pointer-events-none">
+            <Box className="fixed top-4 left-4 right-4 sm:top-8 sm:left-8 sm:right-8 z-[100] flex-row justify-between items-center pointer-events-none">
                 <button
-                    className="rounded-2xl bg-background/60 backdrop-blur-3xl border border-border/40 shadow-2xl w-14 h-14 p-0 items-center justify-center hover:bg-background/80 transition-all active:scale-90 pointer-events-auto flex"
+                    className="rounded-xl sm:rounded-2xl bg-background/60 backdrop-blur-3xl border border-border/40 shadow-2xl w-10 h-10 sm:w-14 sm:h-14 p-0 items-center justify-center hover:bg-background/80 transition-all active:scale-90 pointer-events-auto flex"
                     onClick={() => router.back()}
                 >
                     <ArrowLeftIcon size={24} color="hsl(var(--foreground))" />
@@ -100,7 +100,7 @@ export default function ProductDetails() {
             </Box>
 
             {/* Immersive Gallery / Hero */}
-            <Box className="h-[65vh] w-full relative overflow-hidden bg-secondary/20">
+            <Box className="h-[45vh] sm:h-[55vh] md:h-[65vh] w-full relative overflow-hidden bg-secondary/20">
                 <img
                     src={product.image
                         ? product.image.startsWith('http')
@@ -116,7 +116,7 @@ export default function ProductDetails() {
                 <Box className="absolute inset-x-0 bottom-0 h-96 bg-gradient-to-t from-background via-background/40 to-transparent" />
 
                 {/* Visual Status Badges */}
-                <HStack space="sm" className="absolute bottom-32 left-8">
+                <HStack space="sm" className="absolute bottom-16 sm:bottom-24 md:bottom-32 left-4 sm:left-6 md:left-8 flex-wrap gap-2">
                     <Box className="bg-primary px-4 py-1.5 rounded-full shadow-lg shadow-primary/20">
                         <Text className="text-black text-[10px] font-black uppercase tracking-widest">In Stock ({product.stock})</Text>
                     </Box>
@@ -127,17 +127,17 @@ export default function ProductDetails() {
             </Box>
 
             {/* Unified Product Card Container */}
-            <Box className="px-6 -mt-24 relative z-10 max-w-4xl mx-auto">
-                <VStack space="xl">
+            <Box className="px-4 sm:px-6 -mt-12 sm:-mt-16 md:-mt-24 relative z-10 max-w-4xl mx-auto">
+                <VStack space="lg" className="sm:space-y-6 md:space-y-8">
                     {/* Primary Commercial Card */}
-                    <Box className="bg-card/60 backdrop-blur-3xl border border-border/50 rounded-[3rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.3)] overflow-hidden">
-                        <Box className="p-10">
+                    <Box className="bg-card/60 backdrop-blur-3xl border border-border/50 rounded-xl sm:rounded-[2rem] md:rounded-[3rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.3)] overflow-hidden">
+                        <Box className="p-4 sm:p-6 md:p-8 lg:p-10">
                             <VStack space="xl">
                                 <VStack space="xs">
                                     <HStack className="items-center space-x-2 opacity-60">
                                         <Text className="text-[10px] text-muted-foreground font-black uppercase tracking-[0.4em]">Node ID: {product.sku || 'N/A'}</Text>
                                     </HStack>
-                                    <Heading className="text-6xl font-black text-foreground tracking-tighter leading-[0.85] mb-2">{product.name}</Heading>
+                                    <Heading className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-black text-foreground tracking-tighter leading-[0.85] mb-2">{product.name}</Heading>
                                     {/* <HStack space="xs" className="items-center">
                                         {[1, 2, 3, 4, 5].map((s) => (
                                             <StarIcon key={s} size={14} color="hsl(var(--primary))" fill="hsl(var(--primary))" />
@@ -146,10 +146,10 @@ export default function ProductDetails() {
                                     </HStack> */}
                                 </VStack>
 
-                                <HStack className="justify-between items-end border-t border-border/30 pt-8 mt-4">
+                                <HStack className="justify-between items-end border-t border-border/30 pt-4 sm:pt-6 md:pt-8 mt-4 flex-wrap gap-4">
                                     <VStack>
                                         <Text className="text-muted-foreground text-[10px] font-black uppercase tracking-[0.3em] mb-2">Procurement Value</Text>
-                                        <Text className="text-primary font-black text-5xl tracking-tighter leading-none">₦{product.price.toLocaleString()}</Text>
+                                        <Text className="text-primary font-black text-2xl sm:text-3xl md:text-4xl lg:text-5xl tracking-tighter leading-none">₦{product.price.toLocaleString()}</Text>
                                     </VStack>
 
                                     {/* Advanced Quantity Selector */}
@@ -176,7 +176,7 @@ export default function ProductDetails() {
                     </Box>
 
                     {/* Infrastructure & Trusts Grid */}
-                    <Box className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <Box className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                         {/* <Box className="bg-secondary/10 border border-border/30 p-6 rounded-[2rem] items-center text-center">
                             <Box className="w-12 h-12 bg-primary/10 rounded-2xl items-center justify-center mb-4">
                                 <TruckIcon size={24} color="hsl(var(--primary))" />
@@ -218,8 +218,8 @@ export default function ProductDetails() {
                                 <Box className="w-1.5 h-4 bg-orange-500 rounded-full" />
                                 <Heading size="xs" className="font-black text-foreground uppercase tracking-[0.2em] text-[10px]">Technical Specifications</Heading>
                             </HStack>
-                            <Box className="bg-card/30 border border-border/30 p-8 rounded-[2.5rem]">
-                                <div className="grid grid-cols-2 gap-y-6 gap-x-12">
+                            <Box className="bg-card/30 border border-border/30 p-4 sm:p-6 md:p-8 rounded-xl sm:rounded-[2rem] md:rounded-[2.5rem]">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-y-6 sm:gap-x-8 md:gap-x-12">
                                     <VStack>
                                         <Text className="text-[10px] text-muted-foreground font-black uppercase tracking-widest mb-1">Species / Breed</Text>
                                         <Text className="text-foreground font-bold">{product.speciesBreed || 'N/A'}</Text>
@@ -298,8 +298,8 @@ export default function ProductDetails() {
             </Box>
 
             {/* Procurement Interaction Deck */}
-            <Box className="fixed bottom-0 left-0 right-0 bg-background/80 backdrop-blur-3xl p-8 border-t border-border/30 pb-12 z-[200]">
-                <Box className="max-w-4xl mx-auto flex-row gap-6 items-center">
+            <Box className="fixed bottom-0 left-0 right-0 bg-background/80 backdrop-blur-3xl p-4 sm:p-6 md:p-8 border-t border-border/30 pb-6 sm:pb-8 md:pb-12 z-[200]">
+                <Box className="max-w-4xl mx-auto flex-row gap-4 sm:gap-6 items-center">
                     <VStack className="hidden md:flex">
                         <Text className="text-muted-foreground text-[10px] font-black uppercase tracking-widest mb-1">Total Valuation</Text>
                         <Text className="text-foreground font-black text-2xl tracking-tighter">₦{(product.price * quantity).toLocaleString()}</Text>
@@ -312,7 +312,7 @@ export default function ProductDetails() {
                                 router.push('/cart');
                             }
                         }}
-                        className="flex-1 rounded-[2.5rem] bg-primary hover:scale-[1.02] shadow-[0_24px_48px_rgba(var(--primary),0.3)] border-0 h-24 transition-all active:scale-[0.98] group overflow-hidden relative flex items-center justify-center"
+                        className="flex-1 rounded-xl sm:rounded-2xl md:rounded-[2.5rem] bg-primary hover:scale-[1.02] shadow-[0_24px_48px_rgba(var(--primary),0.3)] border-0 h-14 sm:h-16 md:h-20 lg:h-24 transition-all active:scale-[0.98] group overflow-hidden relative flex items-center justify-center"
                     >
                         <Box className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
                         <HStack space="lg" className="items-center relative z-10">
@@ -320,8 +320,8 @@ export default function ProductDetails() {
                                 <ShoppingBagIcon size={24} color="black" />
                             </Box>
                             <VStack className="items-start">
-                                <Text className="font-black text-black text-xl uppercase tracking-[0.25em] leading-none">Add To Cart</Text>
-                                <Text className="text-black/60 text-[10px] font-black uppercase tracking-widest mt-1">Get a product!</Text>
+                                <Text className="font-black text-black text-base sm:text-lg md:text-xl uppercase tracking-[0.15em] sm:tracking-[0.2em] md:tracking-[0.25em] leading-none">Add To Cart</Text>
+                                <Text className="text-black/60 text-[8px] sm:text-[10px] font-black uppercase tracking-widest mt-1 hidden sm:block">Get a product!</Text>
                             </VStack>
                         </HStack>
                     </button>

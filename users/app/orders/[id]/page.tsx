@@ -90,8 +90,8 @@ export default function OrderDetails() {
     return (
         <Box className="flex-1 min-h-screen bg-background">
             {/* Immersive Header Section */}
-            <Box className={`pt-16 pb-32 px-6 rounded-b-[4rem] shadow-2xl transition-colors duration-700 ${isRefunded ? 'bg-red-500' : isCollected ? 'bg-green-500' : isReadyForPickup ? 'bg-primary' : 'bg-secondary'}`}>
-                <HStack className="items-center justify-between mb-8">
+            <Box className={`pt-10 pb-20 px-4 sm:pt-12 sm:pb-24 sm:px-6 md:pt-16 md:pb-32 md:px-8 rounded-b-[2rem] sm:rounded-b-[3rem] md:rounded-b-[4rem] shadow-2xl transition-colors duration-700 ${isRefunded ? 'bg-red-500' : isCollected ? 'bg-green-500' : isReadyForPickup ? 'bg-primary' : 'bg-secondary'}`}>
+                <HStack className="items-center justify-between mb-6 sm:mb-8">
                     <Button
                         variant="solid"
                         className="rounded-2xl bg-black/10 border border-black/10 w-12 h-12 p-0 items-center justify-center hover:bg-black/20 transition-all active:scale-95"
@@ -109,7 +109,7 @@ export default function OrderDetails() {
                     <Box className="bg-black/10 px-4 py-1.5 rounded-full border border-black/5 mb-2">
                         <Text className="text-black font-black text-[10px] uppercase tracking-[0.3em] font-mono">#{order.id.toString().padStart(6, '0')}</Text>
                     </Box>
-                    <Heading size="3xl" className="text-black font-black tracking-tighter text-center leading-none">
+                    <Heading className="text-xl sm:text-2xl md:text-3xl text-black font-black tracking-tighter text-center leading-none">
                         {isRefunded ? 'Order Refunded' : isCollected ? 'Fulfillment Verified' : isReadyForPickup ? 'Awaiting Retrieval' : 'Manifest Authorized'}
                     </Heading>
                     <HStack space="xs" className="items-center bg-white/20 px-4 py-2 rounded-2xl mt-4">
@@ -119,11 +119,11 @@ export default function OrderDetails() {
                 </VStack>
             </Box>
 
-            <Box className="px-6 -mt-16 max-w-4xl mx-auto pb-40">
-                <VStack space="xl">
+            <Box className="px-4 sm:px-6 -mt-10 sm:-mt-12 md:-mt-16 max-w-4xl mx-auto pb-24 sm:pb-32 md:pb-40">
+                <VStack space="lg" className="sm:space-y-6">
                     {/* Pickup Verification Section (New Simulation Feature) */}
                     {isReadyForPickup && (
-                        <Box className="bg-card p-8 rounded-[3rem] border-2 border-primary shadow-2xl overflow-hidden relative">
+                        <Box className="bg-card p-4 sm:p-6 md:p-8 rounded-xl sm:rounded-[2rem] md:rounded-[3rem] border-2 border-primary shadow-2xl overflow-hidden relative">
                             <Box className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full -mr-16 -mt-16" />
                             <VStack space="lg">
                                 <HStack space="md" className="items-center">
@@ -155,13 +155,13 @@ export default function OrderDetails() {
                                         placeholder="Enter Code to Simulate Pickup"
                                         value={pickupCode}
                                         onChange={(e) => setPickupCode(e.target.value)}
-                                        className="w-full bg-transparent border-b-2 border-primary/30 h-16 text-foreground font-black tracking-[0.3em] uppercase text-center focus:outline-none focus:border-primary transition-all placeholder:text-muted-foreground/50"
+                                        className="w-full bg-transparent border-b-2 border-primary/30 h-12 sm:h-14 md:h-16 text-foreground font-black tracking-[0.2em] sm:tracking-[0.3em] uppercase text-center focus:outline-none focus:border-primary transition-all placeholder:text-muted-foreground/50 text-sm sm:text-base"
                                     />
 
                                     <Button
                                         isDisabled={!pickupCode || isVerifying}
                                         onPress={handleVerifyPickup}
-                                        className="h-16 rounded-2xl bg-primary shadow-lg shadow-primary/20 active:scale-95 transition-all"
+                                        className="h-12 sm:h-14 md:h-16 rounded-xl sm:rounded-2xl bg-primary shadow-lg shadow-primary/20 active:scale-95 transition-all"
                                     >
                                         <ButtonText className="text-black font-black uppercase tracking-widest text-xs">Verify & Collect</ButtonText>
                                     </Button>
@@ -171,7 +171,7 @@ export default function OrderDetails() {
                     )}
 
                     {isCollected && (
-                        <Box className="bg-green-500/10 p-8 rounded-[3rem] border border-green-500/20 shadow-xl overflow-hidden relative">
+                        <Box className="bg-green-500/10 p-4 sm:p-6 md:p-8 rounded-xl sm:rounded-[2rem] md:rounded-[3rem] border border-green-500/20 shadow-xl overflow-hidden relative">
                             <HStack space="md" className="items-center">
                                 <Box className="bg-green-500/20 p-3 rounded-xl">
                                     <CheckCircle2Icon size={20} color="#22c55e" />
@@ -184,9 +184,8 @@ export default function OrderDetails() {
                         </Box>
                     )}
 
-                    {/* Refund Notification Card */}
                     {isRefunded && (
-                        <Box className="bg-red-500/10 p-8 rounded-[3rem] border border-red-500/20 shadow-xl overflow-hidden relative">
+                        <Box className="bg-red-500/10 p-4 sm:p-6 md:p-8 rounded-xl sm:rounded-[2rem] md:rounded-[3rem] border border-red-500/20 shadow-xl overflow-hidden relative">
                             <Box className="absolute top-0 right-0 w-32 h-32 bg-red-500/10 rounded-full -mr-16 -mt-16" />
                             <VStack space="lg">
                                 <HStack space="md" className="items-center">
@@ -282,9 +281,9 @@ export default function OrderDetails() {
                     )}
 
                     {/* Pickup Node Card */}
-                    <Box className="bg-card/40 backdrop-blur-3xl p-8 rounded-[3rem] border border-border/50 shadow-2xl">
+                    <Box className="bg-card/40 backdrop-blur-3xl p-4 sm:p-6 md:p-8 rounded-xl sm:rounded-[2rem] md:rounded-[3rem] border border-border/50 shadow-2xl">
                         <HStack space="md" className="items-start">
-                            <Box className="w-14 h-14 bg-primary/20 rounded-[1.25rem] items-center justify-center border border-primary/20">
+                            <Box className="w-12 h-12 sm:w-14 sm:h-14 bg-primary/20 rounded-[1rem] sm:rounded-[1.25rem] items-center justify-center border border-primary/20">
                                 <MapPinIcon size={24} color="hsl(var(--primary))" />
                             </Box>
                             <VStack className="flex-1">
@@ -335,7 +334,7 @@ export default function OrderDetails() {
                     )}
 
                     {/* Itemization Detail */}
-                    <Box className="bg-card/40 backdrop-blur-3xl p-8 rounded-[3rem] border border-border/50 shadow-xl overflow-hidden">
+                    <Box className="bg-card/40 backdrop-blur-3xl p-4 sm:p-6 md:p-8 rounded-xl sm:rounded-[2rem] md:rounded-[3rem] border border-border/50 shadow-xl overflow-hidden">
                         <HStack className="items-center justify-between mb-8">
                             <Heading size="md" className="text-foreground font-black tracking-tight">Manifest Itemization</Heading>
                             <Box className="bg-secondary/40 px-3 py-1 rounded-full border border-border/40">

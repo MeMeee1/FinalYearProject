@@ -122,3 +122,171 @@
     @apply bg-card text-card-foreground rounded-lg shadow-lg p-4 transition-colors duration-300;
   }
 }
+
+/* ===============================
+   MOBILE RESPONSIVE UTILITIES
+================================ */
+
+/* Responsive Container */
+.container-responsive {
+  @apply w-full px-4 sm:px-6 lg:px-8 mx-auto;
+  max-width: 1400px;
+}
+
+/* Mobile-first text scaling */
+.text-hero {
+  @apply text-3xl sm:text-4xl md:text-5xl lg:text-6xl;
+}
+
+.text-title {
+  @apply text-xl sm:text-2xl md:text-3xl;
+}
+
+.text-subtitle {
+  @apply text-base sm:text-lg md:text-xl;
+}
+
+/* Mobile-friendly header/navigation */
+.header-mobile {
+  @apply px-4 pt-8 pb-4 sm:px-6 sm:pt-12 sm:pb-6;
+}
+
+/* Responsive grid helpers */
+.grid-responsive {
+  @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6;
+}
+
+.grid-form {
+  @apply grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4;
+}
+
+/* Mobile-friendly cards */
+.card-responsive {
+  @apply p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-[2rem] md:rounded-[2.5rem];
+}
+
+/* Fixed bottom bar - mobile friendly */
+.bottom-bar {
+  @apply fixed bottom-0 left-0 right-0 bg-background/80 backdrop-blur-3xl border-t border-border/30 z-50;
+  @apply p-4 pb-6 sm:p-6 sm:pb-8 md:p-8 md:pb-12;
+}
+
+/* Mobile button sizing */
+.btn-responsive {
+  @apply h-14 sm:h-16 md:h-20 lg:h-24;
+  @apply rounded-xl sm:rounded-2xl md:rounded-[2rem] lg:rounded-[2.5rem];
+  @apply text-sm sm:text-base md:text-lg;
+}
+
+/* Hide on mobile, show on larger screens */
+.hide-mobile {
+  @apply hidden sm:flex;
+}
+
+/* Show only on mobile */
+.show-mobile {
+  @apply flex sm:hidden;
+}
+
+/* Responsive spacing */
+.section-spacing {
+  @apply py-4 sm:py-6 md:py-8;
+}
+
+/* Mobile-friendly input styling */
+.input-responsive {
+  @apply h-12 sm:h-14 md:h-16;
+  @apply rounded-xl sm:rounded-2xl;
+  @apply text-sm sm:text-base;
+  @apply px-3 sm:px-4;
+}
+
+/* Responsive icon buttons */
+.icon-btn {
+  @apply w-10 h-10 sm:w-12 sm:h-12;
+  @apply rounded-lg sm:rounded-xl md:rounded-2xl;
+}
+
+/* Mobile-friendly hero sections */
+.hero-section {
+  @apply pt-8 pb-6 px-4 sm:pt-12 sm:pb-8 sm:px-6 md:pt-16 md:pb-12 md:px-8;
+}
+
+/* Scroll container for horizontal lists */
+.scroll-container {
+  @apply flex overflow-x-auto gap-2 sm:gap-3 md:gap-4 pb-2;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scroll-container::-webkit-scrollbar {
+  display: none;
+}
+
+/* Responsive image containers */
+.img-container {
+  @apply h-40 sm:h-48 md:h-56 lg:h-64;
+}
+
+/* Safe area padding for mobile devices */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .bottom-bar {
+    padding-bottom: calc(1.5rem + env(safe-area-inset-bottom));
+  }
+
+  @media (min-width: 640px) {
+    .bottom-bar {
+      padding-bottom: calc(2rem + env(safe-area-inset-bottom));
+    }
+  }
+}
+
+/* Responsive border-radius */
+.rounded-responsive {
+  @apply rounded-xl sm:rounded-2xl md:rounded-[2rem] lg:rounded-[2.5rem];
+}
+
+.rounded-responsive-lg {
+  @apply rounded-2xl sm:rounded-[2rem] md:rounded-[2.5rem] lg:rounded-[3rem];
+}
+
+/* Mobile typography adjustments */
+@media (max-width: 640px) {
+
+  /* Reduce letter-spacing on mobile for better readability */
+  .tracking-widest {
+    letter-spacing: 0.1em;
+  }
+
+  .tracking-\[0\.3em\] {
+    letter-spacing: 0.15em;
+  }
+
+  .tracking-\[0\.25em\] {
+    letter-spacing: 0.12em;
+  }
+
+  /* Reduce oversized rounded corners on mobile */
+  .rounded-\[3rem\] {
+    border-radius: 1.5rem;
+  }
+
+  .rounded-\[2\.5rem\] {
+    border-radius: 1.25rem;
+  }
+
+  .rounded-\[2rem\] {
+    border-radius: 1rem;
+  }
+
+  /* Reduce very large text on mobile */
+  .text-5xl {
+    font-size: 2rem;
+    line-height: 1;
+  }
+
+  .text-6xl {
+    font-size: 2.5rem;
+    line-height: 1;
+  }
+}

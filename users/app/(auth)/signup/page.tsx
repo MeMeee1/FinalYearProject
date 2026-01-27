@@ -71,19 +71,19 @@ export default function Signup() {
     };
 
     return (
-        <Box className="flex-1 min-h-screen bg-background relative overflow-hidden flex items-center justify-center p-6">
+        <Box className="flex-1 min-h-screen bg-background relative overflow-hidden flex items-center justify-center p-4 sm:p-6">
             {/* Ambient Background Elements */}
             <Box className="absolute top-[-20%] right-[-10%] w-[50%] h-[50%] bg-primary/10 rounded-full blur-[150px]" />
             <Box className="absolute bottom-[-20%] left-[-10%] w-[50%] h-[50%] bg-blue-600/10 rounded-full blur-[150px]" />
 
-            <VStack space="xl" className="max-w-md w-full z-10 p-4">
+            <VStack space="xl" className="max-w-md w-full z-10 p-2 sm:p-4">
                 {/* Branding Section */}
                 <VStack space="md" className="items-center mb-2">
-                    <Box className="w-20 h-20 bg-primary rounded-[2rem] items-center justify-center shadow-[0_0_60px_rgba(var(--primary-rgb),0.5)] rotate-3 border-4 border-white/5">
-                        <Heading size="3xl" className="text-primary-foreground font-black italic tracking-tighter">Lx</Heading>
+                    <Box className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 bg-primary rounded-[1.5rem] sm:rounded-[2rem] items-center justify-center shadow-[0_0_60px_rgba(var(--primary-rgb),0.5)] rotate-3 border-4 border-white/5">
+                        <Heading className="text-xl sm:text-2xl md:text-3xl text-primary-foreground font-black italic tracking-tighter">Lx</Heading>
                     </Box>
                     <VStack className="items-center" space="xs">
-                        <Heading className="text-foreground font-black tracking-tighter text-4xl leading-none">Register</Heading>
+                        <Heading className="text-foreground font-black tracking-tighter text-2xl sm:text-3xl md:text-4xl leading-none">Register</Heading>
                         <HStack space="xs" className="items-center bg-secondary/80 px-4 py-1.5 rounded-full border border-white/5 backdrop-blur-md">
                             <ShieldCheckIcon size={12} color="hsl(var(--primary))" />
                             <Text className="text-muted-foreground text-[10px] font-black uppercase tracking-[0.2em]">{step === 1 ? 'Identity Protocol' : 'Logistics Coordinates'}</Text>
@@ -98,7 +98,7 @@ export default function Signup() {
                 </HStack>
 
                 {/* Registration Card */}
-                <Box className="bg-card/80 backdrop-blur-xl p-8 rounded-[2.5rem] border border-white/5 shadow-2xl overflow-hidden relative min-h-[450px]">
+                <Box className="bg-card/80 backdrop-blur-xl p-4 sm:p-6 md:p-8 rounded-xl sm:rounded-[2rem] md:rounded-[2.5rem] border border-white/5 shadow-2xl overflow-hidden relative min-h-[400px] sm:min-h-[450px]">
                     <VStack space="lg">
                         {step === 1 && (
                             <VStack space="lg" className="animate-in slide-in-from-right duration-500 fade-in zoom-in-95">
@@ -113,7 +113,7 @@ export default function Signup() {
                                             placeholder="Your full name"
                                             value={name}
                                             onChange={(e) => setName(e.target.value)}
-                                            className="w-full rounded-2xl bg-input border-transparent h-14 pl-12 pr-4 text-foreground font-bold placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all shadow-sm"
+                                            className="w-full rounded-xl sm:rounded-2xl bg-input border-transparent h-12 sm:h-14 pl-10 sm:pl-12 pr-4 text-foreground font-bold text-sm sm:text-base placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all shadow-sm"
                                         />
                                     </Box>
                                 </Box>
@@ -130,7 +130,7 @@ export default function Signup() {
                                             value={email}
                                             onChange={(e) => setEmail(e.target.value)}
                                             autoCapitalize="none"
-                                            className="w-full rounded-2xl bg-input border-transparent h-14 pl-12 pr-4 text-foreground font-bold placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all shadow-sm"
+                                            className="w-full rounded-xl sm:rounded-2xl bg-input border-transparent h-12 sm:h-14 pl-10 sm:pl-12 pr-4 text-foreground font-bold text-sm sm:text-base placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all shadow-sm"
                                         />
                                     </Box>
                                 </Box>
@@ -146,7 +146,7 @@ export default function Signup() {
                                             placeholder="••••••••••••"
                                             value={password}
                                             onChange={(e) => setPassword(e.target.value)}
-                                            className="w-full rounded-2xl bg-input border-transparent h-14 pl-12 pr-4 text-foreground font-bold placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all shadow-sm"
+                                            className="w-full rounded-xl sm:rounded-2xl bg-input border-transparent h-12 sm:h-14 pl-10 sm:pl-12 pr-4 text-foreground font-bold text-sm sm:text-base placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all shadow-sm"
                                         />
                                     </Box>
                                     {error && step === 1 && (
@@ -155,7 +155,7 @@ export default function Signup() {
                                 </Box>
 
                                 <button
-                                    className="w-full rounded-2xl bg-primary hover:bg-primary/90 hover:scale-[1.02] shadow-[0_20px_40px_-10px_rgba(var(--primary-rgb),0.4)] border-0 h-16 mt-4 transition-all active:scale-[0.98] group overflow-hidden relative flex items-center justify-center"
+                                    className="w-full rounded-xl sm:rounded-2xl bg-primary hover:bg-primary/90 hover:scale-[1.02] shadow-[0_20px_40px_-10px_rgba(var(--primary-rgb),0.4)] border-0 h-12 sm:h-14 md:h-16 mt-4 transition-all active:scale-[0.98] group overflow-hidden relative flex items-center justify-center"
                                     onClick={nextStep}
                                 >
                                     <Box className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />

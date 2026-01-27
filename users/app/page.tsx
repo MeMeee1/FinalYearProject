@@ -60,9 +60,9 @@ export default function Home() {
   };
 
   return (
-    <Box className="flex-1 min-h-screen bg-background pb-32">
+    <Box className="flex-1 min-h-screen bg-background pb-24 sm:pb-32">
       {/* Dynamic Header / Hero */}
-      <Box className="relative overflow-hidden pt-16 pb-12 px-8">
+      <Box className="relative overflow-hidden pt-8 pb-6 px-4 sm:pt-12 sm:pb-8 sm:px-6 md:pt-16 md:pb-12 md:px-8">
         {/* Background Accent */}
         <Box className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/20 rounded-full blur-[100px] pointer-events-none" />
         <Box className="absolute bottom-[-10%] right-[-10%] w-[30%] h-[30%] bg-blue-500/10 rounded-full blur-[80px] pointer-events-none" />
@@ -85,10 +85,10 @@ export default function Home() {
                   <Text className="text-primary text-[8px] font-bold uppercase">(Switch)</Text>
                 </button>
               </HStack>
-              <Heading className="text-5xl font-black text-foreground tracking-tighter leading-[0.9] mb-1">
+              <Heading className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-foreground tracking-tighter leading-[0.9] mb-1">
                 Welcome, <Text className="text-primary italic">{userName || 'Shopper'}</Text>
               </Heading>
-              <Text className="text-muted-foreground font-medium text-lg leading-snug max-w-[80%]">Curating the best local produce for your household.</Text>
+              <Text className="text-muted-foreground font-medium text-sm sm:text-base md:text-lg leading-snug max-w-full sm:max-w-[80%]">Curating the best local produce for your household.</Text>
             </VStack>
 
             <HStack space="md" className="items-center mt-2">
@@ -112,7 +112,7 @@ export default function Home() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                className="w-full bg-secondary/40 backdrop-blur-xl border border-border/30 rounded-[2rem] h-20 pl-20 pr-8 focus:border-primary/50 transition-all text-foreground placeholder:text-muted-foreground/40 font-bold text-lg focus:outline-none"
+                className="w-full bg-secondary/40 backdrop-blur-xl border border-border/30 rounded-xl sm:rounded-2xl md:rounded-[2rem] h-12 sm:h-14 md:h-16 lg:h-20 pl-12 sm:pl-14 md:pl-16 lg:pl-20 pr-4 sm:pr-6 md:pr-8 focus:border-primary/50 transition-all text-foreground placeholder:text-muted-foreground/40 font-bold text-sm sm:text-base md:text-lg focus:outline-none"
               />
             </Box>
           </Box>
@@ -120,7 +120,7 @@ export default function Home() {
       </Box>
 
       {/* Modern Categories */}
-      <Box className="pt-4">
+      <Box className="pt-2 sm:pt-4">
         <HStack className="px-9 justify-between items-center mb-6">
           <HStack space="sm" className="items-center">
             <Box className="w-1.5 h-4 bg-primary rounded-full" />
@@ -130,7 +130,7 @@ export default function Home() {
             <Text className="text-muted-foreground hover:text-primary font-black text-[10px] uppercase tracking-widest transition-colors">Marketplace</Text>
           </Link>
         </HStack>
-        <HStack space="md" className="overflow-x-auto pb-6 px-8 scrollbar-hide">
+        <HStack space="sm" className="overflow-x-auto pb-4 sm:pb-6 px-4 sm:px-6 md:px-8 scrollbar-hide">
           {categories.map((cat, index) => (
             <button
               key={`${cat}-${index}`}
@@ -149,11 +149,11 @@ export default function Home() {
       </Box>
 
       {/* Enhanced Recommendations */}
-      <Box className="px-8 mt-4">
-        <HStack className="justify-between items-end mb-10">
+      <Box className="px-4 sm:px-6 md:px-8 mt-2 sm:mt-4">
+        <HStack className="justify-between items-end mb-6 sm:mb-8 md:mb-10 flex-wrap gap-2">
           <VStack space="xs">
-            <Text className="text-primary font-black text-[10px] uppercase tracking-[0.3em]">Curated Feed</Text>
-            <Heading size="3xl" className="text-foreground font-black tracking-tighter">Recommended For You</Heading>
+            <Text className="text-primary font-black text-[10px] uppercase tracking-[0.2em] sm:tracking-[0.3em]">Curated Feed</Text>
+            <Heading className="text-xl sm:text-2xl md:text-3xl text-foreground font-black tracking-tighter">Recommended For You</Heading>
           </VStack>
           <Link href="/products">
             <HStack className="items-center space-x-2 group-hover:translate-x-1 transition-transform bg-secondary/30 px-4 py-2 rounded-full border border-border/50">
@@ -164,7 +164,7 @@ export default function Home() {
         </HStack>
 
         {products.length > 0 ? (
-          <Box className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+          <Box className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
             {products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}

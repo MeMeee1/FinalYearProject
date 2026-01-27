@@ -122,9 +122,9 @@ function PaymentContent() {
     }
 
     return (
-        <Box className="flex-1 min-h-screen bg-background pb-40">
+        <Box className="flex-1 min-h-screen bg-background pb-32 sm:pb-40">
             {/* Premium Header */}
-            <Box className="bg-background/80 backdrop-blur-3xl px-6 pt-12 pb-6 border-b border-border/40 sticky top-0 z-50">
+            <Box className="bg-background/80 backdrop-blur-3xl px-4 pt-8 pb-4 sm:px-6 sm:pt-12 sm:pb-6 border-b border-border/40 sticky top-0 z-50">
                 <HStack space="md" className="items-center">
                     <button
                         className="rounded-xl bg-secondary/50 border border-border/40 w-10 h-10 p-0 items-center justify-center hover:bg-secondary/80 transition-all active:scale-95 flex"
@@ -139,13 +139,13 @@ function PaymentContent() {
                 </HStack>
             </Box>
 
-            <Box className="p-6 max-w-4xl mx-auto">
-                <VStack space="xl">
+            <Box className="p-4 sm:p-6 max-w-4xl mx-auto">
+                <VStack space="lg" className="sm:space-y-6">
                     {/* Amount Display Card */}
-                    <Box className="bg-primary/90 p-10 rounded-[3rem] shadow-[0_32px_64px_rgba(var(--primary-rgb),0.3)] items-center relative overflow-hidden">
+                    <Box className="bg-primary/90 p-6 sm:p-8 md:p-10 rounded-xl sm:rounded-[2rem] md:rounded-[3rem] shadow-[0_32px_64px_rgba(var(--primary-rgb),0.3)] items-center relative overflow-hidden">
                         <Box className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16" />
-                        <Text className="text-black/60 mb-4 font-black uppercase tracking-[0.25em] text-[10px]">Total Amount</Text>
-                        <Heading className="text-black font-black text-6xl tracking-tighter leading-none mb-2">₦{total.toLocaleString()}</Heading>
+                        <Text className="text-black/60 mb-2 sm:mb-4 font-black uppercase tracking-[0.15em] sm:tracking-[0.25em] text-[9px] sm:text-[10px]">Total Amount</Text>
+                        <Heading className="text-black font-black text-3xl sm:text-4xl md:text-5xl lg:text-6xl tracking-tighter leading-none mb-2">₦{total.toLocaleString()}</Heading>
                         <HStack space="xs" className="items-center bg-black/10 px-3 py-1 rounded-full">
                             <LockIcon size={10} color="black" />
                             <Text className="text-black font-bold uppercase tracking-widest text-[8px]">Escrowed Until Pickup</Text>
@@ -164,12 +164,12 @@ function PaymentContent() {
 
                         {/* Card Method */}
                         <button
-                            className={`p-6 h-auto rounded-[2.5rem] border-2 transition-all cursor-pointer flex w-full ${selectedMethod === 'card' ? 'border-primary bg-primary/10 shadow-lg shadow-primary/10' : 'border-border/40 bg-card/40'}`}
+                            className={`p-4 sm:p-6 h-auto rounded-xl sm:rounded-[2rem] md:rounded-[2.5rem] border-2 transition-all cursor-pointer flex w-full ${selectedMethod === 'card' ? 'border-primary bg-primary/10 shadow-lg shadow-primary/10' : 'border-border/40 bg-card/40'}`}
                             onClick={() => setSelectedMethod('card')}
                         >
                             <HStack className="items-center justify-between w-full">
                                 <HStack space="md" className="items-center">
-                                    <Box className={`w-14 h-14 rounded-2xl items-center justify-center ${selectedMethod === 'card' ? 'bg-primary shadow-lg shadow-primary/20' : 'bg-secondary/40'}`}>
+                                    <Box className={`w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-xl sm:rounded-2xl items-center justify-center ${selectedMethod === 'card' ? 'bg-primary shadow-lg shadow-primary/20' : 'bg-secondary/40'}`}>
                                         <CreditCardIcon size={24} color={selectedMethod === 'card' ? 'black' : 'hsl(var(--muted-foreground))'} />
                                     </Box>
                                     <VStack className="items-start">
@@ -215,10 +215,10 @@ function PaymentContent() {
             </Box>
 
             {/* Bottom Interaction Deck */}
-            <Box className="fixed bottom-0 left-0 right-0 bg-background/80 backdrop-blur-3xl p-8 border-t border-border/30 pb-12 z-50">
+            <Box className="fixed bottom-0 left-0 right-0 bg-background/80 backdrop-blur-3xl p-4 sm:p-6 md:p-8 border-t border-border/30 pb-6 sm:pb-8 md:pb-12 z-50">
                 <Box className="max-w-4xl mx-auto">
                     <button
-                        className="w-full rounded-[2.5rem] bg-primary hover:scale-[1.02] shadow-[0_24px_48px_rgba(var(--primary-rgb),0.3)] border-0 h-24 transition-all active:scale-[0.98] group overflow-hidden relative flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full rounded-xl sm:rounded-2xl md:rounded-[2.5rem] bg-primary hover:scale-[1.02] shadow-[0_24px_48px_rgba(var(--primary-rgb),0.3)] border-0 h-16 sm:h-20 md:h-24 transition-all active:scale-[0.98] group overflow-hidden relative flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                         onClick={handleExecutePayment}
                         disabled={isSubmitting}
                     >

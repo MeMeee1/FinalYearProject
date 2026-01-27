@@ -73,9 +73,9 @@ function AllProductsContent() {
     };
 
     return (
-        <Box className="flex-1 min-h-screen bg-background pb-32">
+        <Box className="flex-1 min-h-screen bg-background pb-24 sm:pb-32">
             {/* Premium Sticky Header */}
-            <Box className="bg-background/80 backdrop-blur-3xl px-6 pt-12 pb-6 border-b border-border/40 sticky top-0 z-[100]">
+            <Box className="bg-background/80 backdrop-blur-3xl px-4 pt-8 pb-4 sm:px-6 sm:pt-12 sm:pb-6 border-b border-border/40 sticky top-0 z-[100]">
                 <VStack space="lg">
                     <HStack className="items-center justify-between">
                         <HStack space="md" className="items-center">
@@ -106,14 +106,14 @@ function AllProductsContent() {
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                                    className="w-full bg-secondary/40 border border-border/40 rounded-2xl h-14 pl-12 pr-4 focus:bg-secondary/60 transition-all text-foreground font-bold placeholder:text-muted-foreground/50 focus:outline-none"
+                                    className="w-full bg-secondary/40 border border-border/40 rounded-xl sm:rounded-2xl h-12 sm:h-14 pl-10 sm:pl-12 pr-3 sm:pr-4 focus:bg-secondary/60 transition-all text-foreground font-bold placeholder:text-muted-foreground/50 focus:outline-none text-sm sm:text-base"
                                 />
                             </Box>
                         </HStack>
                     </HStack>
 
                     {/* Taxonomy Navigation */}
-                    <HStack space="xs" className="overflow-x-auto pb-1 scrollbar-hide py-1">
+                    <HStack space="xs" className="overflow-x-auto pb-1 scrollbar-hide py-1 gap-2">
                         {categories.map((cat) => (
                             <button
                                 key={cat}
@@ -130,7 +130,7 @@ function AllProductsContent() {
             </Box>
 
             {/* Processing Controls Layer */}
-            <Box className="bg-secondary/10 px-6 py-4 border-b border-border/30">
+            <Box className="bg-secondary/10 px-4 py-3 sm:px-6 sm:py-4 border-b border-border/30">
                 <HStack className="justify-between items-center">
                     <HStack space="md" className="items-center">
                         <SlidersHorizontalIcon size={14} color="hsl(var(--muted-foreground))" />
@@ -157,9 +157,9 @@ function AllProductsContent() {
             </Box>
 
             {/* Inventory Grid */}
-            <Box className="p-6 max-w-7xl mx-auto flex-1">
+            <Box className="p-4 sm:p-6 max-w-7xl mx-auto flex-1">
                 {loading ? (
-                    <Box className="flex-1 justify-center items-center py-32">
+                    <Box className="flex-1 justify-center items-center py-20 sm:py-32">
                         <VStack space="xl" className="items-center">
                             <Box className="w-16 h-16 bg-primary/20 rounded-full items-center justify-center border border-primary/20 animate-pulse">
                                 <SearchIcon size={32} color="hsl(var(--primary))" />
@@ -171,7 +171,7 @@ function AllProductsContent() {
                     <VStack space="2xl">
                         {products.length > 0 ? (
                             <>
-                                <Box className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                <Box className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
                                     {products.map((product) => (
                                         <ProductCard key={product.id} product={product} />
                                     ))}

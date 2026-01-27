@@ -60,9 +60,9 @@ export default function Checkout() {
     }, [logisticsConstraint]);
 
     return (
-        <Box className="flex-1 min-h-screen bg-background pb-40">
+        <Box className="flex-1 min-h-screen bg-background pb-32 sm:pb-40">
             {/* Premium Header */}
-            <Box className="bg-background/80 backdrop-blur-3xl px-6 pt-12 pb-6 border-b border-border/40 sticky top-0 z-50">
+            <Box className="bg-background/80 backdrop-blur-3xl px-4 pt-8 pb-4 sm:px-6 sm:pt-12 sm:pb-6 border-b border-border/40 sticky top-0 z-50">
                 <HStack space="md" className="items-center">
                     <button
                         className="rounded-xl bg-secondary/50 border border-border/40 w-10 h-10 p-0 items-center justify-center hover:bg-secondary/80 transition-all active:scale-95 flex"
@@ -77,10 +77,10 @@ export default function Checkout() {
                 </HStack>
             </Box>
 
-            <Box className="p-6 max-w-4xl mx-auto">
-                <VStack space="xl">
+            <Box className="p-4 sm:p-6 max-w-4xl mx-auto">
+                <VStack space="lg" className="sm:space-y-6 md:space-y-8">
                     {/* Fulfillment Hub Selection (NEW) */}
-                    <Box className="bg-card/40 backdrop-blur-3xl p-8 rounded-[2.5rem] border border-border/50 shadow-xl">
+                    <Box className="bg-card/40 backdrop-blur-3xl p-4 sm:p-6 md:p-8 rounded-xl sm:rounded-[2rem] md:rounded-[2.5rem] border border-border/50 shadow-xl">
                         <HStack space="sm" className="items-center justify-between mb-6">
                             <HStack space="sm" className="items-center">
                                 <Box className="w-8 h-8 bg-primary/20 rounded-xl items-center justify-center">
@@ -128,7 +128,7 @@ export default function Checkout() {
                     </Box>
 
                     {/* Delivery Logistics Card */}
-                    <Box className="bg-card/40 backdrop-blur-3xl p-8 rounded-[2.5rem] border border-border/50 shadow-xl">
+                    <Box className="bg-card/40 backdrop-blur-3xl p-4 sm:p-6 md:p-8 rounded-xl sm:rounded-[2rem] md:rounded-[2.5rem] border border-border/50 shadow-xl">
                         <HStack space="sm" className="items-center mb-6">
                             <Box className="w-8 h-8 bg-blue-500/20 rounded-xl items-center justify-center">
                                 <MapPinIcon size={16} color="rgb(59 130 246)" />
@@ -139,22 +139,24 @@ export default function Checkout() {
                         <VStack space="lg">
                             <VStack space="xs">
                                 <Text className="text-[10px] text-muted-foreground font-black uppercase tracking-widest ml-1 mb-1">Backup Address (Optional)</Text>
-                                <input
-                                    placeholder="e.g. 123 Blockchain Ave"
-                                    value={address}
-                                    onChange={(e) => setAddress(e.target.value)}
-                                    className="w-full rounded-2xl bg-secondary/20 border border-border/30 h-16 px-4 text-foreground font-bold focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder:text-muted-foreground/50"
-                                />
+                                <Box className="relative">
+                                    <input
+                                        placeholder="e.g. 123 Blockchain Ave"
+                                        value={address}
+                                        onChange={(e) => setAddress(e.target.value)}
+                                        className="w-full rounded-xl sm:rounded-2xl bg-secondary/20 border border-border/30 h-12 sm:h-14 md:h-16 px-3 sm:px-4 text-foreground font-bold focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder:text-muted-foreground/50 text-sm sm:text-base"
+                                    />
+                                </Box>
                             </VStack>
 
-                            <Box className="grid grid-cols-2 gap-4">
+                            <Box className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                                 <VStack space="xs">
                                     <Text className="text-[10px] text-muted-foreground font-black uppercase tracking-widest ml-1 mb-1">Zone / City</Text>
                                     <input
                                         placeholder="City"
                                         value={city}
                                         onChange={(e) => setCity(e.target.value)}
-                                        className="w-full rounded-2xl bg-secondary/20 border border-border/30 h-16 px-4 text-foreground font-bold focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder:text-muted-foreground/50"
+                                        className="w-full rounded-xl sm:rounded-2xl bg-secondary/20 border border-border/30 h-12 sm:h-14 md:h-16 px-3 sm:px-4 text-foreground font-bold focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder:text-muted-foreground/50 text-sm sm:text-base"
                                     />
                                 </VStack>
                                 <VStack space="xs">
@@ -163,7 +165,7 @@ export default function Checkout() {
                                         placeholder="LGA"
                                         value={lga}
                                         onChange={(e) => setLga(e.target.value)}
-                                        className="w-full rounded-2xl bg-secondary/20 border border-border/30 h-16 px-4 text-foreground font-bold focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder:text-muted-foreground/50"
+                                        className="w-full rounded-xl sm:rounded-2xl bg-secondary/20 border border-border/30 h-12 sm:h-14 md:h-16 px-3 sm:px-4 text-foreground font-bold focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder:text-muted-foreground/50 text-sm sm:text-base"
                                     />
                                 </VStack>
                             </Box>
@@ -175,14 +177,14 @@ export default function Checkout() {
                                     value={phone}
                                     onChange={(e) => setPhone(e.target.value)}
                                     type="tel"
-                                    className="w-full rounded-2xl bg-secondary/20 border border-border/30 h-16 px-4 text-foreground font-bold focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder:text-muted-foreground/50"
+                                    className="w-full rounded-xl sm:rounded-2xl bg-secondary/20 border border-border/30 h-12 sm:h-14 md:h-16 px-3 sm:px-4 text-foreground font-bold focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder:text-muted-foreground/50 text-sm sm:text-base"
                                 />
                             </VStack>
                         </VStack>
                     </Box>
 
                     {/* Infrastructure Grid */}
-                    <Box className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <Box className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                         <Box className="bg-secondary/10 border border-border/30 p-6 rounded-[2rem] flex-row items-center space-x-4">
                             <Box className="w-12 h-12 bg-primary/10 rounded-2xl items-center justify-center">
                                 <TruckIcon size={24} color="hsl(var(--primary))" />
@@ -204,7 +206,7 @@ export default function Checkout() {
                     </Box>
 
                     {/* Valuation Summary Card */}
-                    <Box className="bg-card/60 backdrop-blur-3xl p-8 rounded-[2.5rem] border border-border/50 shadow-2xl">
+                    <Box className="bg-card/60 backdrop-blur-3xl p-4 sm:p-6 md:p-8 rounded-xl sm:rounded-[2rem] md:rounded-[2.5rem] border border-border/50 shadow-2xl">
                         <VStack space="lg">
                             <Heading className="text-foreground font-black tracking-tight text-xl mb-2">Valuation Summary</Heading>
                             <VStack space="md">
@@ -230,7 +232,7 @@ export default function Checkout() {
             </Box>
 
             {/* Bottom Interaction Deck */}
-            <Box className="fixed bottom-0 left-0 right-0 bg-background/80 backdrop-blur-3xl p-8 border-t border-border/30 pb-12 z-50">
+            <Box className="fixed bottom-0 left-0 right-0 bg-background/80 backdrop-blur-3xl p-4 sm:p-6 md:p-8 border-t border-border/30 pb-6 sm:pb-8 md:pb-12 z-50">
                 <Box className="max-w-4xl mx-auto">
                     <button
                         disabled={!address || !city || !phone || !selectedPointId}
@@ -244,7 +246,7 @@ export default function Checkout() {
                             });
                             router.push(`/payment?${params.toString()}`);
                         }}
-                        className={`w-full rounded-[2.5rem] bg-primary hover:scale-[1.02] shadow-[0_24px_48px_rgba(29,185,84,0.3)] border-0 h-24 transition-all active:scale-[0.98] group overflow-hidden relative flex items-center justify-center ${(!address || !city || !phone || !selectedPointId) ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}
+                        className={`w-full rounded-xl sm:rounded-2xl md:rounded-[2.5rem] bg-primary hover:scale-[1.02] shadow-[0_24px_48px_rgba(29,185,84,0.3)] border-0 h-14 sm:h-16 md:h-20 lg:h-24 transition-all active:scale-[0.98] group overflow-hidden relative flex items-center justify-center ${(!address || !city || !phone || !selectedPointId) ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}
                     >
                         <Box className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
                         <HStack space="lg" className="items-center relative z-10">
@@ -252,8 +254,8 @@ export default function Checkout() {
                                 <CreditCardIcon size={24} color="black" />
                             </Box>
                             <VStack className="items-start">
-                                <Text className="font-black text-black text-xl uppercase tracking-[0.25em] leading-none">Initialize Ledger Settlement</Text>
-                                <Text className="text-black/60 text-[10px] font-black uppercase tracking-widest mt-1">Authorize Transaction Through Secure Payment Gateway</Text>
+                                <Text className="font-black text-black text-sm sm:text-base md:text-lg lg:text-xl uppercase tracking-[0.1em] sm:tracking-[0.15em] md:tracking-[0.25em] leading-none">Initialize Ledger Settlement</Text>
+                                <Text className="text-black/60 text-[8px] sm:text-[10px] font-black uppercase tracking-widest mt-1 hidden sm:block">Authorize Transaction Through Secure Payment Gateway</Text>
                             </VStack>
                         </HStack>
                     </button>
