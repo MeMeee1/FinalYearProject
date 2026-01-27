@@ -47,7 +47,7 @@ export interface Order {
     id: number;
     status: string;
     totalAmount: number;
-    deliveryStatus: 'pending' | 'dropped_off' | 'collected';
+    deliveryStatus: 'pending' | 'dropped_off' | 'collected' | 'rejected';
     pickupCode?: string;
     fulfillmentPointId?: number;
     fulfillmentPoint?: {

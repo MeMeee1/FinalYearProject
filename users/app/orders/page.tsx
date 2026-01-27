@@ -50,12 +50,25 @@ export default function Orders() {
 
     const getStatusStyle = (order: Order) => {
         const dStatus = order.deliveryStatus;
+        const escrowStatus = (order as any).escrowStatus;
+
+        // Check for refunded status first (bad drop-off)
+        if (dStatus === 'rejected' || escrowStatus === 'refunded') {
+            return {
+                bg: 'bg-red-500/20',
+                text: 'text-red-500',
+                icon: <AlertCircleIcon size={12} color="rgb(239 68 68)" />,
+                label: 'Refunded',
+                isRefunded: true
+            };
+        }
         if (dStatus === 'collected') {
             return {
                 bg: 'bg-primary/20',
                 text: 'text-primary',
                 icon: <CheckCircle2Icon size={12} color="hsl(var(--primary))" />,
-                label: 'Collected'
+                label: 'Collected',
+                isRefunded: false
             };
         }
         if (dStatus === 'dropped_off') {
@@ -63,14 +76,16 @@ export default function Orders() {
                 bg: 'bg-blue-500/20',
                 text: 'text-blue-500',
                 icon: <PackageIcon size={12} color="rgb(59 130 246)" />,
-                label: 'Ready for Pickup'
+                label: 'Ready for Pickup',
+                isRefunded: false
             };
         }
         return {
             bg: 'bg-yellow-500/20',
             text: 'text-yellow-500',
             icon: <ClockIcon size={12} color="rgb(234 179 8)" />,
-            label: 'In Transit'
+            label: 'In Transit',
+            isRefunded: false
         };
     };
 
@@ -170,6 +185,28 @@ export default function Orders() {
                                                 <Heading size="xl" className="text-black font-black tracking-[0.5em] text-center">{order.pickupCode}</Heading>
                                             </HStack>
                                             <Text className="text-black/60 text-[8px] font-black uppercase tracking-widest mt-2 text-center">Present at Terminal for Collection</Text>
+                                        </Box>
+                                    )}
+
+                                    {/* Refund Notification Banner */}
+                                    {status.isRefunded && (
+                                        <Box className="mb-6 bg-red-500/10 border border-red-500/30 p-4 rounded-2xl">
+                                            <HStack space="sm" className="items-center mb-2">
+                                                <AlertCircleIcon size={16} color="rgb(239 68 68)" />
+                                                <Text className="text-red-500 font-black text-xs uppercase tracking-widest">Order Refunded</Text>
+                                            </HStack>
+                                            <Text className="text-red-400 text-xs font-medium mb-2">
+                                                This order was rejected at the fulfillment point. A refund of 70% has been processed to your account.
+                                            </Text>
+                                            <HStack className="justify-between items-center mt-3 pt-3 border-t border-red-500/20">
+                                                <Text className="text-red-400/80 text-[10px] font-bold uppercase tracking-widest">Your Refund</Text>
+                                                <Text className="text-red-500 font-black text-lg">₦{Math.round((order.totalAmount || 0) * 0.70).toLocaleString()}</Text>
+                                            </HStack>
+                                            {(order as any).notes && (
+                                                <Text className="text-muted-foreground text-[10px] mt-2 italic">
+                                                    Reason: {(order as any).notes}
+                                                </Text>
+                                            )}
                                         </Box>
                                     )}
 

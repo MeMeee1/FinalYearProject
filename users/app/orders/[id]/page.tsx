@@ -85,11 +85,12 @@ export default function OrderDetails() {
 
     const isCollected = order.deliveryStatus === 'collected';
     const isReadyForPickup = order.deliveryStatus === 'dropped_off';
+    const isRefunded = (order as any).escrowStatus === 'refunded' || order.deliveryStatus === 'rejected';
 
     return (
         <Box className="flex-1 min-h-screen bg-background">
             {/* Immersive Header Section */}
-            <Box className={`pt-16 pb-32 px-6 rounded-b-[4rem] shadow-2xl transition-colors duration-700 ${isCollected ? 'bg-green-500' : isReadyForPickup ? 'bg-primary' : 'bg-secondary'}`}>
+            <Box className={`pt-16 pb-32 px-6 rounded-b-[4rem] shadow-2xl transition-colors duration-700 ${isRefunded ? 'bg-red-500' : isCollected ? 'bg-green-500' : isReadyForPickup ? 'bg-primary' : 'bg-secondary'}`}>
                 <HStack className="items-center justify-between mb-8">
                     <Button
                         variant="solid"
@@ -109,7 +110,7 @@ export default function OrderDetails() {
                         <Text className="text-black font-black text-[10px] uppercase tracking-[0.3em] font-mono">#{order.id.toString().padStart(6, '0')}</Text>
                     </Box>
                     <Heading size="3xl" className="text-black font-black tracking-tighter text-center leading-none">
-                        {isCollected ? 'Fulfillment Verified' : isReadyForPickup ? 'Awaiting Retrieval' : 'Manifest Authorized'}
+                        {isRefunded ? 'Order Refunded' : isCollected ? 'Fulfillment Verified' : isReadyForPickup ? 'Awaiting Retrieval' : 'Manifest Authorized'}
                     </Heading>
                     <HStack space="xs" className="items-center bg-white/20 px-4 py-2 rounded-2xl mt-4">
                         <CheckCircle2Icon size={16} color="black" />
@@ -183,19 +184,64 @@ export default function OrderDetails() {
                         </Box>
                     )}
 
+                    {/* Refund Notification Card */}
+                    {isRefunded && (
+                        <Box className="bg-red-500/10 p-8 rounded-[3rem] border border-red-500/20 shadow-xl overflow-hidden relative">
+                            <Box className="absolute top-0 right-0 w-32 h-32 bg-red-500/10 rounded-full -mr-16 -mt-16" />
+                            <VStack space="lg">
+                                <HStack space="md" className="items-center">
+                                    <Box className="bg-red-500/20 p-3 rounded-xl">
+                                        <CheckCircle2Icon size={20} color="#ef4444" />
+                                    </Box>
+                                    <VStack>
+                                        <Text className="text-[10px] font-black text-red-500 uppercase tracking-[0.2em]">Order Cancelled</Text>
+                                        <Text className="text-foreground font-black tracking-tight">Refund Processed</Text>
+                                    </VStack>
+                                </HStack>
+
+                                <Text className="text-muted-foreground text-xs font-medium leading-relaxed">
+                                    This order was rejected at the fulfillment point due to quality or quantity issues.
+                                    A partial refund has been processed to your account.
+                                </Text>
+
+                                <VStack space="sm" className="bg-red-500/5 p-4 rounded-2xl border border-red-500/10">
+                                    <HStack className="justify-between">
+                                        <Text className="text-muted-foreground text-xs">Original Amount</Text>
+                                        <Text className="text-foreground text-xs font-bold line-through">₦{order.totalAmount.toLocaleString()}</Text>
+                                    </HStack>
+                                    <HStack className="justify-between">
+                                        <Text className="text-muted-foreground text-xs">Refund Rate</Text>
+                                        <Text className="text-red-500 text-xs font-bold">70%</Text>
+                                    </HStack>
+                                    <Box className="h-px bg-red-500/20 my-2" />
+                                    <HStack className="justify-between items-end">
+                                        <Text className="text-red-500 font-black text-xs uppercase tracking-widest">Your Refund</Text>
+                                        <Text className="text-red-500 font-black text-2xl">₦{Math.round(order.totalAmount * 0.70).toLocaleString()}</Text>
+                                    </HStack>
+                                </VStack>
+
+                                {(order as any).notes && (
+                                    <Box className="bg-secondary/10 p-4 rounded-2xl border border-border/30">
+                                        <Text className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-2">Rejection Reason</Text>
+                                        <Text className="text-foreground text-sm font-medium">{(order as any).notes}</Text>
+                                    </Box>
+                                )}
+                            </VStack>
+                        </Box>
+                    )}
                     {/* Escrow Status Card */}
                     {(order as any).escrowStatus && (
                         <Box className={`p-6 rounded-[2.5rem] border shadow-xl overflow-hidden ${(order as any).escrowStatus === 'held' ? 'bg-blue-500/10 border-blue-500/20' :
-                                (order as any).escrowStatus === 'released' ? 'bg-green-500/10 border-green-500/20' :
-                                    (order as any).escrowStatus === 'refunded' ? 'bg-orange-500/10 border-orange-500/20' :
-                                        'bg-secondary/10 border-border/30'
+                            (order as any).escrowStatus === 'released' ? 'bg-green-500/10 border-green-500/20' :
+                                (order as any).escrowStatus === 'refunded' ? 'bg-orange-500/10 border-orange-500/20' :
+                                    'bg-secondary/10 border-border/30'
                             }`}>
                             <HStack space="md" className="items-center justify-between">
                                 <HStack space="md" className="items-center">
                                     <Box className={`p-3 rounded-xl ${(order as any).escrowStatus === 'held' ? 'bg-blue-500/20' :
-                                            (order as any).escrowStatus === 'released' ? 'bg-green-500/20' :
-                                                (order as any).escrowStatus === 'refunded' ? 'bg-orange-500/20' :
-                                                    'bg-secondary/20'
+                                        (order as any).escrowStatus === 'released' ? 'bg-green-500/20' :
+                                            (order as any).escrowStatus === 'refunded' ? 'bg-orange-500/20' :
+                                                'bg-secondary/20'
                                         }`}>
                                         <ShieldCheckIcon size={18} color={
                                             (order as any).escrowStatus === 'held' ? 'rgb(59 130 246)' :
@@ -207,9 +253,9 @@ export default function OrderDetails() {
                                     <VStack>
                                         <Text className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Escrow Status</Text>
                                         <Text className={`font-black tracking-tight ${(order as any).escrowStatus === 'held' ? 'text-blue-500' :
-                                                (order as any).escrowStatus === 'released' ? 'text-green-500' :
-                                                    (order as any).escrowStatus === 'refunded' ? 'text-orange-500' :
-                                                        'text-muted-foreground'
+                                            (order as any).escrowStatus === 'released' ? 'text-green-500' :
+                                                (order as any).escrowStatus === 'refunded' ? 'text-orange-500' :
+                                                    'text-muted-foreground'
                                             }`}>
                                             {(order as any).escrowStatus === 'held' ? 'Funds Held in Escrow' :
                                                 (order as any).escrowStatus === 'released' ? 'Funds Released to Vendor' :
@@ -219,14 +265,14 @@ export default function OrderDetails() {
                                     </VStack>
                                 </HStack>
                                 <Box className={`px-3 py-1.5 rounded-full ${(order as any).escrowStatus === 'held' ? 'bg-blue-500/20' :
-                                        (order as any).escrowStatus === 'released' ? 'bg-green-500/20' :
-                                            (order as any).escrowStatus === 'refunded' ? 'bg-orange-500/20' :
-                                                'bg-secondary/20'
+                                    (order as any).escrowStatus === 'released' ? 'bg-green-500/20' :
+                                        (order as any).escrowStatus === 'refunded' ? 'bg-orange-500/20' :
+                                            'bg-secondary/20'
                                     }`}>
                                     <Text className={`text-[8px] font-black uppercase tracking-widest ${(order as any).escrowStatus === 'held' ? 'text-blue-500' :
-                                            (order as any).escrowStatus === 'released' ? 'text-green-500' :
-                                                (order as any).escrowStatus === 'refunded' ? 'text-orange-500' :
-                                                    'text-muted-foreground'
+                                        (order as any).escrowStatus === 'released' ? 'text-green-500' :
+                                            (order as any).escrowStatus === 'refunded' ? 'text-orange-500' :
+                                                'text-muted-foreground'
                                         }`}>
                                         {(order as any).escrowStatus?.toUpperCase()}
                                     </Text>
