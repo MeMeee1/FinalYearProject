@@ -43,7 +43,7 @@ export default async function DashboardPage() {
           <Card className="p-4 sm:p-5 bg-gradient-to-br from-blue-500 to-blue-600 text-white hover:shadow-xl transition-shadow">
             <div className="flex items-start justify-between mb-2 sm:mb-3">
               <div className="p-2 bg-white/20 rounded-lg">
-                <DollarSign className="w-5 h-5 sm:w-6 sm:h-6" />
+                {/* <DollarSign className="w-5 h-5 sm:w-6 sm:h-6" /> */}
               </div>
               <div className="flex items-center gap-1 text-xs sm:text-sm bg-white/20 px-2 py-1 rounded">
                 <TrendingUp className="w-3 h-3" />

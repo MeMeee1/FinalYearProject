@@ -17,6 +17,31 @@ export default function Cart() {
     const router = useRouter();
     const { items, updateQuantity, removeFromCart, subtotal, total } = useCart();
 
+    // Helper to get the first image from a cart item
+    const getFirstImage = (item: CartItem) => {
+        if (!item.image) return 'https://placehold.co/400';
+        
+        // Check if image is a JSON array string
+        if (item.image.startsWith('[')) {
+            try {
+                const images = JSON.parse(item.image);
+                if (Array.isArray(images) && images.length > 0) {
+                    const firstImage = images[0];
+                    return firstImage.startsWith('http')
+                        ? firstImage
+                        : `${(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').replace(/\/$/, '')}${firstImage.startsWith('/') ? '' : '/'}${firstImage}`;
+                }
+            } catch (e) {
+                console.error('Failed to parse cart item images:', e);
+            }
+        }
+        
+        // Single image string
+        return item.image.startsWith('http')
+            ? item.image
+            : `${(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').replace(/\/$/, '')}${item.image.startsWith('/') ? '' : '/'}${item.image}`;
+    };
+
     return (
         <Box className="flex-1 min-h-screen bg-background pb-32 sm:pb-40">
             {/* Premium Header */}
@@ -50,13 +75,7 @@ export default function Cart() {
                                     <HStack space="md" className="items-center w-full flex-wrap sm:flex-nowrap">
                                         <Box className="relative w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 rounded-xl sm:rounded-2xl md:rounded-3xl overflow-hidden bg-muted border border-border/40 shadow-inner flex-shrink-0">
                                             <img
-                                                src={
-                                                    item.image
-                                                        ? item.image.startsWith('http')
-                                                            ? item.image
-                                                            : `${(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').replace(/\/$/, '')}${item.image.startsWith('/') ? '' : '/'}${item.image}`
-                                                        : 'https://placehold.co/400'
-                                                }
+                                                src={getFirstImage(item)}
                                                 alt={item.name}
                                                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                                             />

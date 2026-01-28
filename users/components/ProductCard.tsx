@@ -54,19 +54,38 @@ export function ProductCard({ product }: ProductCardProps) {
         }
     };
 
+    // Helper to get the first image from the product
+    const getFirstImage = () => {
+        if (!product.image) return 'https://placehold.co/400';
+        
+        // Check if image is a JSON array string
+        if (product.image.startsWith('[')) {
+            try {
+                const images = JSON.parse(product.image);
+                if (Array.isArray(images) && images.length > 0) {
+                    const firstImage = images[0];
+                    return firstImage.startsWith('http')
+                        ? firstImage
+                        : `${(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').replace(/\/$/, '')}${firstImage.startsWith('/') ? '' : '/'}${firstImage}`;
+                }
+            } catch (e) {
+                console.error('Failed to parse product images:', e);
+            }
+        }
+        
+        // Single image string
+        return product.image.startsWith('http')
+            ? product.image
+            : `${(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').replace(/\/$/, '')}${product.image.startsWith('/') ? '' : '/'}${product.image}`;
+    };
+
     return (
         <Link href={`/product/${product.id}`} passHref legacyBehavior>
             <Box className="cursor-pointer group flex-1 transition-all duration-500 hover:-translate-y-2">
                 <Card size="md" variant="elevated" className="p-0 overflow-hidden h-full border border-border/40 shadow-sm hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500 bg-card rounded-xl sm:rounded-[1.5rem] md:rounded-[2rem]">
                     <Box className="relative h-36 sm:h-44 md:h-56 w-full bg-secondary/30 overflow-hidden">
                         <img
-                            src={
-                                product.image
-                                    ? product.image.startsWith('http')
-                                        ? product.image
-                                        : `${(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').replace(/\/$/, '')}${product.image.startsWith('/') ? '' : '/'}${product.image}`
-                                    : 'https://placehold.co/400'
-                            }
+                            src={getFirstImage()}
                             alt={product.name}
                             className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                             onError={(e) => {

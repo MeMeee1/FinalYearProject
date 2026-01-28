@@ -52,6 +52,31 @@ export default function ProductDetails() {
         }
     }, [params.id]);
 
+    // Helper to get the first image from the product
+    const getFirstImage = () => {
+        if (!product?.image) return 'https://placehold.co/1200x800';
+        
+        // Check if image is a JSON array string
+        if (product.image.startsWith('[')) {
+            try {
+                const images = JSON.parse(product.image);
+                if (Array.isArray(images) && images.length > 0) {
+                    const firstImage = images[0];
+                    return firstImage.startsWith('http')
+                        ? firstImage
+                        : `${(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').replace(/\/$/, '')}${firstImage.startsWith('/') ? '' : '/'}${firstImage}`;
+                }
+            } catch (e) {
+                console.error('Failed to parse product images:', e);
+            }
+        }
+        
+        // Single image string
+        return product.image.startsWith('http')
+            ? product.image
+            : `${(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').replace(/\/$/, '')}${product.image.startsWith('/') ? '' : '/'}${product.image}`;
+    };
+
     if (loading) {
         return (
             <Box className="flex-1 justify-center items-center bg-background">
@@ -101,11 +126,7 @@ export default function ProductDetails() {
             {/* Immersive Gallery / Hero */}
             <Box className="h-[45vh] sm:h-[55vh] md:h-[65vh] w-full relative overflow-hidden bg-secondary/20">
                 <img
-                    src={product.image
-                        ? product.image.startsWith('http')
-                            ? product.image
-                            : `${(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').replace(/\/$/, '')}${product.image.startsWith('/') ? '' : '/'}${product.image}`
-                        : 'https://placehold.co/1200x800'}
+                    src={getFirstImage()}
                     alt={product.name}
                     className="w-full h-full object-cover"
                     onError={(e) => {

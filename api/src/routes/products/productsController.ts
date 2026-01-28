@@ -105,6 +105,15 @@ export async function getProductById(req: Request, res: Response) {
         sellerId: productsTable.sellerId,
         video: productsTable.video,
         supportsOutsideLgaDelivery: productsTable.supportsOutsideLgaDelivery,
+        // Agricultural/Livestock-specific fields
+        productTags: productsTable.productTags,
+        speciesBreed: productsTable.speciesBreed,
+        age: productsTable.age,
+        weightSize: productsTable.weightSize,
+        growthStage: productsTable.growthStage,
+        healthStatus: productsTable.healthStatus,
+        vaccinationStatus: productsTable.vaccinationStatus,
+        diseaseHistory: productsTable.diseaseHistory,
         vendor: {
           id: vendorsTable.id,
           storeName: vendorsTable.storeName,
@@ -150,10 +159,20 @@ export async function getProductsBySeller(req: Request, res: Response) {
         image: productsTable.image,
         price: productsTable.price,
         stock: productsTable.stock,
+        sku: productsTable.sku,
         status: productsTable.status,
-        video: productsTable.video, // Add video
+        video: productsTable.video,
         createdAt: productsTable.createdAt,
         updatedAt: productsTable.updatedAt,
+        // Agricultural/Livestock-specific fields
+        productTags: productsTable.productTags,
+        speciesBreed: productsTable.speciesBreed,
+        age: productsTable.age,
+        weightSize: productsTable.weightSize,
+        growthStage: productsTable.growthStage,
+        healthStatus: productsTable.healthStatus,
+        vaccinationStatus: productsTable.vaccinationStatus,
+        supportsOutsideLgaDelivery: productsTable.supportsOutsideLgaDelivery,
       })
       .from(productsTable)
       .where(eq(productsTable.sellerId, Number(sellerId)))
